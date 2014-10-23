@@ -1,17 +1,15 @@
 package com.ftloverdrive.ui.ship;
 
 import com.badlogic.gdx.assets.AssetManager;
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
-import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.math.GridPoint2;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.utils.SpriteDrawable;
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.IntMap;
-
 import com.ftloverdrive.core.OverdriveContext;
 import com.ftloverdrive.event.game.GamePlayerShipChangeEvent;
 import com.ftloverdrive.event.game.GamePlayerShipChangeListener;
@@ -21,10 +19,6 @@ import com.ftloverdrive.io.ImageSpec;
 import com.ftloverdrive.model.ship.RoomModel;
 import com.ftloverdrive.model.ship.ShipCoordinate;
 import com.ftloverdrive.model.ship.ShipModel;
-import com.ftloverdrive.ui.ship.ShipFloorLinesActor;
-import com.ftloverdrive.ui.ship.ShipFloorTilesActor;
-import com.ftloverdrive.ui.ship.ShipRoomDecorsActor;
-import com.ftloverdrive.ui.ship.ShipWallLinesActor;
 import com.ftloverdrive.util.OVDConstants;
 
 
@@ -61,9 +55,17 @@ public class ShipActor extends Group implements Disposable, GamePlayerShipChange
 		assetManager.load( OVDConstants.SHIP_ATLAS, TextureAtlas.class );
 		assetManager.finishLoading();
 
+		TextureAtlas rootAtlas = assetManager.get( OVDConstants.ROOT_ATLAS, TextureAtlas.class );
+		Sprite nullSprite = rootAtlas.createSprite( "nullResource" );
+		nullDrawable = new SpriteDrawable( nullSprite );
+
 		shipFudgeGroup = new Group();
 		shipFudgeGroup.setName( "ShipFudgeGroup" );
 		this.addActor( shipFudgeGroup );
+
+		// Shield is not affected by hull offset, but is drawn below it.
+		shieldImage = new Image( nullDrawable );
+		shipFudgeGroup.addActor( shieldImage );
 
 		shipHullGroup = new Group();
 		shipHullGroup.setName( "ShipHullGroup" );
@@ -72,13 +74,6 @@ public class ShipActor extends Group implements Disposable, GamePlayerShipChange
 		shipFloorplanGroup = new Group();
 		shipFloorplanGroup.setName( "ShipFloorplanGroup" );
 		shipFudgeGroup.addActor( shipFloorplanGroup );
-
-		TextureAtlas rootAtlas = assetManager.get( OVDConstants.ROOT_ATLAS, TextureAtlas.class );
-		Sprite nullSprite = rootAtlas.createSprite( "nullResource" );
-		nullDrawable = new SpriteDrawable( nullSprite );
-
-		shieldImage = new Image( nullDrawable );
-		shipHullGroup.addActor( shieldImage );
 
 		baseImage = new Image( nullDrawable );
 		shipHullGroup.addActor( baseImage );
@@ -185,9 +180,12 @@ public class ShipActor extends Group implements Disposable, GamePlayerShipChange
 					shieldImage.setDrawable( nullDrawable );
 				}
 
-				shieldImage.setX( shipModel.getShieldEllipseSemiMajorAxis() - shieldImage.getPrefWidth()/2 + shipModel.getShieldEllipseOffsetX() );
-				shieldImage.setY( shipModel.getShieldEllipseSemiMinorAxis() - shieldImage.getPrefHeight()/2 + shipModel.getShieldEllipseOffsetY() );
-				shieldImage.setSize( shieldImage.getPrefWidth(), shieldImage.getPrefHeight() );
+				GridPoint2 layoutSize = shipModel.getLayout().getSize();
+				layoutSize.x *= 35;
+				layoutSize.y *= 35;
+				shieldImage.setX( layoutSize.x / 2 + shipModel.getShieldEllipseOffsetX() - shipModel.getShieldEllipseSemiMajorAxis() );
+				shieldImage.setY( layoutSize.y / 2 + shipModel.getShieldEllipseOffsetY() );
+				shieldImage.setSize( shipModel.getShieldEllipseSemiMajorAxis() * 2, shipModel.getShieldEllipseSemiMinorAxis() * 2 );
 				shieldImage.validate();
 			}
 
@@ -218,9 +216,8 @@ public class ShipActor extends Group implements Disposable, GamePlayerShipChange
 					cloakImage.setDrawable( nullDrawable );
 				}
 
-				cloakImage.setPosition( -10, -10 );
-				cloakImage.setWidth( shipModel.getHullWidth()+20 );
-				cloakImage.setHeight( shipModel.getHullHeight()+20 );
+				cloakImage.setPosition( shipModel.getCloakOffsetX(), shipModel.getCloakOffsetY() );
+				cloakImage.setSize( cloakImage.getPrefWidth(), cloakImage.getPrefHeight() );
 				cloakImage.validate();
 			}
 
@@ -235,8 +232,8 @@ public class ShipActor extends Group implements Disposable, GamePlayerShipChange
 					floorImage.setDrawable( nullDrawable );
 				}
 
-				floorImage.setPosition( 0, 0 );
-				floorImage.setSize( shipModel.getHullWidth(), shipModel.getHullHeight() );
+				floorImage.setPosition( shipModel.getFloorOffsetX(), shipModel.getFloorOffsetY() );
+				floorImage.setSize( floorImage.getPrefWidth(), floorImage.getPrefHeight() );
 				floorImage.validate();
 			}
 

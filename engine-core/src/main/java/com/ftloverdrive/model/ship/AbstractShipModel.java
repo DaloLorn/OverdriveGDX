@@ -16,10 +16,17 @@ public class AbstractShipModel extends AbstractOVDModel implements ShipModel {
 
 	protected float shipOffsetX = 0f;
 	protected float shipOffsetY = 0f;
+	
 	protected float hullOffsetX = 0f;
 	protected float hullOffsetY = 0f;
+	// TODO hull width/height are not really used for anything in AE anymore,
+	// remove them and just use hull image dimensions instead?
 	protected float hullWidth = 0f;
 	protected float hullHeight = 0f;
+	protected float floorOffsetX = 0f;
+	protected float floorOffsetY = 0f;
+	protected float cloakOffsetX = 0f;
+	protected float cloakOffsetY = 0f;
 
 	protected float shieldEllipseOffsetX = 0f;
 	protected float shieldEllipseOffsetY = 0f;
@@ -36,10 +43,15 @@ public class AbstractShipModel extends AbstractOVDModel implements ShipModel {
 		super();
 		shipProperties.setInt( OVDConstants.HULL_MAX, 0 );
 		shipProperties.setInt( OVDConstants.HULL, 0 );
+		shipProperties.setInt( OVDConstants.POWER_MAX, 0);
+		shipProperties.setInt( OVDConstants.POWER, 0);
 		shipProperties.setInt( OVDConstants.SCRAP, 0 );
 		shipProperties.setInt( OVDConstants.FUEL, 0 );
 		shipProperties.setInt( OVDConstants.MISSILES, 0 );
 		shipProperties.setInt( OVDConstants.DRONE_PARTS, 0 );
+		shipProperties.setInt( OVDConstants.WEAPON_SLOTS, 0);
+		shipProperties.setInt( OVDConstants.DRONE_SLOTS, 0);
+		shipProperties.setInt( OVDConstants.AUGMENT_SLOTS, 0);
 		shipLayout = new ShipLayout();
 	}
 
@@ -108,6 +120,37 @@ public class AbstractShipModel extends AbstractOVDModel implements ShipModel {
 		return hullHeight;
 	}
 
+	@Override
+	public void setFloorOffset( float x, float y ) {
+		floorOffsetX = x;
+		floorOffsetY = y;
+	}
+
+	@Override
+	public float getFloorOffsetX() {
+		return floorOffsetX;
+	}
+
+	@Override
+	public float getFloorOffsetY() {
+		return floorOffsetY;
+	}
+
+	@Override
+	public void setCloakOffset( float x, float y ) {
+		cloakOffsetX = x;
+		cloakOffsetY = y;
+	}
+
+	@Override
+	public float getCloakOffsetX() {
+		return cloakOffsetX;
+	}
+
+	@Override
+	public float getCloakOffsetY() {
+		return cloakOffsetY;
+	}
 
 	@Override
 	public void setShieldEllipse( float x, float y, float semiMajorAxis, float semiMinorAxis ) {

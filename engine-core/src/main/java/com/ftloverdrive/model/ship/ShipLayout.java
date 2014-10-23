@@ -4,12 +4,10 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
+import com.badlogic.gdx.math.GridPoint2;
 import com.badlogic.gdx.utils.IntMap;
 import com.badlogic.gdx.utils.ObjectIntMap;
 import com.badlogic.gdx.utils.Pools;
-
-import com.ftloverdrive.model.ship.ShipCoordinate;
-import com.ftloverdrive.model.ship.ShipLayout;
 
 
 public class ShipLayout {
@@ -119,5 +117,33 @@ public class ShipLayout {
 		}
 
 		return result;
+	}
+
+	/**
+	 * Computes and returns the current size of the room layout.
+	 */
+	public GridPoint2 getSize() {
+		int wMax = 0;
+		int wMin = Integer.MAX_VALUE;
+		int hMax = 0;
+		int hMin = Integer.MAX_VALUE;
+
+		for ( ShipCoordinate coord : allShipCoords ) {
+			// Only count square coords
+			if ( coord.v != 0 )
+				continue;
+			
+			if ( coord.x > wMax )
+				wMax = coord.x;
+			else if ( coord.x < wMin )
+				wMin = coord.x;
+
+			if ( coord.y > hMax )
+				hMax = coord.y;
+			else if ( coord.y < hMin )
+				hMin = coord.y;
+		}
+		
+		return new GridPoint2( wMax - wMin, hMax - hMin );
 	}
 }

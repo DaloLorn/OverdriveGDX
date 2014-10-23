@@ -17,7 +17,7 @@ public interface ShipModel extends OVDModel {
 
 
 	/**
-	 * Shifts *all* graphics (hull images and rooms).
+	 * Shifts *all* graphics (hull images, shield and rooms).
 	 *
 	 * In Overdrive: +X is right, +Y is up.
 	 *
@@ -31,11 +31,9 @@ public interface ShipModel extends OVDModel {
 	public float getShipOffsetY();
 
 	/**
-	 * Shifts the hull images only, not rooms.
+	 * Shifts the hull images only, but not shield and rooms.
 	 *
 	 * In Overdrive: +X is right, +Y is up.
-	 *
-	 * The cloak image will be shifted to (X-10)x(Y-10) due to scaling.
 	 *
 	 * The original FTL set this in snipname.xml.
 	 * The img tag's x and y attributes behaved similarly.
@@ -46,19 +44,46 @@ public interface ShipModel extends OVDModel {
 	public float getHullOffsetY();
 
 	/**
-	 * Sets the size of hull images.
+	 * Sets the size of hull image.
 	 *
 	 * The base image will be scaled to WxH.
-	 * The floor image will be scaled to WxH.
-	 * The cloak image will be scaled to (W+20)x(H+20).
-	 * The shield image will not be scaled.
+	 * The floor, cloak and shield images will not be scaled.
 	 *
 	 * The original FTL set this in snipname.xml.
 	 * The img tag's w and h attributes behaved similarly.
+	 * 
+	 * TODO: since AE, hull size is no longer really used for anything (both 
+	 * floor and cloak are drawn as they are, without any scaling), remove?
 	 */
 	public void setHullSize( float width, float height );
 	public float getHullWidth();
 	public float getHullHeight();
+	
+	/**
+	 * Shifts the floor image only.
+	 * 
+	 * In Overdrive: +X is right, +Y is up.
+	 * 
+	 * The original FTL set this in snipname.xml.
+	 * The floor tag's x and y attributes behaved similarly.
+	 * There, +X was right, +Y was down.
+	 */
+	public void setFloorOffset( float x, float y );
+	public float getFloorOffsetX();
+	public float getFloorOffsetY();
+
+	/**
+	 * Shifts the cloak image only.
+	 * 
+	 * In Overdrive: +X is right, +Y is up.
+	 * 
+	 * The original FTL set this in snipname.xml.
+	 * The cloak tag's x and y attributes behaved similarly.
+	 * There, +X was right, +Y was down.
+	 */
+	public void setCloakOffset( float x, float y );
+	public float getCloakOffsetX();
+	public float getCloakOffsetY();
 
 
 	/**
