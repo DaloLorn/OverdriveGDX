@@ -271,8 +271,8 @@ public class TestScreen implements Disposable, OVDScreen {
 		loremIpsum += "\n\nThis window is draggable.";
 
 		rootAtlas = context.getAssetManager().get( ROOT_ATLAS, TextureAtlas.class );
-		TextureRegion plotDlgRegion = rootAtlas.findRegion( "window-base-alpha" ); // box_text1 no longer available in AE, use the nearest equivalent
-		NinePatchDrawable plotDlgBgDrawable = new NinePatchDrawable( new NinePatch( plotDlgRegion, 20, 20, 35, 20 ) );
+		TextureRegion plotDlgRegion = rootAtlas.findRegion( "window-base-alpha" ); // TODO box_text1 no longer available in AE, use the nearest equivalent
+		NinePatchDrawable plotDlgBgDrawable = new NinePatchDrawable( new NinePatch( plotDlgRegion, 22, 22, 36, 22 ) );
 
 		Window plotDlg = new Window( "", new Window.WindowStyle( plotFont, new Color( 1f, 1f, 1f, 1f ), plotDlgBgDrawable ) );
 		plotDlg.setKeepWithinStage( true );

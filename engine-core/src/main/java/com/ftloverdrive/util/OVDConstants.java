@@ -3,17 +3,27 @@ package com.ftloverdrive.util;
 
 public class OVDConstants {
 
-	/** Orientation, direction, facing, etc. */
+	/*
+	 * ========================================
+	 * Orientation / direction / facing.
+	 */
+
+	/** A constant indicating northern orientation, ie. facing upwards. */
 	public static final int ORIENT_NORTH = 0;
 
-	/** Orientation, direction, facing, etc. */
+	/** A constant indicating southern orientation, ie. facing downwards. */
 	public static final int ORIENT_SOUTH = 1;
 
-	/** Orientation, direction, facing, etc. */
+	/** A contant indicating eastern orientation, ie. facing rightwards. */
 	public static final int ORIENT_EAST = 2;
 
-	/** Orientation, direction, facing, etc. */
+	/** A constant indicating western orientation, ie. facing leftwards. */
 	public static final int ORIENT_WEST = 3;
+
+	/*
+	 * ========================================
+	 * Ship properties.
+	 */
 
 	/** Ship property. */
 	public static final String HULL_MAX = "HullMax";
@@ -22,7 +32,13 @@ public class OVDConstants {
 	public static final String HULL = "Hull";
 
 	/** Ship property. */
-	public static final String SCRAP = "Scrap";
+	public static final String POWER_MAX = "PowerMax";
+
+	/** Ship property. */
+	public static final String POWER = "Power";
+
+	/** Ship property. */
+	public static final String SCRAP = "Scrap"; // TODO player property instead?
 
 	/** Ship property. */
 	public static final String FUEL = "Fuel";
@@ -32,6 +48,26 @@ public class OVDConstants {
 
 	/** Ship property. */
 	public static final String DRONE_PARTS = "DroneParts";
+
+	/** Ship property. */
+	public static final String WEAPON_SLOTS = "WeaponSlots";
+
+	/** Ship property. */
+	public static final String DRONE_SLOTS = "DroneSlots";
+
+	/** Ship property. */
+	public static final String AUGMENT_SLOTS = "AugmentSlots";
+
+	/** In enemy ships, indicates the minimum sector in which the ship can start appearing. */
+	public static final String SECTOR_MIN = "SectorMin";
+
+	/** In enemy ships, indicates the maximum sector in which the ship can still appear. */
+	public static final String SECTOR_MAX = "SectorMax";
+
+	/*
+	 * ========================================
+	 * Atlas paths.
+	 */
 
 	public static final String ROOT_ATLAS = "img/pack.atlas";
 	public static final String BUTTONS_FTL_ATLAS = "img/buttons/FTL/pack.atlas";
