@@ -1,7 +1,6 @@
 package com.ftloverdrive.blueprint.ship;
 
 import com.badlogic.gdx.utils.Pools;
-
 import com.ftloverdrive.core.OverdriveContext;
 import com.ftloverdrive.event.ship.ShipCreationEvent;
 import com.ftloverdrive.event.ship.ShipLayoutRoomAddEvent;
@@ -10,9 +9,6 @@ import com.ftloverdrive.event.ship.ShipRoomImageChangeEvent;
 import com.ftloverdrive.io.ImageSpec;
 import com.ftloverdrive.model.ship.ShipCoordinate;
 import com.ftloverdrive.model.ship.ShipLayout;
-import com.ftloverdrive.model.ship.ShipModel;
-import com.ftloverdrive.model.ship.TestShipModel;
-import com.ftloverdrive.util.IntRectangle;
 import com.ftloverdrive.util.OVDConstants;
 
 

@@ -39,12 +39,13 @@ public class GameEventHandler implements OVDEventHandler {
 		if ( e instanceof GamePlayerShipChangeEvent ) {
 			GamePlayerShipChangeEvent event = (GamePlayerShipChangeEvent)e;
 
+			int playerRefId = event.getPlayerRefId();
 			int gameRefId = event.getGameRefId();
 			int shipRefId = event.getShipRefId();
 			GameModel gameModel = context.getReferenceManager().getObject( gameRefId, GameModel.class );
 			ShipModel shipModel = context.getReferenceManager().getObject( shipRefId, ShipModel.class );
 			if ( shipModel != null ) {
-				gameModel.setPlayerShip( shipRefId );
+				gameModel.setPlayerShip( playerRefId, shipRefId );
 			}
 
 			for ( int i = listeners.length-2; i >= 0; i-=2 ) {

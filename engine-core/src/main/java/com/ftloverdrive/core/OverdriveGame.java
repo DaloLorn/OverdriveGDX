@@ -53,7 +53,7 @@ public class OverdriveGame implements ApplicationListener {
 	private OVDNetManager netManager;
 	private Screen currentScreen = null;
 
-	private com.ftloverdrive.net.NetworkTest networkTest;  // TODO: Remove me.
+	//private com.ftloverdrive.net.NetworkTest networkTest;  // TODO: Remove me.
 
 
 	@Override
@@ -107,7 +107,7 @@ public class OverdriveGame implements ApplicationListener {
 
 		screenManager.showScreen( screenManager.getInitScreenKey() );
 
-		networkTest = new com.ftloverdrive.net.NetworkTest();
+		//networkTest = new com.ftloverdrive.net.NetworkTest();
 		//networkTest.init();
 	}
 
@@ -213,6 +213,6 @@ public class OverdriveGame implements ApplicationListener {
 		if ( currentScreen != null ) currentScreen.dispose();
 		screenManager.dispose();
 		assetManager.dispose();
-		networkTest.shutdown();
+		//networkTest.shutdown();
 	}
 }
