@@ -172,7 +172,7 @@ public class OverdrivePacker {
 				File nestedOutputDir = new File( outputDir, dirPath );
 
 				TexturePacker2.Settings dirSettings = new TexturePacker2.Settings( normalSettings );
-				if ( dirPath.equals( "img/map/" ) ) {
+				if ( dirPath.equals( "img/map/" ) || dirPath.contains( "img/ipad" ) ) {
 					dirSettings.paddingX = 0;  // Some images are exactly 1024, padding puts them over the limit.
 					dirSettings.paddingY = 0;
 				}
