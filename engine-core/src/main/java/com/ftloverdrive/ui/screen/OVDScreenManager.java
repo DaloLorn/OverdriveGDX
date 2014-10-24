@@ -71,6 +71,9 @@ public class OVDScreenManager implements Disposable {
 			else if ( TEST_SCREEN.equals( key ) ) {
 				screen = new TestScreen( context );
 			}
+			else if ( MAINMENU_SCREEN.equals( key ) ) {
+				screen = new MainMenuScreen ( context );
+			}
 			if ( screen != null ) {
 				screenMap.put( key, screen );
 			}
@@ -90,6 +93,9 @@ public class OVDScreenManager implements Disposable {
 			nextScreenKey = TEST_SCREEN;
 		}
 		else if ( LOADING_SCREEN.equals( currentScreenKey ) ) {
+			nextScreenKey = MAINMENU_SCREEN;
+		}
+		else if ( MAINMENU_SCREEN.equals( currentScreenKey ) ) {
 			nextScreenKey = TEST_SCREEN;
 		}
 

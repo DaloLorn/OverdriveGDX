@@ -1,0 +1,8 @@
+{
+    "com.badlogic.gdx.graphics.g2d.BitmapFont": {
+        "font": { "file": "overdrive-assets/fonts/c&cnew.fnt" },
+    },
+    "com.badlogic.gdx.scenes.scene2d.ui.TextButton$TextButtonStyle": { 
+        "default": { "up": "menu-button-up" , "down": "menu-button-down", "font": font }
+    }
+}
