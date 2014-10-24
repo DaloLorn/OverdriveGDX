@@ -9,7 +9,7 @@ public class OverdriveGameDesktop {
 	public static void main (String[] args) {
 		LwjglApplicationConfiguration config = new LwjglApplicationConfiguration();
 		config.title = "Overdrive";
-		config.useGL20 = false;
+		config.useGL30 = false;
 		config.width = 1024;
 		config.height = 650;
 		config.fullscreen = false;

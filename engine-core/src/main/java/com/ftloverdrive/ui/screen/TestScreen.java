@@ -2,19 +2,17 @@ package com.ftloverdrive.ui.screen;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputMultiplexer;
-import com.badlogic.gdx.assets.loaders.FileHandleResolver;
-import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.GL10;
-import com.badlogic.gdx.graphics.g2d.BitmapFont;
-import com.badlogic.gdx.graphics.g2d.Sprite;
-import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.Animation;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.NinePatch;
+import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Matrix4;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
@@ -25,7 +23,7 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.Logger;
 import com.badlogic.gdx.utils.Pools;
-
+import com.badlogic.gdx.utils.Scaling;
 import com.ftloverdrive.blueprint.ship.TestShipBlueprint;
 import com.ftloverdrive.core.OverdriveContext;
 import com.ftloverdrive.event.OVDEventManager;
@@ -43,21 +41,18 @@ import com.ftloverdrive.model.DefaultPlayerModel;
 import com.ftloverdrive.model.GameModel;
 import com.ftloverdrive.model.PlayerModel;
 import com.ftloverdrive.model.ship.ShipModel;
-import com.ftloverdrive.model.ship.TestShipModel;
 import com.ftloverdrive.script.OVDScriptManager;
 import com.ftloverdrive.ui.ShatteredImage;
 import com.ftloverdrive.ui.hud.PlayerShipHullMonitor;
-import com.ftloverdrive.ui.screen.OVDScreen;
-import com.ftloverdrive.ui.screen.OVDStageManager;
 import com.ftloverdrive.ui.ship.ShipActor;
 import com.ftloverdrive.util.OVDConstants;
 
 
 public class TestScreen implements Disposable, OVDScreen {
-	protected static final String BKG_ATLAS = "img/stars/bg-dullstars-bigcols5.atlas";
-	protected static final String ROOT_ATLAS = "img/pack.atlas";
-	protected static final String MISC_ATLAS = "img/misc/pack.atlas";
-	protected static final String PEOPLE_ATLAS = "img/people/pack.atlas";
+	protected static final String BKG_ATLAS = "img/stars/.atlas.atlas";
+	protected static final String ROOT_ATLAS = "img/.atlas.atlas";
+	protected static final String MISC_ATLAS = "img/misc/.atlas.atlas";
+	protected static final String PEOPLE_ATLAS = "img/people/.atlas.atlas";
 	protected static final String PLOT_FONT = "fonts/JustinFont12Bold.ttf?size=13";
 
 	private Logger log;
@@ -254,7 +249,7 @@ public class TestScreen implements Disposable, OVDScreen {
 
 
 		try {
-			FileHandleResolver resolver = context.getFileHandleResolver();
+			//FileHandleResolver resolver = context.getFileHandleResolver();
 			//scriptManager.eval( resolver.resolve( "script.java" ) );
 		}
 		catch ( Exception e ) {
@@ -274,7 +269,7 @@ public class TestScreen implements Disposable, OVDScreen {
 		TextureRegion plotDlgRegion = rootAtlas.findRegion( "window-base-alpha" ); // TODO box_text1 no longer available in AE, use the nearest equivalent
 		NinePatchDrawable plotDlgBgDrawable = new NinePatchDrawable( new NinePatch( plotDlgRegion, 22, 22, 36, 22 ) );
 
-		Window plotDlg = new Window( "", new Window.WindowStyle( plotFont, new Color( 1f, 1f, 1f, 1f ), plotDlgBgDrawable ) );
+		Window plotDlg = new Window( "Test", new Window.WindowStyle( plotFont, new Color( 1f, 1f, 1f, 1f ), plotDlgBgDrawable ) );
 		plotDlg.setKeepWithinStage( true );
 		plotDlg.setMovable( true );
 		plotDlg.setSize( 200, 250 );
@@ -312,7 +307,8 @@ public class TestScreen implements Disposable, OVDScreen {
 
 	@Override
 	public void resize( int width, int height ) {
-		hudStage.setViewport( width, height, true );
+		Vector2 scaledView = Scaling.stretch.apply( 800, 400, width, height );
+		hudStage.getViewport().update( (int) scaledView.x, (int) scaledView.y, true );
 		// TODO: Re-layout Stages.
 
 		// SpriteBatches get resized to match the new aspect ratio,
@@ -344,7 +340,7 @@ public class TestScreen implements Disposable, OVDScreen {
 		eventManager.processEvents( context );
 
 		Gdx.gl.glClearColor( 0, 0, 0, 0 );
-		Gdx.gl.glClear( GL10.GL_COLOR_BUFFER_BIT );
+		Gdx.gl.glClear( GL20.GL_COLOR_BUFFER_BIT );
 
 		if ( renderedPreviousFrame )
 			elapsed += delta;

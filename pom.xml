@@ -9,7 +9,7 @@
 	<name>Overdrive Parent</name>
 
 	<properties>
-		<gdx.version>0.9.9-SNAPSHOT</gdx.version>
+		<gdx.version>1.4.1</gdx.version>
 		<android.version>4.1.1.4</android.version>
 		<android.maven.version>3.6.0</android.maven.version>
 		<beanshell2.version>2.1.6</beanshell2.version>

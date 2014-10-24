@@ -1,16 +1,14 @@
 package com.ftloverdrive.ui.ship;
 
 import com.badlogic.gdx.assets.AssetManager;
+import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.NinePatch;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.utils.NinePatchDrawable;
-import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Disposable;
-
 import com.ftloverdrive.core.OverdriveContext;
 import com.ftloverdrive.model.ship.ShipCoordinate;
 import com.ftloverdrive.util.OVDConstants;
@@ -49,7 +47,7 @@ public class ShipFloorTilesActor extends Group implements Disposable {
 
 
 	@Override
-	public void draw( SpriteBatch batch, float parentAlpha ) {
+	public void draw( Batch batch, float parentAlpha ) {
 		super.draw( batch, parentAlpha );
 	}
 

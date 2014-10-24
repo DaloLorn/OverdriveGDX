@@ -4,8 +4,8 @@ import java.awt.image.BufferedImage;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.InputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -13,19 +13,17 @@ import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
 import javax.imageio.ImageIO;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 
-import com.badlogic.gdx.tools.imagepacker.TexturePacker2;
-
 import net.vhati.ftldat.FTLDat;
 
-import com.ftloverdrive.packer.FTLUtilities;
+import com.badlogic.gdx.tools.texturepacker.TexturePacker;
 
 
 public class OverdrivePacker {
@@ -124,9 +122,9 @@ public class OverdrivePacker {
 		try {
 			resP = new FTLDat.FTLPack( resDatFile, "r" );
 
-			TexturePacker2.Settings normalSettings = new TexturePacker2.Settings();
+			TexturePacker.Settings normalSettings = new TexturePacker.Settings();
 
-			TexturePacker2.Settings bgSettings = new TexturePacker2.Settings();
+			TexturePacker.Settings bgSettings = new TexturePacker.Settings();
 			bgSettings.paddingX = 0;
 			bgSettings.paddingY = 0;
 
@@ -171,7 +169,7 @@ public class OverdrivePacker {
 				if ( dirPaths.isEmpty() || isSkippedDir( dirPaths, skipPtns ) ) continue;
 				File nestedOutputDir = new File( outputDir, dirPath );
 
-				TexturePacker2.Settings dirSettings = new TexturePacker2.Settings( normalSettings );
+				TexturePacker.Settings dirSettings = new TexturePacker.Settings( normalSettings );
 				if ( dirPath.equals( "img/map/" ) || dirPath.contains( "img/ipad" ) ) {
 					dirSettings.paddingX = 0;  // Some images are exactly 1024, padding puts them over the limit.
 					dirSettings.paddingY = 0;
@@ -181,7 +179,7 @@ public class OverdrivePacker {
 					dirSettings.paddingY = 0;
 				}
 
-				TexturePacker2 dirPacker = new TexturePacker2( dirSettings );
+				TexturePacker dirPacker = new TexturePacker( dirSettings );
 
 				for ( String innerPath : dirPaths ) {
 					if ( isSkippedInnerPath( innerPath, skipPtns ) ) continue;
@@ -202,7 +200,7 @@ public class OverdrivePacker {
 						if ( rawW > 1024 || rawH > 1024 ) {
 							// Pack large images in their own atlas of fragments.
 
-							TexturePacker2 bgPacker = new TexturePacker2( bgSettings );
+							TexturePacker bgPacker = new TexturePacker( bgSettings );
 							int regionCount = 0;
 							String regionName;
 							BufferedImage regionImage;

@@ -1,8 +1,8 @@
 package com.ftloverdrive.ui.ship;
 
 import com.badlogic.gdx.assets.AssetManager;
+import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.Sprite;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.scenes.scene2d.Group;
@@ -10,11 +10,9 @@ import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.utils.SpriteDrawable;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Disposable;
-
 import com.ftloverdrive.core.OverdriveContext;
 import com.ftloverdrive.io.ImageSpec;
 import com.ftloverdrive.model.ship.ShipCoordinate;
-import com.ftloverdrive.util.OVDConstants;
 
 
 /**
@@ -49,7 +47,7 @@ public class ShipRoomDecorsActor extends Group implements Disposable {
 
 
 	@Override
-	public void draw( SpriteBatch batch, float parentAlpha ) {
+	public void draw( Batch batch, float parentAlpha ) {
 		super.draw( batch, parentAlpha );
 	}
 

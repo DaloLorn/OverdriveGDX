@@ -1,8 +1,8 @@
 package com.ftloverdrive.ui.ship;
 
 import com.badlogic.gdx.assets.AssetManager;
+import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.Sprite;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.math.GridPoint2;
 import com.badlogic.gdx.scenes.scene2d.Group;
@@ -100,7 +100,7 @@ public class ShipActor extends Group implements Disposable, GamePlayerShipChange
 
 
 	@Override
-	public void draw( SpriteBatch batch, float parentAlpha ) {
+	public void draw( Batch batch, float parentAlpha ) {
 		if ( shipModelRefId != -1 ) {
 			//zzz.setPosition( this.getX(), this.getY() );
 			super.draw( batch, parentAlpha );
@@ -153,6 +153,16 @@ public class ShipActor extends Group implements Disposable, GamePlayerShipChange
 			baseImage.setDrawable( nullDrawable );
 			baseImage.setBounds( 0, 0, 0, 0 );
 			baseImage.validate();
+			
+			floorImgSpec = null;
+			floorImage.setDrawable( nullDrawable );
+			floorImage.setBounds( 0, 0, 0, 0 );
+			floorImage.validate();
+			
+			cloakImgSpec = null;
+			cloakImage.setDrawable( nullDrawable );
+			cloakImage.setBounds( 0, 0, 0, 0 );
+			cloakImage.validate();
 
 			floorTiles.clear();
 			floorTiles.setSize( 0, 0 );
@@ -184,7 +194,7 @@ public class ShipActor extends Group implements Disposable, GamePlayerShipChange
 				layoutSize.x *= 35;
 				layoutSize.y *= 35;
 				shieldImage.setX( layoutSize.x / 2 + shipModel.getShieldEllipseOffsetX() - shipModel.getShieldEllipseSemiMajorAxis() );
-				shieldImage.setY( layoutSize.y / 2 + shipModel.getShieldEllipseOffsetY() );
+				shieldImage.setY( layoutSize.y / 2 - shipModel.getShieldEllipseOffsetY() );
 				shieldImage.setSize( shipModel.getShieldEllipseSemiMajorAxis() * 2, shipModel.getShieldEllipseSemiMinorAxis() * 2 );
 				shieldImage.validate();
 			}
@@ -277,7 +287,6 @@ public class ShipActor extends Group implements Disposable, GamePlayerShipChange
 		if ( b != null ) return b.equals( a );
 		return true; // Both null.
 	}
-
 
 	// Actors don't normally have a dispose().
 	@Override

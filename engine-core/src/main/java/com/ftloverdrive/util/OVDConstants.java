@@ -69,18 +69,18 @@ public class OVDConstants {
 	 * Atlas paths.
 	 */
 
-	public static final String ROOT_ATLAS = "img/pack.atlas";
-	public static final String BUTTONS_FTL_ATLAS = "img/buttons/FTL/pack.atlas";
-	public static final String COMBATUI_ATLAS = "img/combatUI/pack.atlas";
-	public static final String EFFECTS_ATLAS = "img/effects/pack.atlas";
-	public static final String ICONS_ATLAS = "img/icons/pack.atlas";
-	public static final String MISC_ATLAS = "img/misc/pack.atlas";
-	public static final String PEOPLE_ATLAS = "img/people/pack.atlas";
-	public static final String SHIP_ATLAS = "img/ship/pack.atlas";
-	public static final String SHIP_INTERIOR_ATLAS = "img/ship/interior/pack.atlas";
-	public static final String STATUSUI_ATLAS = "img/statusUI/pack.atlas";
-	public static final String SYSTEMUI_ATLAS = "img/systemUI/pack.atlas";
-	public static final String WEAPONS_ATLAS = "img/weapons/pack.atlas";
+	public static final String ROOT_ATLAS = "img/.atlas.atlas";
+	public static final String BUTTONS_FTL_ATLAS = "img/buttons/FTL/.atlas.atlas";
+	public static final String COMBATUI_ATLAS = "img/combatUI/.atlas.atlas";
+	public static final String EFFECTS_ATLAS = "img/effects/.atlas.atlas";
+	public static final String ICONS_ATLAS = "img/icons/.atlas.atlas";
+	public static final String MISC_ATLAS = "img/misc/.atlas.atlas";
+	public static final String PEOPLE_ATLAS = "img/people/.atlas.atlas";
+	public static final String SHIP_ATLAS = "img/ship/.atlas.atlas";
+	public static final String SHIP_INTERIOR_ATLAS = "img/ship/interior/.atlas.atlas";
+	public static final String STATUSUI_ATLAS = "img/statusUI/.atlas.atlas";
+	public static final String SYSTEMUI_ATLAS = "img/systemUI/.atlas.atlas";
+	public static final String WEAPONS_ATLAS = "img/weapons/.atlas.atlas";
 
 	public static final String FLOORPLAN_ATLAS = "internal://overdrive-assets/images/floorplan.atlas";
 }

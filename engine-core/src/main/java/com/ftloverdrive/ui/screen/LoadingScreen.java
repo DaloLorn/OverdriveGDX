@@ -1,26 +1,26 @@
 // Based on Matsemann's demo.
 //   https://github.com/Matsemann/libgdx-loading-screen
+// The demo for Libgdx 1.4.1:
+// https://github.com/Matsemann/libgdx-loading-screen/tree/libgdx1.2.0-EyeOfMidas
 
 package com.ftloverdrive.ui.screen;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
-import com.badlogic.gdx.graphics.GL10;
-import com.badlogic.gdx.graphics.g2d.Animation;
+import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.math.Interpolation;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.Logger;
 import com.badlogic.gdx.utils.Pools;
-
+import com.badlogic.gdx.utils.Scaling;
 import com.ftloverdrive.core.OverdriveContext;
 import com.ftloverdrive.event.OVDEventManager;
 import com.ftloverdrive.script.OVDScriptManager;
-import com.ftloverdrive.ui.screen.OVDScreen;
-import com.ftloverdrive.ui.screen.OVDStageManager;
 import com.ftloverdrive.util.OVDConstants;
 
 
@@ -38,7 +38,7 @@ public class LoadingScreen implements Disposable, OVDScreen {
 
 	private Image logo;
 	private Image loadingFrame;
-	private Image loadingBarHidden;;
+	private Image loadingBarHidden;
 	private Image screenBg;
 	private Image loadingBg;
 	private Actor loadingBar;
@@ -61,14 +61,15 @@ public class LoadingScreen implements Disposable, OVDScreen {
 		eventManager = new OVDEventManager();
 		scriptManager = new OVDScriptManager();
 
+
 		mainStage = new Stage();
 		stageManager.putStage( "Main", mainStage );
 
 		loadingAssetManager = new AssetManager();
-		loadingAssetManager.load( "overdrive-assets/images/loading.pack", TextureAtlas.class );
+		loadingAssetManager.load( "overdrive-assets/images/loading.atlas", TextureAtlas.class );
 		loadingAssetManager.finishLoading();  // Block until loaded completely.
 
-		atlas = loadingAssetManager.get( "overdrive-assets/images/loading.pack", TextureAtlas.class );
+		atlas = loadingAssetManager.get( "overdrive-assets/images/loading.atlas", TextureAtlas.class );
 		logo = new Image( atlas.findRegion("libgdx-logo") );
 		loadingFrame = new Image( atlas.findRegion("loading-frame") );
 		loadingBarHidden = new Image( atlas.findRegion("loading-bar-hidden") );
@@ -106,9 +107,8 @@ public class LoadingScreen implements Disposable, OVDScreen {
 
 	@Override
 	public void resize( int width, int height ) {
-		width = 480 * width / height;
-		height = 480;
-		mainStage.setViewport( width, height, false );
+		Vector2 scaledView = Scaling.stretch.apply( 800, 400, width, height );
+		mainStage.getViewport().update( (int) scaledView.x, (int) scaledView.y, true );
 
 		// Make the background fill the screen.
 		screenBg.setSize(width, height);
@@ -153,7 +153,7 @@ public class LoadingScreen implements Disposable, OVDScreen {
 	@Override
 	public void render( float delta ) {
 		Gdx.gl.glClearColor( 0, 0, 0, 0 );
-		Gdx.gl.glClear( GL10.GL_COLOR_BUFFER_BIT );
+		Gdx.gl.glClear( GL20.GL_COLOR_BUFFER_BIT );
 
 		// Incrementally load assets until completely done.
 		if ( context.getAssetManager().update() ) {

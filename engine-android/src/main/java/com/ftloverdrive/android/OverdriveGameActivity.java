@@ -13,7 +13,7 @@ public class OverdriveGameActivity extends AndroidApplication {
 	public void onCreate(Bundle savedInstanceState) {
 			super.onCreate(savedInstanceState);
 			AndroidApplicationConfiguration config = new AndroidApplicationConfiguration();
-			config.useGL20 = true;
+			config.useGL30 = true;
 			initialize(new OverdriveGame(), config);
 	}
 }

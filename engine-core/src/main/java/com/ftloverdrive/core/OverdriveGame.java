@@ -1,7 +1,6 @@
 package com.ftloverdrive.core;
 
 import java.io.File;
-import java.io.IOException;
 
 import com.badlogic.gdx.Application;
 import com.badlogic.gdx.ApplicationListener;
@@ -9,21 +8,11 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.assets.loaders.FileHandleResolver;
-import com.badlogic.gdx.assets.loaders.resolvers.InternalFileHandleResolver;
 import com.badlogic.gdx.assets.loaders.resolvers.ExternalFileHandleResolver;
-import com.badlogic.gdx.files.FileHandle;
-import com.badlogic.gdx.graphics.GL10;
-import com.badlogic.gdx.graphics.Pixmap;
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.Texture.TextureFilter;
-import com.badlogic.gdx.graphics.g2d.Animation;
+import com.badlogic.gdx.assets.loaders.resolvers.InternalFileHandleResolver;
+import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
-import com.badlogic.gdx.graphics.g2d.PixmapPacker;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.g2d.TextureAtlas;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.Logger;
-
 import com.ftloverdrive.io.FreeTypeFontLoader;
 import com.ftloverdrive.io.RelativeFileHandleResolver;
 import com.ftloverdrive.io.URIFileHandleResolver;
@@ -81,12 +70,11 @@ public class OverdriveGame implements ApplicationListener {
 		resourcesDir = new File( appDir, "resources" );
 
 		java.nio.IntBuffer buf = com.badlogic.gdx.utils.BufferUtils.newIntBuffer(16);
-		Gdx.gl.glGetIntegerv( GL10.GL_MAX_TEXTURE_SIZE, buf );
+		Gdx.gl.glGetIntegerv( GL20.GL_MAX_TEXTURE_SIZE, buf );
 		int maxTextureSize = buf.get();
 		log.debug( "Device Estimated Max Texture Size: "+ maxTextureSize );
 
-		log.debug( "Device GL11: "+ Gdx.graphics.isGL11Available() );
-		log.debug( "Device GL20: "+ Gdx.graphics.isGL20Available() );
+		log.debug( "Device GL30: "+ Gdx.graphics.isGL30Available() );
 
 		fileHandleResolver = new URIFileHandleResolver();
 		fileHandleResolver.setResolver( "internal:", new InternalFileHandleResolver(), true );
