@@ -3,11 +3,13 @@ package com.ftloverdrive.ui.screen;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
+import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Button.ButtonStyle;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.Align;
@@ -19,15 +21,12 @@ import com.badlogic.gdx.utils.Logger;
 import com.badlogic.gdx.utils.Pools;
 import com.badlogic.gdx.utils.Scaling;
 import com.ftloverdrive.core.OverdriveContext;
-import com.ftloverdrive.event.OVDEventListener;
 import com.ftloverdrive.event.OVDEventManager;
-import com.ftloverdrive.event.OVDInputEvent;
 import com.ftloverdrive.script.OVDScriptManager;
 import com.ftloverdrive.ui.ShatteredImage;
+import com.ftloverdrive.util.OVDConstants;
 
 public class MainMenuScreen implements Disposable, OVDScreen {
-	
-	protected static final String MENU_ATLAS = "img/main_menus/.atlas.atlas";
 
 	private Logger log;
 	private TextureAtlas menuAtlas;
@@ -74,20 +73,21 @@ public class MainMenuScreen implements Disposable, OVDScreen {
 			mainStage.getRoot().addActor( tmpGroup );
 		}
 
-		context.getAssetManager().load( MENU_ATLAS, TextureAtlas.class );
-		context.getAssetManager().finishLoading();
+		menuAtlas = context.getAssetManager().get( OVDConstants.MENU_ATLAS, TextureAtlas.class );
 
-		menuAtlas = context.getAssetManager().get( MENU_ATLAS, TextureAtlas.class );
-
-		bgImage = new ShatteredImage( menuAtlas.findRegions( "main_base2" ), 5 );
+		bgImage = new ShatteredImage( menuAtlas.findRegions( "main-base2" ), 5 );
 		bgImage.setFillParent( true );
 		bgImage.setPosition( 0, 0 );
-		((Group) mainStage.getRoot().findActor( "Background" )).addActor( bgImage );
-		
+		Group bg = mainStage.getRoot().findActor( "Background" );
+		// Groups don't get resized when actors are inserted into them
+		bg.setSize( mainStage.getWidth(), mainStage.getHeight() );
+		bg.addActor( bgImage );
+
 		menuTable = new Table();
 
 		TextureRegionDrawable temp;
 
+		// TODO a button factory that takes a json file handle and uses that to create the button
 		// TODO use json or scripts to specify all of this instead of being hard-coded (we're being mod-friendly after all)
 		ButtonStyle btnStylePlay = new ButtonStyle();
 		btnStylePlay.up = new TextureRegionDrawable( menuAtlas.findRegion( "start-on" ) );
@@ -96,7 +96,7 @@ public class MainMenuScreen implements Disposable, OVDScreen {
 		btnStylePlay.down = temp;
 		btnStylePlay.over = temp;
 		buttonPlay = new Button( btnStylePlay );
-		
+
 		ButtonStyle btnStyleExit = new ButtonStyle();
 		btnStyleExit.up = new TextureRegionDrawable( menuAtlas.findRegion( "quit-on" ) );
 		btnStyleExit.disabled = new TextureRegionDrawable( menuAtlas.findRegion( "quit-off" ) );
@@ -104,7 +104,7 @@ public class MainMenuScreen implements Disposable, OVDScreen {
 		btnStyleExit.down = temp;
 		btnStyleExit.over = temp;
 		buttonExit = new Button( btnStyleExit );
-		
+
 		buttonPlay.addListener(new ClickListener() {
 	        @Override
 	        public void clicked( InputEvent event, float x, float y ) {
@@ -157,7 +157,7 @@ public class MainMenuScreen implements Disposable, OVDScreen {
 		mainStage.getViewport().update( (int) scaledView.x, (int) scaledView.y, true );
 
 		// Make the background fill the screen.
-		bgImage.setSize( width, height );
+		//bgImage.setSize( scaledView.x, scaledView.y );
 	}
 
 	@Override
@@ -183,7 +183,7 @@ public class MainMenuScreen implements Disposable, OVDScreen {
 	@Override
 	public void dispose() {
 		mainStage.dispose();
-		context.getAssetManager().unload( MENU_ATLAS );
+		context.getAssetManager().unload( OVDConstants.MENU_ATLAS );
 		Pools.get( OverdriveContext.class ).free( context );
 	}
 

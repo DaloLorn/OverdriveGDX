@@ -81,6 +81,8 @@ public class OVDConstants {
 	public static final String STATUSUI_ATLAS = "img/statusUI/.atlas.atlas";
 	public static final String SYSTEMUI_ATLAS = "img/systemUI/.atlas.atlas";
 	public static final String WEAPONS_ATLAS = "img/weapons/.atlas.atlas";
+	public static final String BKG_ATLAS = "img/stars/.atlas.atlas";
+	public static final String MENU_ATLAS = "img/main_menus/.atlas.atlas";
 
 	public static final String FLOORPLAN_ATLAS = "internal://overdrive-assets/images/floorplan.atlas";
 }

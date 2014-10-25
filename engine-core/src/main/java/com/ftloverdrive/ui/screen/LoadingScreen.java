@@ -101,6 +101,10 @@ public class LoadingScreen implements Disposable, OVDScreen {
 		context.getAssetManager().load( OVDConstants.SHIP_INTERIOR_ATLAS, TextureAtlas.class );
 		context.getAssetManager().load( OVDConstants.STATUSUI_ATLAS, TextureAtlas.class );
 		context.getAssetManager().load( OVDConstants.SYSTEMUI_ATLAS, TextureAtlas.class );
+		context.getAssetManager().load( OVDConstants.BKG_ATLAS, TextureAtlas.class );
+		context.getAssetManager().load( OVDConstants.ROOT_ATLAS, TextureAtlas.class );
+		context.getAssetManager().load( OVDConstants.MISC_ATLAS, TextureAtlas.class );
+		context.getAssetManager().load( OVDConstants.MENU_ATLAS, TextureAtlas.class );
 		//context.getAssetManager().load( OVDConstants.WEAPONS_ATLAS, TextureAtlas.class );
 	}
 

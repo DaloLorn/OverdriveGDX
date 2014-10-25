@@ -49,10 +49,7 @@ import com.ftloverdrive.util.OVDConstants;
 
 
 public class TestScreen implements Disposable, OVDScreen {
-	protected static final String BKG_ATLAS = "img/stars/.atlas.atlas";
-	protected static final String ROOT_ATLAS = "img/.atlas.atlas";
-	protected static final String MISC_ATLAS = "img/misc/.atlas.atlas";
-	protected static final String PEOPLE_ATLAS = "img/people/.atlas.atlas";
+
 	protected static final String PLOT_FONT = "fonts/JustinFont12Bold.ttf?size=13";
 
 	private Logger log;
@@ -148,18 +145,22 @@ public class TestScreen implements Disposable, OVDScreen {
 		//   Group lowerLayer = (Group)stageRoot.findActor( layerName );
 		//   stageRoot.addActorAfter( lowerLayer, newGroup );
 
-		context.getAssetManager().load( BKG_ATLAS, TextureAtlas.class );
-		context.getAssetManager().load( ROOT_ATLAS, TextureAtlas.class );
-		context.getAssetManager().load( MISC_ATLAS, TextureAtlas.class );
-		context.getAssetManager().load( PEOPLE_ATLAS, TextureAtlas.class );
+		// Already loaded in LoadingScreen
+		//context.getAssetManager().load( OVDConstants.BKG_ATLAS, TextureAtlas.class );
+		//context.getAssetManager().load( OVDConstants.ROOT_ATLAS, TextureAtlas.class );
+		//context.getAssetManager().load( OVDConstants.MISC_ATLAS, TextureAtlas.class );
+		//context.getAssetManager().load( OVDConstants.PEOPLE_ATLAS, TextureAtlas.class );
 		context.getAssetManager().load( PLOT_FONT, BitmapFont.class );
 		context.getAssetManager().finishLoading();
 
-		bgAtlas = context.getAssetManager().get( BKG_ATLAS, TextureAtlas.class );
+		bgAtlas = context.getAssetManager().get( OVDConstants.BKG_ATLAS, TextureAtlas.class );
 		ShatteredImage bgImage = new ShatteredImage( bgAtlas.findRegions( "bg-dullstars" ), 5 );
 		bgImage.setFillParent( true );
 		bgImage.setPosition( 0, 0 );
-		((Group)mainStage.getRoot().findActor( "Background" )).addActor( bgImage );
+		Group bg = mainStage.getRoot().findActor( "Background" );
+		// Groups don't get resized when actors are inserted into them
+		bg.setSize( mainStage.getWidth(), mainStage.getHeight() );
+		bg.addActor( bgImage );
 
 		textWindowDemo();
 
@@ -265,7 +266,7 @@ public class TestScreen implements Disposable, OVDScreen {
 		loremIpsum += "sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.";
 		loremIpsum += "\n\nThis window is draggable.";
 
-		rootAtlas = context.getAssetManager().get( ROOT_ATLAS, TextureAtlas.class );
+		rootAtlas = context.getAssetManager().get( OVDConstants.ROOT_ATLAS, TextureAtlas.class );
 		TextureRegion plotDlgRegion = rootAtlas.findRegion( "window-base-alpha" ); // TODO box_text1 no longer available in AE, use the nearest equivalent
 		NinePatchDrawable plotDlgBgDrawable = new NinePatchDrawable( new NinePatch( plotDlgRegion, 22, 22, 36, 22 ) );
 
@@ -286,12 +287,12 @@ public class TestScreen implements Disposable, OVDScreen {
 	}
 
 	private void movingSpriteDemo() {
-		miscAtlas = context.getAssetManager().get( MISC_ATLAS, TextureAtlas.class );
+		miscAtlas = context.getAssetManager().get( OVDConstants.MISC_ATLAS, TextureAtlas.class );
 		driftSprite = miscAtlas.createSprite( "crosshairs-placed" );
 	}
 
 	private void walkAnimDemo() {
-		peopleAtlas = context.getAssetManager().get( PEOPLE_ATLAS, TextureAtlas.class );
+		peopleAtlas = context.getAssetManager().get( OVDConstants.PEOPLE_ATLAS, TextureAtlas.class );
 		TextureRegion crewRegion = peopleAtlas.findRegion( "human-base" ); // TODO FTL:AE introduced layers to color the base images
 
 		// FTL's animations.xml counts 0-based rows from the bottom.
@@ -387,10 +388,10 @@ public class TestScreen implements Disposable, OVDScreen {
 		hudStage.dispose();
 		playerShipHullMonitor.dispose();
 		shipActor.dispose();
-		context.getAssetManager().unload( BKG_ATLAS );
-		context.getAssetManager().unload( ROOT_ATLAS );
-		context.getAssetManager().unload( MISC_ATLAS );
-		context.getAssetManager().unload( PEOPLE_ATLAS );
+		context.getAssetManager().unload( OVDConstants.BKG_ATLAS );
+		context.getAssetManager().unload( OVDConstants.ROOT_ATLAS );
+		context.getAssetManager().unload( OVDConstants.MISC_ATLAS );
+		context.getAssetManager().unload( OVDConstants.PEOPLE_ATLAS );
 		context.getAssetManager().unload( PLOT_FONT );
 		Pools.get( OverdriveContext.class ).free( context );
 	}
