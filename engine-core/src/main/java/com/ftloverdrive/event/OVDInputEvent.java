@@ -37,8 +37,8 @@ public class OVDInputEvent extends AbstractOVDEvent implements Poolable {
 	public void reset() {
 		sourceRefId = -1;
 		cancelled = false;
-		if (event != null)
-			Pools.free(event);
+		if ( event != null )
+			Pools.get( InputEvent.class ).free( event );
 		event = null;
 	}
 
