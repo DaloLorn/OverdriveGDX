@@ -145,11 +145,10 @@ public class TestScreen implements Disposable, OVDScreen {
 		//   Group lowerLayer = (Group)stageRoot.findActor( layerName );
 		//   stageRoot.addActorAfter( lowerLayer, newGroup );
 
-		// Already loaded in LoadingScreen
-		//context.getAssetManager().load( OVDConstants.BKG_ATLAS, TextureAtlas.class );
-		//context.getAssetManager().load( OVDConstants.ROOT_ATLAS, TextureAtlas.class );
-		//context.getAssetManager().load( OVDConstants.MISC_ATLAS, TextureAtlas.class );
-		//context.getAssetManager().load( OVDConstants.PEOPLE_ATLAS, TextureAtlas.class );
+		context.getAssetManager().load( OVDConstants.BKG_ATLAS, TextureAtlas.class );
+		context.getAssetManager().load( OVDConstants.ROOT_ATLAS, TextureAtlas.class );
+		context.getAssetManager().load( OVDConstants.MISC_ATLAS, TextureAtlas.class );
+		context.getAssetManager().load( OVDConstants.PEOPLE_ATLAS, TextureAtlas.class );
 		context.getAssetManager().load( PLOT_FONT, BitmapFont.class );
 		context.getAssetManager().finishLoading();
 
