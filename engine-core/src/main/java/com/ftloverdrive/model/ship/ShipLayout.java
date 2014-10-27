@@ -4,7 +4,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
-import com.badlogic.gdx.math.GridPoint2;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.IntMap;
 import com.badlogic.gdx.utils.ObjectIntMap;
 import com.badlogic.gdx.utils.Pools;
@@ -122,7 +122,7 @@ public class ShipLayout {
 	/**
 	 * Computes and returns the current size of the room layout.
 	 */
-	public GridPoint2 getSize() {
+	public Vector2 getSize() {
 		int wMax = 0;
 		int wMin = Integer.MAX_VALUE;
 		int hMax = 0;
@@ -143,7 +143,10 @@ public class ShipLayout {
 			else if ( coord.y < hMin )
 				hMin = coord.y;
 		}
-		
-		return new GridPoint2( wMax - wMin, hMax - hMin );
+
+		wMin--;
+		hMin--;
+
+		return new Vector2( wMax - wMin, hMax - hMin );
 	}
 }

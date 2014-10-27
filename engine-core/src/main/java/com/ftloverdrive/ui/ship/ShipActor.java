@@ -4,7 +4,7 @@ import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
-import com.badlogic.gdx.math.GridPoint2;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.utils.SpriteDrawable;
@@ -63,10 +63,6 @@ public class ShipActor extends Group implements Disposable, GamePlayerShipChange
 		shipFudgeGroup.setName( "ShipFudgeGroup" );
 		this.addActor( shipFudgeGroup );
 
-		// Shield is not affected by hull offset, but is drawn below it.
-		shieldImage = new Image( nullDrawable );
-		shipFudgeGroup.addActor( shieldImage );
-
 		shipHullGroup = new Group();
 		shipHullGroup.setName( "ShipHullGroup" );
 		shipFudgeGroup.addActor( shipHullGroup );
@@ -74,6 +70,11 @@ public class ShipActor extends Group implements Disposable, GamePlayerShipChange
 		shipFloorplanGroup = new Group();
 		shipFloorplanGroup.setName( "ShipFloorplanGroup" );
 		shipFudgeGroup.addActor( shipFloorplanGroup );
+
+		// Shield is not affected by hull offset, but is drawn below it.
+		shieldImage = new Image( nullDrawable );
+		shipFudgeGroup.addActor( shieldImage );
+		shieldImage.toBack();
 
 		baseImage = new Image( nullDrawable );
 		shipHullGroup.addActor( baseImage );
@@ -176,28 +177,8 @@ public class ShipActor extends Group implements Disposable, GamePlayerShipChange
 			ShipModel shipModel = context.getReferenceManager().getObject( shipModelRefId, ShipModel.class );
 			TextureAtlas shipAtlas = assetManager.get( OVDConstants.SHIP_ATLAS, TextureAtlas.class );
 
-			shipFudgeGroup.setPosition( shipModel.getShipOffsetX(), shipModel.getShipOffsetY() );
-			shipHullGroup.setPosition( shipModel.getHullOffsetX(), shipModel.getHullOffsetY() );
-
-			ImageSpec currentShieldImgSpec = shipModel.getShieldImageSpec();
-			if ( !isEqual( shieldImgSpec, currentShieldImgSpec ) ) {
-				shieldImgSpec = currentShieldImgSpec;
-
-				Sprite shieldSprite = shipAtlas.createSprite( shieldImgSpec.getRegionName() );
-				if ( shieldSprite != null ) {
-					shieldImage.setDrawable( new SpriteDrawable( shieldSprite ) );
-				} else {
-					shieldImage.setDrawable( nullDrawable );
-				}
-
-				GridPoint2 layoutSize = shipModel.getLayout().getSize();
-				layoutSize.x *= 35;
-				layoutSize.y *= 35;
-				shieldImage.setX( layoutSize.x / 2 + shipModel.getShieldEllipseOffsetX() - shipModel.getShieldEllipseSemiMajorAxis() );
-				shieldImage.setY( layoutSize.y / 2 - shipModel.getShieldEllipseOffsetY() );
-				shieldImage.setSize( shipModel.getShieldEllipseSemiMajorAxis() * 2, shipModel.getShieldEllipseSemiMinorAxis() * 2 );
-				shieldImage.validate();
-			}
+			shipFudgeGroup.setPosition( shipModel.getShipOffsetX(), -shipModel.getShipOffsetY() );
+			shipHullGroup.setPosition( shipModel.getHullOffsetX(), -shipModel.getHullOffsetY() );
 
 			ImageSpec currentBaseImgSpec = shipModel.getBaseImageSpec();
 			if ( !isEqual( baseImgSpec, currentBaseImgSpec ) ) {
@@ -210,9 +191,30 @@ public class ShipActor extends Group implements Disposable, GamePlayerShipChange
 					baseImage.setDrawable( nullDrawable );
 				}
 
+				// Not relative to anything (except the ship's base group)
 				baseImage.setPosition( 0, 0 );
 				baseImage.setSize( shipModel.getHullWidth(), shipModel.getHullHeight() );
 				baseImage.validate();
+			}
+
+			ImageSpec currentShieldImgSpec = shipModel.getShieldImageSpec();
+			if ( !isEqual( shieldImgSpec, currentShieldImgSpec ) ) {
+				shieldImgSpec = currentShieldImgSpec;
+
+				Sprite shieldSprite = shipAtlas.createSprite( shieldImgSpec.getRegionName() );
+				if ( shieldSprite != null ) {
+					shieldImage.setDrawable( new SpriteDrawable( shieldSprite ) );
+				} else {
+					shieldImage.setDrawable( nullDrawable );
+				}
+
+				Vector2 layoutSize = shipModel.getLayout().getSize();
+				layoutSize.x *= 35;
+				layoutSize.y *= 35;
+				shieldImage.setX( layoutSize.x / 2 + shipModel.getShieldEllipseOffsetX() - shipModel.getShieldEllipseSemiMajorAxis() );
+				shieldImage.setY( -shipModel.getShieldEllipseSemiMinorAxis() + baseImage.getHeight() - layoutSize.y / 2 - shipModel.getShieldEllipseOffsetY() );
+				shieldImage.setSize( shipModel.getShieldEllipseSemiMajorAxis() * 2, shipModel.getShieldEllipseSemiMinorAxis() * 2 );
+				shieldImage.validate();
 			}
 
 			ImageSpec currentCloakImgSpec = shipModel.getCloakImageSpec();
@@ -226,7 +228,10 @@ public class ShipActor extends Group implements Disposable, GamePlayerShipChange
 					cloakImage.setDrawable( nullDrawable );
 				}
 
-				cloakImage.setPosition( shipModel.getCloakOffsetX(), shipModel.getCloakOffsetY() );
+				// Relative to base image's bottom-left corner
+				// Ie. X values calculated normally, but Y needs some adjustments...
+				cloakImage.setPosition( shipModel.getCloakOffsetX(),
+						baseImage.getHeight() - cloakImage.getPrefHeight() -shipModel.getCloakOffsetY() );
 				cloakImage.setSize( cloakImage.getPrefWidth(), cloakImage.getPrefHeight() );
 				cloakImage.validate();
 			}
@@ -242,7 +247,10 @@ public class ShipActor extends Group implements Disposable, GamePlayerShipChange
 					floorImage.setDrawable( nullDrawable );
 				}
 
-				floorImage.setPosition( shipModel.getFloorOffsetX(), shipModel.getFloorOffsetY() );
+				// Relative to base image's bottom-left corner
+				// Ie. X values calculated normally, but Y needs some adjustments...
+				floorImage.setPosition( shipModel.getFloorOffsetX(),
+						baseImage.getHeight() - floorImage.getPrefHeight() -shipModel.getFloorOffsetY() );
 				floorImage.setSize( floorImage.getPrefWidth(), floorImage.getPrefHeight() );
 				floorImage.validate();
 			}
