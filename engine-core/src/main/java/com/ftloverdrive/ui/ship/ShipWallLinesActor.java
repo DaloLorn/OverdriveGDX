@@ -95,7 +95,7 @@ public class ShipWallLinesActor extends Actor implements Disposable {
 		ShipCoordinate tmpCoord = Pools.get( ShipCoordinate.class ).obtain();
 
 		tmpCoord.init( coord.x, coord.y, 1 );
-		boolean nWall = allCoords.contains( tmpCoord ) ? true : false;
+		boolean nWall = allCoords.contains( tmpCoord ) ? true : false; // TODO: remove the ternary op? it's superfluous
 		tmpCoord.init( coord.x, coord.y+1, 1 );
 		boolean sWall = allCoords.contains( tmpCoord ) ? true : false;
 		tmpCoord.init( coord.x, coord.y, 2 );
@@ -112,7 +112,7 @@ public class ShipWallLinesActor extends Actor implements Disposable {
 		if ( allCoords.contains( tmpCoord ) ) nwCorner = true;
 		tmpCoord.init( coord.x-1, coord.y, 1 );
 		if ( allCoords.contains( tmpCoord ) ) nwCorner = true;
-/*
+
 		tmpCoord.init( coord.x+1, coord.y-1, 2 );
 		if ( allCoords.contains( tmpCoord ) ) neCorner = true;
 		tmpCoord.init( coord.x+1, coord.y, 1 );
@@ -127,13 +127,11 @@ public class ShipWallLinesActor extends Actor implements Disposable {
 		if ( allCoords.contains( tmpCoord ) ) seCorner = true;
 		tmpCoord.init( coord.x+1, coord.y+1, 1 );
 		if ( allCoords.contains( tmpCoord ) ) seCorner = true;
-*/
+
 		String regionName = null;
+		// Sides
 		if ( nWall && sWall && wWall && eWall ) {
 			regionName = "wall-side-n,s,e,w";
-		}
-		else if ( nwCorner && neCorner && swCorner && seCorner ) {
-			regionName = "wall-corner-nw,ne,sw,se";
 		}
 		else if ( nWall && !sWall && !wWall && !eWall                           && !swCorner && !seCorner ) {
 			regionName = "wall-side-n";
@@ -170,6 +168,10 @@ public class ShipWallLinesActor extends Actor implements Disposable {
 		}
 		else if ( nWall && sWall && wWall && !eWall                                                     ) {
 			regionName = "wall-side-n,s,w";
+		}
+		// Corners
+		else if ( nwCorner && neCorner && swCorner && seCorner                                          ) {
+			regionName = "wall-corner-nw,ne,sw,se";
 		}
 		else if ( !nWall && !sWall && !wWall && !eWall && nwCorner && !neCorner && !swCorner && !seCorner ) {
 			regionName = "wall-corner-nw";
@@ -242,6 +244,12 @@ public class ShipWallLinesActor extends Actor implements Disposable {
 		}
 		else if ( !nWall && sWall && wWall && !eWall              && neCorner                           ) {
 			regionName = "wall-corner-s,w,ne";
+		}
+		else if (!nWall && !sWall && !wWall && !eWall && nwCorner && !neCorner && !swCorner && seCorner ) {
+			regionName = "wall-corner-nw,se";
+		}
+		else if (!nWall && !sWall && !wWall && !eWall && !nwCorner && neCorner && swCorner && !seCorner ) {
+			regionName = "wall-corner-ne,sw";
 		}
 
 		if ( regionName != null ) {

@@ -178,6 +178,20 @@ wall-corner-nw,sw
   orig: 5, 5
   offset: 0, 0
   index: -1
+wall-corner-nw,se
+  rotate: false
+  xy: 30, 49
+  size: 5, 5
+  orig: 5, 5
+  offset: 0, 0
+  index: -1
+wall-corner-ne,sw
+  rotate: false
+  xy: 23, 49
+  size: 5, 5
+  orig: 5, 5
+  offset: 0, 0
+  index: -1
 wall-corner-nw,ne,sw
   rotate: false
   xy: 37, 35
