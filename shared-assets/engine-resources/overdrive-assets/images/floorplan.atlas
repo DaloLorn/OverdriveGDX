@@ -94,6 +94,20 @@ wall-side-s,w
   orig: 5, 5
   offset: 0, 0
   index: -1
+wall-side-n,s
+  rotate: false
+  xy: 23, 56
+  size: 5, 5
+  orig: 5, 5
+  offset: 0, 0
+  index: -1
+wall-side-w,e
+  rotate: false
+  xy: 30, 56
+  size: 5, 5
+  orig: 5, 5
+  offset: 0, 0
+  index: -1
 wall-side-n,e,w
   rotate: false
   xy: 37, 14

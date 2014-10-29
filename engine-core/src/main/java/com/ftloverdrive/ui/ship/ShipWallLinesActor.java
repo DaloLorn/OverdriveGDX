@@ -157,6 +157,12 @@ public class ShipWallLinesActor extends Actor implements Disposable {
 		else if ( !nWall && sWall && !wWall && eWall && !nwCorner                                        ) {
 			regionName = "wall-side-s,e";
 		}
+		else if ( nWall && sWall && !wWall && !eWall                                                     ) {
+			regionName = "wall-side-n,s";
+		}
+		else if ( !nWall && !sWall && wWall && eWall                                                     ) {
+			regionName = "wall-side-w,e";
+		}
 		else if ( nWall && !sWall && wWall && eWall                                                     ) {
 			regionName = "wall-side-n,e,w";
 		}
@@ -170,9 +176,6 @@ public class ShipWallLinesActor extends Actor implements Disposable {
 			regionName = "wall-side-n,s,w";
 		}
 		// Corners
-		else if ( nwCorner && neCorner && swCorner && seCorner                                          ) {
-			regionName = "wall-corner-nw,ne,sw,se";
-		}
 		else if ( !nWall && !sWall && !wWall && !eWall && nwCorner && !neCorner && !swCorner && !seCorner ) {
 			regionName = "wall-corner-nw";
 		}
@@ -245,11 +248,14 @@ public class ShipWallLinesActor extends Actor implements Disposable {
 		else if ( !nWall && sWall && wWall && !eWall              && neCorner                           ) {
 			regionName = "wall-corner-s,w,ne";
 		}
-		else if (!nWall && !sWall && !wWall && !eWall && nwCorner && !neCorner && !swCorner && seCorner ) {
+		else if ( !nWall && !sWall && !wWall && !eWall && nwCorner && !neCorner && !swCorner && seCorner ) {
 			regionName = "wall-corner-nw,se";
 		}
-		else if (!nWall && !sWall && !wWall && !eWall && !nwCorner && neCorner && swCorner && !seCorner ) {
+		else if ( !nWall && !sWall && !wWall && !eWall && !nwCorner && neCorner && swCorner && !seCorner ) {
 			regionName = "wall-corner-ne,sw";
+		}
+		else if ( nwCorner && neCorner && swCorner && seCorner                                          ) {
+			regionName = "wall-corner-nw,ne,sw,se";
 		}
 
 		if ( regionName != null ) {
