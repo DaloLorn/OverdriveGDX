@@ -5,6 +5,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.IntMap;
 import com.badlogic.gdx.utils.ObjectIntMap;
 import com.badlogic.gdx.utils.Pools;
@@ -117,6 +118,116 @@ public class ShipLayout {
 		}
 
 		return result;
+	}
+
+	/**
+	 * Creates ShipCoordinates of squares and walls as described by the char matrix.
+	 * Position in the matrix specifies the cell's location relative to the room's
+	 * coordinates (params x and y).
+	 * 
+	 * All rows of the matrix have to have the same length.
+	 * 
+	 * The char itself specifies the type of cell: (+ memorization tricks!)
+	 * <     -- wWest
+	 * >     -- wEast
+	 * ^     -- wNorth
+	 * v     -- wSouth (the sharp end points at the wall)
+	 * "     -- wWestEast (kinda looks like two vertical walls next to each other)
+	 * =     -- wNorthSouth (kinda looks like two horizontal walls next to each other)
+	 * q     -- wNorthWest
+	 * w     -- wNorthEast
+	 * a     -- wSouthWest (these four chars are located in a more or --)
+	 * s     -- wSouthEast (-- less diagonal manner on a QWERTY keyboard)
+	 * d     -- wNorthSouthWest
+	 * f     -- wNorthSouthEast
+	 * r     -- wNorthWestEast (these four chars are located in a more or --)
+	 * c     -- wSouthWestEast (-- less orthogonal manner on a QWERTY keyboard)
+	 * #     -- square (no walls)
+	 * space -- nothing (empty space)
+	 * 
+	 * For example, the following char matrix:
+	 *   char[][] room = {
+	 *       { ' ', 'r', ' ' },
+	 *       { 'd', '#', 'f' },
+	 *       { ' ', 'c', ' ' }
+	 *   }
+	 * ...would create a room the shape of a + sign, with appropriately placed walls.
+	 */
+	public static ShipCoordinate[] createRoomCoords( int x, int y, char[][] matrix ) {
+		int w = matrix.length;
+		int h = matrix[0].length;
+		Array<ShipCoordinate> result = new Array<ShipCoordinate>();
+
+		for ( int r=0; r < w; r++ ) {
+			if ( matrix[r].length != h ) {
+				throw new IllegalArgumentException( String.format( "Row %s width (%s) differs from matrix width (%s).",
+						r, matrix[r].length, h ) );
+			}
+
+			for ( int c=0; c < h; c++ ) {
+				ShipCoordinate[] tmp = createCell( x+c, y+r, matrix[r][c] );
+				for ( int i=0; i < tmp.length; i++ )
+					result.add( tmp[i] );
+			}
+		}
+
+		return result.toArray( ShipCoordinate.class );
+	}
+
+	/**
+	 * @see #createRoomCoords(int, int, char[][])
+	 */
+	public static ShipCoordinate[] createRoomCoords( int x, int y, String s ) {
+		if ( s.isEmpty() )
+			return new ShipCoordinate[]{};
+
+		String[] rows = s.split( "\n" );
+		char[][] chars = new char[rows.length][];
+
+		for ( int r=0; r < rows.length; r++ )
+			chars[r] = rows[r].toCharArray();
+		
+		return createRoomCoords( x, y, chars );
+	}
+
+	private static ShipCoordinate[] createCell( int x, int y, char c) {
+		switch ( c ) {
+			case 0:
+			case ' ':
+				return new ShipCoordinate[0];
+			case '#':
+				return ShipCoordinate.square( x, y );
+			case '<':
+				return ShipCoordinate.wWest( x, y );
+			case '>':
+				return ShipCoordinate.wEast( x, y );
+			case '^':
+				return ShipCoordinate.wNorth( x, y );
+			case 'v':
+				return ShipCoordinate.wSouth( x, y );
+			case 'q':
+				return ShipCoordinate.wNorthWest( x, y );
+			case 'w':
+				return ShipCoordinate.wNorthEast( x, y );
+			case 'a':
+				return ShipCoordinate.wSouthWest( x, y );
+			case 's':
+				return ShipCoordinate.wSouthEast( x, y );
+			case '"':
+				return ShipCoordinate.wWestEast( x, y );
+			case '=':
+				return ShipCoordinate.wNorthSouth( x, y );
+			case 'r':
+				return ShipCoordinate.wNorthWestEast( x, y );
+			case 'c':
+				return ShipCoordinate.wSouthWestEast( x, y );
+			case 'd':
+				return ShipCoordinate.wNorthSouthWest( x, y );
+			case 'f':
+				return ShipCoordinate.wNorthSouthEast( x, y );
+			default:
+				throw new IllegalArgumentException("Invalid cell type: " + c);
+		}
 	}
 
 	/**

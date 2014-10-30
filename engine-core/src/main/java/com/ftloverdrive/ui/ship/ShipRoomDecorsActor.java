@@ -70,7 +70,7 @@ public class ShipRoomDecorsActor extends Group implements Disposable {
 
 		Rectangle decorBounds = null;
 		for ( ShipCoordinate coord : coords ) {
-			if ( coord.v != 0 ) continue;
+			if ( coord.v != ShipCoordinate.TYPE_SQUARE ) continue;
 
 			Rectangle tmpRect = new Rectangle( calcTileX( coord ), calcTileY( coord ), tileSize, tileSize );
 			if ( decorBounds == null ) {

@@ -3,6 +3,7 @@ package com.ftloverdrive.blueprint.ship;
 import com.badlogic.gdx.utils.Pools;
 import com.ftloverdrive.core.OverdriveContext;
 import com.ftloverdrive.event.ship.ShipCreationEvent;
+import com.ftloverdrive.event.ship.ShipDoorCreationEvent;
 import com.ftloverdrive.event.ship.ShipLayoutRoomAddEvent;
 import com.ftloverdrive.event.ship.ShipRoomCreationEvent;
 import com.ftloverdrive.event.ship.ShipRoomImageChangeEvent;
@@ -75,6 +76,21 @@ public class TestShipBlueprint implements ShipBlueprint {
 			roomAddEvent.init( shipRefId, roomRefId, roomCoords );
 			context.getScreenEventManager().postDelayedEvent( roomAddEvent );
 		}
+
+		// Non-rectangular room test
+		roomRefId = context.getNetManager().requestNewRefId();
+		String roomLayout =
+				"d=w" + "\n" +
+				"  c";
+		roomCoords = ShipLayout.createRoomCoords(8, 1, roomLayout);
+
+		ShipRoomCreationEvent roomCreateEvent = Pools.get( ShipRoomCreationEvent.class ).obtain();
+		roomCreateEvent.init( roomRefId );
+		context.getScreenEventManager().postDelayedEvent( roomCreateEvent );
+
+		ShipLayoutRoomAddEvent roomAddEvent = Pools.get( ShipLayoutRoomAddEvent.class ).obtain();
+		roomAddEvent.init( shipRefId, roomRefId, roomCoords );
+		context.getScreenEventManager().postDelayedEvent( roomAddEvent );
 
 		return shipRefId;
 	}

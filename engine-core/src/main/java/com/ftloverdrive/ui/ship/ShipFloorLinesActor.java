@@ -82,7 +82,7 @@ public class ShipFloorLinesActor extends Actor implements Disposable {
 	 * Adds a tile to represent a ShipCoordinate.
 	 */
 	public void addTile( ShipCoordinate coord ) {
-		if ( coord.v != 0 ) return;
+		if ( coord.v != ShipCoordinate.TYPE_SQUARE ) return;
 
 		TextureAtlas floorAtlas = assetManager.get( OVDConstants.FLOORPLAN_ATLAS, TextureAtlas.class );
 

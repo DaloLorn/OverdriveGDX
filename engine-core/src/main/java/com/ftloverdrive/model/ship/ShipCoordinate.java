@@ -1,5 +1,6 @@
 package com.ftloverdrive.model.ship;
 
+import com.badlogic.gdx.utils.Pools;
 import com.badlogic.gdx.utils.Pool.Poolable;
 
 
@@ -16,6 +17,10 @@ import com.badlogic.gdx.utils.Pool.Poolable;
  * Similarly, don't free() an instance unless you're sure it's unused.
  */
 public class ShipCoordinate implements Poolable {
+	public static final int TYPE_SQUARE = 0;
+	public static final int TYPE_WALL_H = 1;
+	public static final int TYPE_WALL_V = 2;
+
 	public int x = 0;
 	public int y = 0;
 	public int v = 0;
@@ -32,6 +37,7 @@ public class ShipCoordinate implements Poolable {
 	 * @param v 0=square, 1=horizontal wall, 2=vertical wall
 	 */
 	public void init( int x, int y, int v ) {
+		checkType(v);
 		this.x = x;
 		this.y = y;
 		this.v = v;
@@ -46,6 +52,217 @@ public class ShipCoordinate implements Poolable {
 		this.v = srcCoord.v;
 	}
 
+	private void checkType(int type) {
+		if ( type != TYPE_SQUARE && type != TYPE_WALL_H && type != TYPE_WALL_V )
+			throw new IllegalArgumentException( "Invalid coord type" );
+	}
+
+
+	/**
+	 * A cell that has no walls to any side.
+	 */
+	public static ShipCoordinate[] square( int x, int y ) {
+		ShipCoordinate[] result = new ShipCoordinate[1];
+		result[0] = Pools.get( ShipCoordinate.class ).obtain();
+		result[0].init( x, y, TYPE_SQUARE );
+		return result;
+	}
+
+	/**
+	 * A cell that only has a wall to the north.
+	 */
+	public static ShipCoordinate[] wNorth( int x, int y ) {
+		ShipCoordinate[] result = new ShipCoordinate[2];
+		result[0] = Pools.get( ShipCoordinate.class ).obtain();
+		result[1] = Pools.get( ShipCoordinate.class ).obtain();
+		result[0].init( x, y, TYPE_SQUARE );
+		result[1].init( x, y, TYPE_WALL_H );
+		return result;
+	}
+
+	/**
+	 * A cell that only has a wall to the south.
+	 */
+	public static ShipCoordinate[] wSouth( int x, int y ) {
+		ShipCoordinate[] result = new ShipCoordinate[2];
+		result[0] = Pools.get( ShipCoordinate.class ).obtain();
+		result[1] = Pools.get( ShipCoordinate.class ).obtain();
+		result[0].init( x, y, TYPE_SQUARE );
+		result[1].init( x, y + 1, TYPE_WALL_H );
+		return result;
+	}
+
+	/**
+	 * A cell that only has a wall to the west.
+	 */
+	public static ShipCoordinate[] wWest( int x, int y ) {
+		ShipCoordinate[] result = new ShipCoordinate[2];
+		result[0] = Pools.get( ShipCoordinate.class ).obtain();
+		result[1] = Pools.get( ShipCoordinate.class ).obtain();
+		result[0].init( x, y, TYPE_SQUARE );
+		result[1].init( x, y, TYPE_WALL_V );
+		return result;
+	}
+
+	/**
+	 * A cell that only has a wall to the east.
+	 */
+	public static ShipCoordinate[] wEast( int x, int y ) {
+		ShipCoordinate[] result = new ShipCoordinate[2];
+		result[0] = Pools.get( ShipCoordinate.class ).obtain();
+		result[1] = Pools.get( ShipCoordinate.class ).obtain();
+		result[0].init( x, y, TYPE_SQUARE );
+		result[1].init( x + 1, y, TYPE_WALL_V );
+		return result;
+	}
+
+	/**
+	 * A cell that has walls to the north and west.
+	 */
+	public static ShipCoordinate[] wNorthWest( int x, int y ) {
+		ShipCoordinate[] result = new ShipCoordinate[3];
+		result[0] = Pools.get( ShipCoordinate.class ).obtain();
+		result[1] = Pools.get( ShipCoordinate.class ).obtain();
+		result[2] = Pools.get( ShipCoordinate.class ).obtain();
+		result[0].init( x, y, TYPE_SQUARE );
+		result[1].init( x, y, TYPE_WALL_H );
+		result[2].init( x, y, TYPE_WALL_V );
+		return result;
+	}
+
+	/**
+	 * A cell that has walls to the north and east.
+	 */
+	public static ShipCoordinate[] wNorthEast( int x, int y ) {
+		ShipCoordinate[] result = new ShipCoordinate[3];
+		result[0] = Pools.get( ShipCoordinate.class ).obtain();
+		result[1] = Pools.get( ShipCoordinate.class ).obtain();
+		result[2] = Pools.get( ShipCoordinate.class ).obtain();
+		result[0].init( x, y, TYPE_SQUARE );
+		result[1].init( x, y, TYPE_WALL_H );
+		result[2].init( x + 1, y, TYPE_WALL_V );
+		return result;
+	}
+
+	/**
+	 * A cell that has walls to the south and west.
+	 */
+	public static ShipCoordinate[] wSouthWest( int x, int y ) {
+		ShipCoordinate[] result = new ShipCoordinate[3];
+		result[0] = Pools.get( ShipCoordinate.class ).obtain();
+		result[1] = Pools.get( ShipCoordinate.class ).obtain();
+		result[2] = Pools.get( ShipCoordinate.class ).obtain();
+		result[0].init( x, y, TYPE_SQUARE );
+		result[1].init( x, y + 1, TYPE_WALL_H );
+		result[2].init( x, y, TYPE_WALL_V );
+		return result;
+	}
+
+	/**
+	 * A cell that has walls to the south and east.
+	 */
+	public static ShipCoordinate[] wSouthEast( int x, int y ) {
+		ShipCoordinate[] result = new ShipCoordinate[3];
+		result[0] = Pools.get( ShipCoordinate.class ).obtain();
+		result[1] = Pools.get( ShipCoordinate.class ).obtain();
+		result[2] = Pools.get( ShipCoordinate.class ).obtain();
+		result[0].init( x, y, TYPE_SQUARE );
+		result[1].init( x, y + 1, TYPE_WALL_H );
+		result[2].init( x + 1, y, TYPE_WALL_V );
+		return result;
+	}
+
+	/**
+	 * A cell that has walls to the north and south.
+	 */
+	public static ShipCoordinate[] wNorthSouth( int x, int y ) {
+		ShipCoordinate[] result = new ShipCoordinate[3];
+		result[0] = Pools.get( ShipCoordinate.class ).obtain();
+		result[1] = Pools.get( ShipCoordinate.class ).obtain();
+		result[2] = Pools.get( ShipCoordinate.class ).obtain();
+		result[0].init( x, y, TYPE_SQUARE );
+		result[1].init( x, y, TYPE_WALL_H );
+		result[2].init( x, y + 1, TYPE_WALL_H );
+		return result;
+	}
+
+	/**
+	 * A cell that has walls to the west and east.
+	 */
+	public static ShipCoordinate[] wWestEast( int x, int y ) {
+		ShipCoordinate[] result = new ShipCoordinate[3];
+		result[0] = Pools.get( ShipCoordinate.class ).obtain();
+		result[1] = Pools.get( ShipCoordinate.class ).obtain();
+		result[2] = Pools.get( ShipCoordinate.class ).obtain();
+		result[0].init( x, y, TYPE_SQUARE );
+		result[1].init( x, y, TYPE_WALL_V );
+		result[2].init( x + 1, y, TYPE_WALL_V );
+		return result;
+	}
+
+	/**
+	 * A cell that has walls to the north, west and east.
+	 */
+	public static ShipCoordinate[] wNorthWestEast( int x, int y ) {
+		ShipCoordinate[] result = new ShipCoordinate[4];
+		result[0] = Pools.get( ShipCoordinate.class ).obtain();
+		result[1] = Pools.get( ShipCoordinate.class ).obtain();
+		result[2] = Pools.get( ShipCoordinate.class ).obtain();
+		result[3] = Pools.get( ShipCoordinate.class ).obtain();
+		result[0].init( x, y, TYPE_SQUARE );
+		result[1].init( x, y, TYPE_WALL_V );
+		result[2].init( x, y, TYPE_WALL_H );
+		result[3].init( x + 1, y, TYPE_WALL_V );
+		return result;
+	}
+
+	/**
+	 * A cell that has walls to the north, south and east.
+	 */
+	public static ShipCoordinate[] wNorthSouthEast( int x, int y ) {
+		ShipCoordinate[] result = new ShipCoordinate[4];
+		result[0] = Pools.get( ShipCoordinate.class ).obtain();
+		result[1] = Pools.get( ShipCoordinate.class ).obtain();
+		result[2] = Pools.get( ShipCoordinate.class ).obtain();
+		result[3] = Pools.get( ShipCoordinate.class ).obtain();
+		result[0].init( x, y, TYPE_SQUARE );
+		result[1].init( x, y, TYPE_WALL_H );
+		result[2].init( x + 1, y, TYPE_WALL_V );
+		result[3].init( x, y + 1, TYPE_WALL_H );
+		return result;
+	}
+
+	/**
+	 * A cell that has walls to the south, west and east.
+	 */
+	public static ShipCoordinate[] wSouthWestEast( int x, int y ) {
+		ShipCoordinate[] result = new ShipCoordinate[4];
+		result[0] = Pools.get( ShipCoordinate.class ).obtain();
+		result[1] = Pools.get( ShipCoordinate.class ).obtain();
+		result[2] = Pools.get( ShipCoordinate.class ).obtain();
+		result[3] = Pools.get( ShipCoordinate.class ).obtain();
+		result[0].init( x, y, TYPE_SQUARE );
+		result[1].init( x, y, TYPE_WALL_V );
+		result[2].init( x + 1, y, TYPE_WALL_V );
+		result[3].init( x, y + 1, TYPE_WALL_H );
+		return result;
+	}
+
+	/**
+	 * A cell that has walls to the north, south and west.
+	 */
+	public static ShipCoordinate[] wNorthSouthWest( int x, int y ) {
+		ShipCoordinate[] result = new ShipCoordinate[4];
+		result[0] = Pools.get( ShipCoordinate.class ).obtain();
+		result[1] = Pools.get( ShipCoordinate.class ).obtain();
+		result[2] = Pools.get( ShipCoordinate.class ).obtain();
+		result[3] = Pools.get( ShipCoordinate.class ).obtain();
+		result[0].init( x, y, TYPE_SQUARE );
+		result[1].init( x, y, TYPE_WALL_H );
+		result[2].init( x, y, TYPE_WALL_V );
+		result[3].init( x, y + 1, TYPE_WALL_H );
+		return result;
+	}
 
 	@Override
 	public boolean equals( Object o ) {
