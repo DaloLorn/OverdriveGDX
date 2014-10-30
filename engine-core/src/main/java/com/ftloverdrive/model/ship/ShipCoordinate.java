@@ -20,6 +20,8 @@ public class ShipCoordinate implements Poolable {
 	public static final int TYPE_SQUARE = 0;
 	public static final int TYPE_WALL_H = 1;
 	public static final int TYPE_WALL_V = 2;
+	public static final int TYPE_DOOR_H = 3;
+	public static final int TYPE_DOOR_V = 4;
 
 	public int x = 0;
 	public int y = 0;
@@ -53,10 +55,18 @@ public class ShipCoordinate implements Poolable {
 	}
 
 	private void checkType(int type) {
-		if ( type != TYPE_SQUARE && type != TYPE_WALL_H && type != TYPE_WALL_V )
+		if ( type != TYPE_SQUARE && type != TYPE_WALL_H && type != TYPE_WALL_V
+				&& type != TYPE_DOOR_H && type != TYPE_DOOR_V )
 			throw new IllegalArgumentException( "Invalid coord type" );
 	}
 
+
+	public static ShipCoordinate[] door( int x, int y, boolean horizontal ) {
+		ShipCoordinate[] result = new ShipCoordinate[1];
+		result[0] = Pools.get( ShipCoordinate.class ).obtain();
+		result[0].init( x, y, horizontal ? TYPE_DOOR_H : TYPE_DOOR_V );
+		return result;
+	}
 
 	/**
 	 * A cell that has no walls to any side.

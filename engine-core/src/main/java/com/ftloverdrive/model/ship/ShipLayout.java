@@ -16,12 +16,16 @@ public class ShipLayout {
 	protected Set<ShipCoordinate> allShipCoords;
 	protected ObjectIntMap<ShipCoordinate> coordToRoomRefIdMap;
 	protected IntMap<ShipCoordinate[]> roomRefIdToCoordsMap;
+	protected ObjectIntMap<ShipCoordinate> coordToDoorRefIdMap;
+	protected IntMap<ShipCoordinate> doorRefIdToCoordsMap;
 
 
 	public ShipLayout() {
 		allShipCoords = new HashSet<ShipCoordinate>();
 		coordToRoomRefIdMap = new ObjectIntMap<ShipCoordinate>();
 		roomRefIdToCoordsMap = new IntMap<ShipCoordinate[]>();
+		coordToDoorRefIdMap = new ObjectIntMap<ShipCoordinate>();
+		doorRefIdToCoordsMap = new IntMap<ShipCoordinate>();
 	}
 
 
@@ -36,12 +40,25 @@ public class ShipLayout {
 		roomRefIdToCoordsMap.put( roomModelRefId, roomCoords );
 	}
 
+	public void addDoor( int doorModelRefId, ShipCoordinate doorCoords ) {
+		allShipCoords.add( doorCoords );
+		doorRefIdToCoordsMap.put( doorModelRefId, doorCoords );
+		coordToDoorRefIdMap.put (doorCoords, doorModelRefId );
+	}
+
 
 	/**
 	 * Returns the ShipCoordinates for squares and walls of a room.
 	 */
 	public ShipCoordinate[] getRoomCoords( int roomModelRefId ) {
 		return roomRefIdToCoordsMap.get( roomModelRefId );
+	}
+
+	/**
+	 * Returns the ShipCoordinate for the door.
+	 */
+	public ShipCoordinate getDoorCoords( int doorModelRefId ) {
+		return doorRefIdToCoordsMap.get( doorModelRefId );
 	}
 
 	/**
@@ -53,6 +70,14 @@ public class ShipLayout {
 		return coordToRoomRefIdMap.get( coord, -1 );
 	}
 
+	/**
+	 * Returns a reference id for the door placed at the ShipCoordinate, or -1.
+	 * 
+	 * TODO: Two doors can be placed at single ShipCoordinate. As such this method is very reliable. Remove?
+	 */
+	public int getDoorRefIdOfCoords( ShipCoordinate coord ) {
+		return coordToDoorRefIdMap.get( coord, -1 );
+	}
 
 	/**
 	 * Returns all the ShipCoordinates, including walls.
@@ -74,6 +99,17 @@ public class ShipLayout {
 		return roomRefIdToCoordsMap.keys();
 	}
 
+	/**
+	 * Returns an interator for the DoorModel reference ids.
+	 * 
+	 * Usage:
+	 * for ( IntMap.Keys it = layout.getAllRoomRefIds(); it.hasNext; ) {
+	 *   int n = it.next();
+	 * }
+	 */
+	public IntMap.Keys doorRefIds() {
+		return doorRefIdToCoordsMap.keys();
+	}
 
 
 	/**
@@ -225,6 +261,10 @@ public class ShipLayout {
 				return ShipCoordinate.wNorthSouthWest( x, y );
 			case 'f':
 				return ShipCoordinate.wNorthSouthEast( x, y );
+			case '-':
+				return ShipCoordinate.door( x, y, true ); // Horizontal door
+			case '|':
+				return ShipCoordinate.door( x, y, false ); // Vertical door
 			default:
 				throw new IllegalArgumentException("Invalid cell type: " + c);
 		}

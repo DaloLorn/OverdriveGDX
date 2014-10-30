@@ -39,6 +39,7 @@ public class ShipActor extends Group implements Disposable, GamePlayerShipChange
 	protected ShipFloorLinesActor floorLines;
 	protected ShipRoomDecorsActor roomDecors;
 	protected ShipWallLinesActor wallLines;
+	protected ShipDoorsActor doors;
 
 	protected int shipModelRefId = -1;
 	protected ImageSpec shieldImgSpec = null;
@@ -97,6 +98,9 @@ public class ShipActor extends Group implements Disposable, GamePlayerShipChange
 
 		wallLines = new ShipWallLinesActor( context );
 		shipFloorplanGroup.addActor( wallLines );
+
+		doors = new ShipDoorsActor( context );
+		shipFloorplanGroup.addActor( doors );
 	}
 
 
@@ -170,6 +174,15 @@ public class ShipActor extends Group implements Disposable, GamePlayerShipChange
 
 			floorLines.clear();
 			floorLines.setSize( 0, 0 );
+
+			roomDecors.clear();
+			roomDecors.setSize( 0, 0 );
+
+			wallLines.clear();
+			wallLines.setSize( 0, 0 );
+
+			doors.clear();
+			doors.setSize( 0, 0 );
 
 			this.setSize( 0, 0 );
 		}
@@ -286,6 +299,14 @@ public class ShipActor extends Group implements Disposable, GamePlayerShipChange
 			wallLines.setTileSize( 35 );
 			for ( ShipCoordinate coord : shipModel.getLayout().getAllShipCoords() ) {
 				wallLines.addTile( coord, shipModel.getLayout().getAllShipCoords() );
+			}
+
+			doors.clear();
+			doors.setSize( shipModel.getHullWidth(), shipModel.getHullHeight() );
+			doors.setTileSize( 35 );
+			for ( IntMap.Keys it = shipModel.getLayout().doorRefIds(); it.hasNext; ) {
+				int doorRefId = it.next();
+				doors.addTile( context, shipModel.getLayout().getDoorCoords( doorRefId ), doorRefId );
 			}
 		}
 	}

@@ -4,6 +4,7 @@ import com.badlogic.gdx.utils.Pools;
 import com.ftloverdrive.core.OverdriveContext;
 import com.ftloverdrive.event.ship.ShipCreationEvent;
 import com.ftloverdrive.event.ship.ShipDoorCreationEvent;
+import com.ftloverdrive.event.ship.ShipLayoutDoorAddEvent;
 import com.ftloverdrive.event.ship.ShipLayoutRoomAddEvent;
 import com.ftloverdrive.event.ship.ShipRoomCreationEvent;
 import com.ftloverdrive.event.ship.ShipRoomImageChangeEvent;
@@ -91,6 +92,55 @@ public class TestShipBlueprint implements ShipBlueprint {
 		ShipLayoutRoomAddEvent roomAddEvent = Pools.get( ShipLayoutRoomAddEvent.class ).obtain();
 		roomAddEvent.init( shipRefId, roomRefId, roomCoords );
 		context.getScreenEventManager().postDelayedEvent( roomAddEvent );
+
+		// =====
+		// Doors
+
+		int doorRefId = -1;
+		ShipCoordinate doorCoords = null;
+
+		int doorsXYLRH[][] = new int[][] {
+			new int[] { 14,  4,  0,  1, 1 },
+			new int[] { 12,  4,  1,  3, 1 },
+			new int[] { 12,  3,  1,  2, 1 },
+			new int[] { 10,  3,  2,  4, 1 },
+			new int[] { 10,  4,  3,  5, 1 },
+			new int[] {  8,  4,  4,  5, 0 },
+			new int[] {  8,  2,  4,  7, 1 },
+			new int[] {  8,  5,  5,  8, 1 },
+			new int[] {  7,  6,  8,  9, 0 },
+			new int[] {  7,  2,  6,  7, 0 },
+			new int[] {  6,  3,  7, 10, 1 },
+			new int[] {  6,  4,  8, 10, 1 },
+			new int[] {  4,  5, 10, 12, 0 },
+			new int[] {  4,  3, 10, 11, 0 },
+			new int[] {  3,  2, 11, 13, 1 },
+			new int[] {  2,  3, 13, 14, 0 },
+			new int[] {  2,  5, 14, 15, 0 },
+			new int[] {  3,  5, 12, 15, 1 },
+			new int[] {  1,  4, 14, 16, 1 },
+			new int[] {  1,  3, 14, 16, 1 },
+			new int[] {  0,  3, 16, -1, 1 },
+			new int[] {  0,  4, 16, -1, 1 },
+			new int[] {  6,  7,  9, -1, 0 },
+			new int[] {  7,  7,  9, -1, 0 },
+			new int[] {  6,  1,  6, -1, 0 },
+			new int[] {  7,  1,  6, -1, 0 }
+		};
+
+		for ( int i=0; i < doorsXYLRH.length; i++ ) {
+			int[] xylrh = doorsXYLRH[i];
+			doorRefId = context.getNetManager().requestNewRefId();
+			doorCoords = ShipCoordinate.door( xylrh[0], xylrh[1], xylrh[4] == 0 )[0];
+
+			ShipDoorCreationEvent doorCreateEvent = Pools.get( ShipDoorCreationEvent.class ).obtain();
+			doorCreateEvent.init( doorRefId );
+			context.getScreenEventManager().postDelayedEvent( doorCreateEvent );
+
+			ShipLayoutDoorAddEvent doorAddEvent = Pools.get( ShipLayoutDoorAddEvent.class ).obtain();
+			doorAddEvent.init( shipRefId, doorRefId, doorCoords );
+			context.getScreenEventManager().postDelayedEvent( doorAddEvent );
+		}
 
 		return shipRefId;
 	}
