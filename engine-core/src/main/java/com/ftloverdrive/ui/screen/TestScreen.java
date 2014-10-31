@@ -13,8 +13,13 @@ import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.EventListener;
 import com.badlogic.gdx.scenes.scene2d.Group;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.InputEvent.Type;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Window;
 import com.badlogic.gdx.scenes.scene2d.utils.Align;
@@ -24,6 +29,7 @@ import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.Logger;
 import com.badlogic.gdx.utils.Pools;
 import com.badlogic.gdx.utils.Scaling;
+import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.ftloverdrive.blueprint.ship.TestShipBlueprint;
 import com.ftloverdrive.core.OverdriveContext;
 import com.ftloverdrive.event.OVDEventManager;
@@ -70,6 +76,7 @@ public class TestScreen implements Disposable, OVDScreen {
 	private Stage mainStage;
 	private Stage hudStage;
 	private Stage popupStage;
+	private Matrix4 projMatrix;
 
 	private Sprite driftSprite = null;
 	private Animation walkAnim = null;
@@ -90,35 +97,42 @@ public class TestScreen implements Disposable, OVDScreen {
 		eventManager = new OVDEventManager();
 		scriptManager = new OVDScriptManager();
 
-		mainStage = new Stage();
+		// Stages use StretchViewport by default, which causes everything that is drawn
+		// on the stage to be stretched to fit the new dimensions.
+		// ScreenViewport instead adds more area to the stage, allowing things to retain
+		// their original size. The downside is that higher resolutions have an advantage
+		// over lower ones (due to more of the game world being visible), but that's
+		// not really an issue for a game like FTL.
+		// https://github.com/libgdx/libgdx/wiki/Viewports
+		mainStage = new Stage( new ScreenViewport() );
 		stageManager.putStage( "Main", mainStage );
-		hudStage = new Stage();
+		hudStage = new Stage( new ScreenViewport() );
 		stageManager.putStage( "HUD", hudStage );
-		popupStage = new Stage();
+		popupStage = new Stage( new ScreenViewport() );
 		stageManager.putStage( "Popup", popupStage );
 
-		// These layers are mainly notes. Many will probably be moved inside
-		// actors.
+		// These layers are mainly notes. Many will probably be moved inside actors.
 		Array<String> mainLayerNames = new Array<String>();
 		mainLayerNames.add( "Background" );
-		mainLayerNames.add( "BackgroundAccent" );  // Planet.
-		mainLayerNames.add( "ShipShield" );
+		mainLayerNames.add( "BackgroundAccent" );	// Planet.
+		mainLayerNames.add( "BackgroundDetail" );	// Asteroids, fleet, etc.
+		mainLayerNames.add( "ShipShield" );				// Done: inside ShipActor
 		mainLayerNames.add( "ShipGib" );
 		mainLayerNames.add( "ShipWeapon" );
-		mainLayerNames.add( "ShipBase" );
-		mainLayerNames.add( "ShipFloor" );
-		mainLayerNames.add( "ShipFloorSheen" );  // Oxygen stripes.
-		mainLayerNames.add( "ShipRoomDecor" );
-		mainLayerNames.add( "ShipRoomAccent" );  // Terminal.
+		mainLayerNames.add( "ShipBase" );				// Done: inside ShipActor
+		mainLayerNames.add( "ShipFloor" );				// Done: inside ShipActor
+		mainLayerNames.add( "ShipFloorSheen" );		// Oxygen stripes.
+		mainLayerNames.add( "ShipRoomDecor" );			// Done: inside ShipActor
+		mainLayerNames.add( "ShipRoomAccent" );		// Terminal.
 		mainLayerNames.add( "ShipBreach" );
 		mainLayerNames.add( "ShipFire" );
 		mainLayerNames.add( "ShipSystemIcon" );
-		mainLayerNames.add( "ShipPersonnelDot" );  // Sensor blip or walk target.
+		mainLayerNames.add( "ShipPersonnelDot" );	// Sensor blip or walk target.
 		mainLayerNames.add( "ShipPersonnel" );
-		mainLayerNames.add( "ShipWall" );
-		mainLayerNames.add( "ShipDoor" );
-		mainLayerNames.add( "Satellite" );  // Flying drones.
-		mainLayerNames.add( "Debris" );  // Crystal lockdown chunks. Explosions.
+		mainLayerNames.add( "ShipWall" );				// Done: inside ShipActor
+		mainLayerNames.add( "ShipDoor" );				// Done: inside ShipActor
+		mainLayerNames.add( "Satellite" );			// Flying drones.
+		mainLayerNames.add( "Debris" );				// Crystal lockdown chunks. Explosions.
 		for ( String layerName : mainLayerNames ) {
 			Group tmpGroup = new Group();
 			tmpGroup.setName( layerName );
@@ -126,10 +140,10 @@ public class TestScreen implements Disposable, OVDScreen {
 		}
 
 		Array<String> hudLayerNames = new Array<String>();
-		hudLayerNames.add( "Warning" );  // "Danger", "Intruders Detected" and "O2 Low".
-		hudLayerNames.add( "UnitStatus" );  // Health bars over crew.
+		hudLayerNames.add( "Warning" );				// "Danger", "Intruders Detected" and "O2 Low".
+		hudLayerNames.add( "UnitStatus" );			// Health bars over crew.
 		hudLayerNames.add( "ShipDoorHighlight" );
-		hudLayerNames.add( "FloatyDamageNumber" );  // When hit.
+		hudLayerNames.add( "FloatyDamageNumber" );	// When hit.
 		hudLayerNames.add( "Beam" );
 		hudLayerNames.add( "Reticle" );
 		hudLayerNames.add( "CtrlPanel" );
@@ -153,18 +167,13 @@ public class TestScreen implements Disposable, OVDScreen {
 		context.getAssetManager().finishLoading();
 
 		bgAtlas = context.getAssetManager().get( OVDConstants.BKG_ATLAS, TextureAtlas.class );
-		ShatteredImage bgImage = new ShatteredImage( bgAtlas.findRegions( "bg-dullstars" ), 5 );
+		ShatteredImage bgImage = new ShatteredImage( bgAtlas.findRegions( "bg-blueStarcluster" ), 5 );
 		bgImage.setFillParent( true );
-		bgImage.setPosition( 0, 0 );
 		Group bg = mainStage.getRoot().findActor( "Background" );
-		// Groups don't get resized when actors are inserted into them
-		bg.setSize( mainStage.getWidth(), mainStage.getHeight() );
 		bg.addActor( bgImage );
 
 		textWindowDemo();
-
 		movingSpriteDemo();
-
 		walkAnimDemo();
 
 		batch = new SpriteBatch();
@@ -184,7 +193,9 @@ public class TestScreen implements Disposable, OVDScreen {
 		hudStage.addActor( playerShipHullMonitor );
 
 		shipActor = new ShipActor( context );
-		shipActor.setPosition( 200, 100 );  // TODO: Magic numbers (~200x200 on 1280x768).
+		// Ship's offset from the window's top left corner in FTL: X + 350, Y + 170
+		// At this point, shipActor's height is 0...
+		shipActor.setPosition( 350, mainStage.getHeight() - shipActor.getHeight() - 170 );
 		mainStage.addActor( shipActor );
 
 		inputMultiplexer = new InputMultiplexer();
@@ -192,6 +203,16 @@ public class TestScreen implements Disposable, OVDScreen {
 		inputMultiplexer.addProcessor( hudStage );
 		inputMultiplexer.addProcessor( mainStage );
 
+		mainStage.addListener(new InputListener() {
+			@Override
+			public boolean touchDown (InputEvent event, float x, float y, int pointer, int button) {
+				InputEvent e = (InputEvent)event;
+				Actor actor = mainStage.hit( e.getStageX(), e.getStageY(), false );
+				if ( actor instanceof EventListener )
+					return ((EventListener) actor).handle(event);
+				return false;
+			}
+		});
 
 		// Wire up the event manager...
 		TickEventHandler tickHandler = new TickEventHandler();
@@ -266,7 +287,8 @@ public class TestScreen implements Disposable, OVDScreen {
 		loremIpsum += "\n\nThis window is draggable.";
 
 		rootAtlas = context.getAssetManager().get( OVDConstants.ROOT_ATLAS, TextureAtlas.class );
-		TextureRegion plotDlgRegion = rootAtlas.findRegion( "window-base-alpha" ); // TODO box_text1 no longer available in AE, use the nearest equivalent
+		// TODO box_text1 no longer available in AE, use the nearest equivalent
+		TextureRegion plotDlgRegion = rootAtlas.findRegion( "window-base-alpha" );
 		NinePatchDrawable plotDlgBgDrawable = new NinePatchDrawable( new NinePatch( plotDlgRegion, 22, 22, 36, 22 ) );
 
 		Window plotDlg = new Window( "Test", new Window.WindowStyle( plotFont, new Color( 1f, 1f, 1f, 1f ), plotDlgBgDrawable ) );
@@ -292,7 +314,8 @@ public class TestScreen implements Disposable, OVDScreen {
 
 	private void walkAnimDemo() {
 		peopleAtlas = context.getAssetManager().get( OVDConstants.PEOPLE_ATLAS, TextureAtlas.class );
-		TextureRegion crewRegion = peopleAtlas.findRegion( "human-base" ); // TODO FTL:AE introduced layers to color the base images
+		// TODO FTL:AE introduced layers to color the base images
+		TextureRegion crewRegion = peopleAtlas.findRegion( "human-base" );
 
 		// FTL's animations.xml counts 0-based rows from the bottom.
 		TextureRegion[][] tmpFrames = crewRegion.split( 35, 35 );
@@ -307,18 +330,26 @@ public class TestScreen implements Disposable, OVDScreen {
 
 	@Override
 	public void resize( int width, int height ) {
-		Vector2 scaledView = Scaling.stretch.apply( 800, 400, width, height );
-		hudStage.getViewport().update( (int) scaledView.x, (int) scaledView.y, true );
+		hudStage.getViewport().update( width, height, true );
+		mainStage.getViewport().update( width, height, true );
+		popupStage.getViewport().update( width, height, true );
+		Group bg = mainStage.getRoot().findActor( "Background" );
+		Vector2 scaled = Scaling.stretch.apply( 1280, 720, width, height );
+		bg.setSize( scaled.x, scaled.y );
+
 		// TODO: Re-layout Stages.
+
+		// HUD
+		playerShipHullMonitor.setPosition( 0, hudStage.getHeight()-playerShipHullMonitor.getHeight() );
+		// Main
+		shipActor.setPosition( 350, mainStage.getHeight() - shipActor.getHeight() - 170 );
 
 		// SpriteBatches get resized to match the new aspect ratio,
 		// need to counteract this.
 		// http://stackoverflow.com/questions/14085212/libgdx-framebuffer-scaling
-
-		playerShipHullMonitor.setPosition( 0, hudStage.getHeight()-playerShipHullMonitor.getHeight() );
-		Matrix4 matrix = new Matrix4();
-		matrix.setToOrtho2D( 0, 0, width, height );
-		batch.setProjectionMatrix( matrix );
+		projMatrix = new Matrix4();
+		projMatrix.setToOrtho2D( 0, 0, width, height );
+		batch.setProjectionMatrix( projMatrix );
 	}
 
 	@Override

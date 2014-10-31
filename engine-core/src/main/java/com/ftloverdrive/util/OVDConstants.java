@@ -64,6 +64,25 @@ public class OVDConstants {
 	/** In enemy ships, indicates the maximum sector in which the ship can still appear. */
 	public static final String SECTOR_MAX = "SectorMax";
 
+	/** Strength of the ship's doors. Determines which sprite to use to represent the door.
+	 * -1 - hacked (pink-ish sprite)
+	 * 0 - default sprite tinted red
+	 * 1 - default (orange) sprite
+	 * 2 - gray sprite
+	 * 3 - gray sprite with marks
+	 * 4 - gray sprite with more marks
+	 */
+	public static final String DOOR_LEVEL = "DoorUpgradeLevel";
+
+	/*
+	 * ========================================
+	 * Door properties.
+	 */
+
+	public static final String DOOR_HEALTH_MAX = "DoorHeathMax";
+	public static final String DOOR_HEALTH = "DoorHeath";
+	public static final String DOOR_OPEN = "DoorOpen";
+	
 	/*
 	 * ========================================
 	 * Atlas paths.

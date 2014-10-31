@@ -4,6 +4,8 @@ import com.badlogic.gdx.utils.Pools;
 import com.ftloverdrive.core.OverdriveContext;
 import com.ftloverdrive.event.OVDEvent;
 import com.ftloverdrive.event.OVDEventHandler;
+import com.ftloverdrive.event.ship.DoorPropertyEvent;
+import com.ftloverdrive.event.ship.DoorPropertyListener;
 import com.ftloverdrive.event.ship.ShipCreationEvent;
 import com.ftloverdrive.event.ship.ShipDoorCreationEvent;
 import com.ftloverdrive.event.ship.ShipLayoutDoorAddEvent;
@@ -35,7 +37,8 @@ public class ShipEventHandler implements OVDEventHandler {
 			ShipRoomCreationEvent.class,
 			ShipRoomImageChangeEvent.class,
 			ShipLayoutDoorAddEvent.class,
-			ShipDoorCreationEvent.class
+			ShipDoorCreationEvent.class,
+			DoorPropertyEvent.class
 		};
 		listenerClasses = new Class[] {
 			ShipPropertyListener.class
@@ -54,7 +57,6 @@ public class ShipEventHandler implements OVDEventHandler {
 	}
 
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public void handle( OverdriveContext context, OVDEvent e, Object[] listeners ) {
 		if ( e instanceof ShipCreationEvent ) {
@@ -137,10 +139,31 @@ public class ShipEventHandler implements OVDEventHandler {
 
 			shipModel.getLayout().addDoor( doorRefId, event.getDoorCoords() );
 		}
+		else if ( e instanceof DoorPropertyEvent ) {
+			DoorPropertyEvent event = (DoorPropertyEvent)e;
+
+			int doorRefId = event.getDoorRefId();
+			DoorModel doorModel = context.getReferenceManager().getObject( doorRefId, DoorModel.class );
+			if ( event.getPropertyType() == DoorPropertyEvent.BOOL_TYPE ) {
+				if ( event.getAction() == DoorPropertyEvent.SET_ACTION ) {
+					boolean value = event.getBoolValue();
+					String key = event.getPropertyKey();
+					doorModel.getProperties().setBool( key, value );
+				}
+				else if ( event.getAction() == ShipPropertyEvent.TOGGLE_ACTION ) {
+					String key = event.getPropertyKey();
+					doorModel.getProperties().toggleBool( key );
+				}
+			}
+
+			for ( int i = listeners.length-2; i >= 0; i-=2 ) {
+				if ( listeners[i] == DoorPropertyListener.class ) {
+					((DoorPropertyListener)listeners[i+1]).doorPropertyChanged( context, event );
+				}
+			}
+		}
 	}
 
-
-	@SuppressWarnings("unchecked")
 	@Override
 	public void disposeEvent( OVDEvent e ) {
 		if ( e.getClass() == ShipCreationEvent.class ) {
@@ -158,5 +181,16 @@ public class ShipEventHandler implements OVDEventHandler {
 		else if ( e.getClass() == ShipLayoutRoomAddEvent.class ) {
 			Pools.get( ShipLayoutRoomAddEvent.class ).free( (ShipLayoutRoomAddEvent)e );
 		}
+		else if ( e.getClass() == ShipDoorCreationEvent.class ) {
+			Pools.get( ShipDoorCreationEvent.class ).free( (ShipDoorCreationEvent)e );
+		}
+		else if ( e.getClass() == ShipLayoutDoorAddEvent.class ) {
+			Pools.get( ShipLayoutDoorAddEvent.class ).free( (ShipLayoutDoorAddEvent)e );
+		}
+		else if ( e.getClass() == DoorPropertyEvent.class ) {
+			Pools.get( DoorPropertyEvent.class ).free( (DoorPropertyEvent)e );
+		}
+		else
+			throw new IllegalArgumentException( "Missing dispose case for event type: " + e.getClass() );
 	}
 }

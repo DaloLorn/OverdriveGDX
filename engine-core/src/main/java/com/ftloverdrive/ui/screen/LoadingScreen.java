@@ -18,6 +18,7 @@ import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.Logger;
 import com.badlogic.gdx.utils.Pools;
 import com.badlogic.gdx.utils.Scaling;
+import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.ftloverdrive.core.OverdriveContext;
 import com.ftloverdrive.event.OVDEventManager;
 import com.ftloverdrive.script.OVDScriptManager;
@@ -62,7 +63,7 @@ public class LoadingScreen implements Disposable, OVDScreen {
 		scriptManager = new OVDScriptManager();
 
 
-		mainStage = new Stage();
+		mainStage = new Stage(new ScreenViewport());
 		stageManager.putStage( "Main", mainStage );
 
 		loadingAssetManager = new AssetManager();
@@ -75,6 +76,8 @@ public class LoadingScreen implements Disposable, OVDScreen {
 		loadingBarHidden = new Image( atlas.findRegion("loading-bar-hidden") );
 		screenBg = new Image( atlas.findRegion("screen-bg") );
 		loadingBg = new Image( atlas.findRegion("loading-frame-bg") );
+		
+		screenBg.setFillParent( true );
 
 		// Animated bar.
 		//Animation anim = new Animation( 0.05f, atlas.findRegions("loading-bar-anim") );
@@ -115,11 +118,13 @@ public class LoadingScreen implements Disposable, OVDScreen {
 		mainStage.getViewport().update( (int) scaledView.x, (int) scaledView.y, true );
 
 		// Make the background fill the screen.
-		screenBg.setSize(width, height);
+		//screenBg.setSize(scaledView.x, scaledView.y);
+		//screenBg.setX( 0 );
+		//screenBg.setY( 0 );
 
 		// Place the logo in the middle of the screen and 100 px up.
-		logo.setX((width - logo.getWidth()) / 2);
-		logo.setY((height - logo.getHeight()) / 2 + 100);
+		logo.setX((scaledView.x - logo.getWidth()) / 2);
+		logo.setY((scaledView.y - logo.getHeight()) / 2 + 100);
 
 		// Place the loading frame in the middle of the screen.
 		loadingFrame.setX((mainStage.getWidth() - loadingFrame.getWidth()) / 2);

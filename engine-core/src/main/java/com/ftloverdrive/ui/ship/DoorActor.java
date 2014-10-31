@@ -5,20 +5,28 @@ import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.Animation.PlayMode;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.Event;
+import com.badlogic.gdx.scenes.scene2d.EventListener;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.utils.Disposable;
+import com.badlogic.gdx.utils.Pools;
 import com.ftloverdrive.core.OverdriveContext;
-import com.ftloverdrive.io.ImageSpec;
+import com.ftloverdrive.event.OVDEventManager;
+import com.ftloverdrive.event.ship.DoorPropertyEvent;
+import com.ftloverdrive.event.ship.DoorPropertyListener;
+import com.ftloverdrive.io.AnimSpec;
 import com.ftloverdrive.model.ship.DoorModel;
+import com.ftloverdrive.util.OVDConstants;
 
 /**
  * An actor that represents a single door.
  */
-public class DoorActor extends Actor implements Disposable {
+public class DoorActor extends Actor implements Disposable, EventListener, DoorPropertyListener {
 	protected AssetManager assetManager;
+	protected OVDEventManager eventManager;
 
-	protected ImageSpec animSpec;
+	protected AnimSpec animSpec;
 	protected Animation doorAnim;
 	/* 
 	 * Keep the elapsed time as a field so that the animation will move smoothly
@@ -29,9 +37,10 @@ public class DoorActor extends Actor implements Disposable {
 
 	protected int doorModelRefId = -1;
 
-	public DoorActor( AssetManager assetManager ) {
+	public DoorActor( OverdriveContext context ) {
 		super();
-		this.assetManager = assetManager;
+		this.assetManager = context.getAssetManager();
+		this.eventManager = context.getScreenEventManager();
 	}
 
 	@Override
@@ -91,42 +100,95 @@ public class DoorActor extends Actor implements Disposable {
 		elapsed = doorAnim.getAnimationDuration();
 	}
 
+	public boolean isStateClosed() {
+		if ( doorModelRefId == -1 ) return false;
+		return ( doorAnim.getPlayMode() == PlayMode.REVERSED && elapsed >= doorAnim.getAnimationDuration() ) ||
+				( doorAnim.getPlayMode() == PlayMode.NORMAL && elapsed == 0 );
+	}
+
+	public boolean isStateOpen() {
+		if ( doorModelRefId == -1 ) return false;
+		return ( doorAnim.getPlayMode() == PlayMode.NORMAL && elapsed >= doorAnim.getAnimationDuration() ) ||
+				( doorAnim.getPlayMode() == PlayMode.REVERSED && elapsed == 0 );
+	}
+
 	public void setDoorModel( OverdriveContext context, int doorModelRefId ) {
 		this.doorModelRefId = doorModelRefId;
-		updateInfo( context );
+		updateDoorInfo( context );
+	}
+
+	public int getDoorModel() {
+		return doorModelRefId;
 	}
 
 	/**
 	 * Updates everything to match the current DoorModel.
 	 */
-	private void updateInfo( OverdriveContext context ) {
+	private void updateDoorInfo( OverdriveContext context ) {
 		if ( doorModelRefId == -1 ) {
 			setPosition( 0, 0 );
 			setSize( 0, 0 );
 		}
 		else {
-			if (animSpec != null)
-				assetManager.unload( animSpec.getAtlasPath() );
-
 			DoorModel doorModel = context.getReferenceManager().getObject( doorModelRefId, DoorModel.class );
-			animSpec = doorModel.getAnimSpec();
-			
-			assetManager.get( animSpec.getAtlasPath(), TextureAtlas.class );
-			TextureAtlas doorAtlas = assetManager.get( animSpec.getAtlasPath(), TextureAtlas.class );
-			TextureRegion doorRegion = doorAtlas.findRegion( animSpec.getRegionName() ); 
-			// FTL's animations.xml counts 0-based rows from the bottom.
-			TextureRegion[][] tmpFrames = doorRegion.split( 35, 35 );
-			TextureRegion[] doorFrames = new TextureRegion[5];
-			for ( int i=0; i < doorFrames.length; i++ )
-				doorFrames[i] = tmpFrames[0][i];
+			AnimSpec newAnimSpec = doorModel.getAnimSpec();
 
-			setSize( 35, 35 );
-			doorAnim = new Animation( .2f, doorFrames );
+			// Default values
+			boolean stateOpen = false;
+			boolean stateClosed = !doorModel.getProperties().getBool( OVDConstants.DOOR_OPEN );
+			if ( doorAnim != null ) {
+				// Both can be null when door is currently changing states
+				stateOpen = isStateOpen();
+				stateClosed = isStateClosed();
+			}
+
+			if ( animSpec != null && !animSpec.equals( newAnimSpec ) ) {
+				assetManager.unload( animSpec.getAtlasPath() );
+				animSpec = null;
+			}
+			if ( animSpec == null && newAnimSpec != null ) {
+				animSpec = newAnimSpec;
+				assetManager.load( animSpec.getAtlasPath(), TextureAtlas.class );
+				assetManager.finishLoading();
+				doorAnim = animSpec.create( context );
+			}
+
+			boolean open = doorModel.getProperties().getBool( OVDConstants.DOOR_OPEN );
+			if ( stateOpen )
+				if ( open ) setStateOpen(); else playClose();
+			else if ( stateClosed )
+				if ( open ) playOpen(); else setStateClosed();
 		}
 	}
 
 	@Override
 	public void dispose() {
 		assetManager.unload( animSpec.getAtlasPath() );
+	}
+
+	@Override
+	public boolean handle(Event event) {
+		if (event instanceof InputEvent) {
+			InputEvent e = (InputEvent)event;
+			switch (e.getType()) {
+				case touchDown:
+					DoorPropertyEvent ev = Pools.get( DoorPropertyEvent.class ).obtain();
+					ev.init( doorModelRefId, DoorPropertyEvent.BOOL_TYPE, DoorPropertyEvent.TOGGLE_ACTION, OVDConstants.DOOR_OPEN, false );
+					eventManager.postDelayedEvent(ev);
+					return true;
+				default:
+					return false;
+			}
+		}
+		return false;
+	}
+
+	@Override
+	public void doorPropertyChanged(OverdriveContext context, DoorPropertyEvent e) {
+		if ( e.getDoorRefId() != doorModelRefId ) return;
+
+		if ( e.getPropertyType() == DoorPropertyEvent.BOOL_TYPE ) {
+			updateDoorInfo( context );
+		}
 	}
 }

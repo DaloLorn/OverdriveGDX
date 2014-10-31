@@ -107,7 +107,6 @@ public class ShipActor extends Group implements Disposable, GamePlayerShipChange
 	@Override
 	public void draw( Batch batch, float parentAlpha ) {
 		if ( shipModelRefId != -1 ) {
-			//zzz.setPosition( this.getX(), this.getY() );
 			super.draw( batch, parentAlpha );
 		}
 	}
@@ -311,6 +310,14 @@ public class ShipActor extends Group implements Disposable, GamePlayerShipChange
 		}
 	}
 
+	@Override
+	public float getHeight() {
+		if ( baseImgSpec == null )
+			return 0;
+		else
+			return baseImage.getHeight();
+	}
+
 	protected boolean isEqual( Object a, Object b ) {
 		if ( a != null ) return a.equals( b );
 		if ( b != null ) return b.equals( a );
@@ -318,7 +325,6 @@ public class ShipActor extends Group implements Disposable, GamePlayerShipChange
 	}
 
 	// Actors don't normally have a dispose().
-	@Override
 	public void dispose() {
 		floorTiles.dispose();
 		roomDecors.dispose();
