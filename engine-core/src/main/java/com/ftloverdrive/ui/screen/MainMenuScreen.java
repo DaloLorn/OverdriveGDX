@@ -15,7 +15,6 @@ import com.badlogic.gdx.utils.Scaling;
 import com.ftloverdrive.core.OverdriveContext;
 import com.ftloverdrive.event.OVDEventManager;
 import com.ftloverdrive.script.OVDScriptManager;
-import com.ftloverdrive.util.OVDConstants;
 
 public class MainMenuScreen implements Disposable, OVDScreen {
 
@@ -46,13 +45,17 @@ public class MainMenuScreen implements Disposable, OVDScreen {
 		mainStage = new Stage();
 		stageManager.putStage( "Main", mainStage );
 
+		// TODO: works in theory, but what about unloading assets?
+		// are scripts the right way to go, or is it too much "power"?
+		// maybe json-based data descriptors instead?
+
 		Map<String, Object> vars = new HashMap<String, Object>();
 		vars.put( "context", context );
 		vars.put( "stage", mainStage );
 
 		try {
 			FileHandleResolver resolver = context.getFileHandleResolver();
-			scriptManager.eval( resolver.resolve( "overdrive-assets/scripts/ui/screen-main-menu.java" ), vars );
+			scriptManager.eval( resolver.resolve( "overdrive-assets/scripts/ui/screens/main-menu.java" ), vars );
 		}
 		catch ( Exception e ) {
 			log.error( "Error evaluating script.", e );
@@ -105,7 +108,6 @@ public class MainMenuScreen implements Disposable, OVDScreen {
 	@Override
 	public void dispose() {
 		mainStage.dispose();
-		context.getAssetManager().unload( OVDConstants.MENU_ATLAS );
 		Pools.get( OverdriveContext.class ).free( context );
 	}
 
