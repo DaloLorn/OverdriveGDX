@@ -2,20 +2,9 @@ package com.ftloverdrive.event.ship;
 
 import com.badlogic.gdx.utils.Pool.Poolable;
 
-import com.ftloverdrive.event.AbstractOVDEvent;
 
-
-public class ShipPropertyEvent extends AbstractOVDEvent implements Poolable {
-	public static final int INT_TYPE = 0;
-
-	public static final int SET_ACTION = 0;
-	public static final int INCREMENT_ACTION = 1;
-
+public class ShipPropertyEvent extends AbstractPropertyEvent implements Poolable {
 	protected int shipRefId = -1;
-	protected int propertyType = -1;
-	protected int action = -1;
-	protected String propertyKey = null;
-	protected int intValue = 0;
 
 
 	public ShipPropertyEvent() {
@@ -32,27 +21,17 @@ public class ShipPropertyEvent extends AbstractOVDEvent implements Poolable {
 		this.intValue = intValue;
 	}
 
+	public void init( int shipRefId, int propertyType, int action, String propertyKey, boolean boolValue ) {
+		this.shipRefId = shipRefId;
+		this.propertyType = propertyType;
+		this.action = action;
+		this.propertyKey = propertyKey;
+		this.boolValue = boolValue;
+	}
 
 	public int getShipRefId() {
 		return shipRefId;
 	}
-
-	public int getPropertyType() {
-		return propertyType;
-	}
-
-	public int getAction() {
-		return action;
-	}
-
-	public String getPropertyKey() {
-		return propertyKey;
-	}
-
-	public int getIntValue() {
-		return intValue;
-	}
-
 
 	@Override
 	public void reset() {
