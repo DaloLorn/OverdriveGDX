@@ -1,9 +1,8 @@
 package com.ftloverdrive.event;
 
-import com.badlogic.gdx.utils.Pool.Poolable;
 
 
-public class TickEvent extends AbstractOVDEvent implements Poolable {
+public class TickEvent extends AbstractOVDEvent {
 	protected int tickCount = 0;
 
 
@@ -39,8 +38,7 @@ public class TickEvent extends AbstractOVDEvent implements Poolable {
 	 */
 	@Override
 	public void reset() {
-		cancelled = false;
-		sourceRefId = -1;
+		super.reset();
 		tickCount = 0;
 	}
 

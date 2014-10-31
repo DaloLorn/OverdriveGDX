@@ -1,14 +1,14 @@
 package com.ftloverdrive.event.ship;
 
-import com.badlogic.gdx.utils.Pool.Poolable;
 import com.ftloverdrive.event.AbstractOVDEvent;
 
-public abstract class AbstractPropertyEvent extends AbstractOVDEvent implements Poolable {
+public abstract class AbstractPropertyEvent extends AbstractOVDEvent {
 	public static final int INT_TYPE = 0;
 	public static final int BOOL_TYPE = 1;
 
 	public static final int SET_ACTION = 0;
 	public static final int INCREMENT_ACTION = 1;
+	/** Only applies to BOOL_TYPE. Negates the property's boolean value. boolValue field is ignored. */
 	public static final int TOGGLE_ACTION = 2;
 
 	protected int propertyType = -1;
@@ -45,6 +45,7 @@ public abstract class AbstractPropertyEvent extends AbstractOVDEvent implements 
 	}
 
 	public void reset() {
+		super.reset();
 		propertyType = -1;
 		action = -1;
 		propertyKey = null;

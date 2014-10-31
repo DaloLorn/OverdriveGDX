@@ -1,9 +1,9 @@
 package com.ftloverdrive.event;
 
-import com.ftloverdrive.event.OVDEvent;
+import com.badlogic.gdx.utils.Pool.Poolable;
 
 
-public abstract class AbstractOVDEvent implements OVDEvent {
+public abstract class AbstractOVDEvent implements OVDEvent, Poolable {
 	protected int sourceRefId = -1;
 	protected boolean cancelled = false;
 
@@ -22,5 +22,10 @@ public abstract class AbstractOVDEvent implements OVDEvent {
 
 	public boolean isCancelled() {
 		return cancelled;
+	}
+
+	public void reset() {
+		sourceRefId = -1;
+		cancelled = false;
 	}
 }

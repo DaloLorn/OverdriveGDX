@@ -1,18 +1,13 @@
 package com.ftloverdrive.event;
 
-import java.util.concurrent.LinkedBlockingDeque;
 import java.util.Deque;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.LinkedBlockingDeque;
 
 import com.badlogic.gdx.utils.Pool;
 import com.badlogic.gdx.utils.Pools;
-
 import com.ftloverdrive.core.OverdriveContext;
-import com.ftloverdrive.event.OVDEvent;
-import com.ftloverdrive.event.OVDEventListenerList;
-import com.ftloverdrive.event.TickEvent;
-import com.ftloverdrive.event.TickListener;
 
 
 /**
