@@ -19,7 +19,6 @@ import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.InputEvent.Type;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Window;
 import com.badlogic.gdx.scenes.scene2d.utils.Align;
@@ -170,6 +169,7 @@ public class TestScreen implements Disposable, OVDScreen {
 		ShatteredImage bgImage = new ShatteredImage( bgAtlas.findRegions( "bg-blueStarcluster" ), 5 );
 		bgImage.setFillParent( true );
 		Group bg = mainStage.getRoot().findActor( "Background" );
+		bg.setSize( bgImage.getCompleteWidth(), bgImage.getCompleteHeight() );
 		bg.addActor( bgImage );
 
 		textWindowDemo();
@@ -205,11 +205,10 @@ public class TestScreen implements Disposable, OVDScreen {
 
 		mainStage.addListener(new InputListener() {
 			@Override
-			public boolean touchDown (InputEvent event, float x, float y, int pointer, int button) {
-				InputEvent e = (InputEvent)event;
-				Actor actor = mainStage.hit( e.getStageX(), e.getStageY(), false );
+			public boolean touchDown( InputEvent event, float x, float y, int pointer, int button ) {
+				Actor actor = event.getTarget();
 				if ( actor instanceof EventListener )
-					return ((EventListener) actor).handle(event);
+					return ( (EventListener)actor ).handle( event );
 				return false;
 			}
 		});
@@ -334,8 +333,8 @@ public class TestScreen implements Disposable, OVDScreen {
 		mainStage.getViewport().update( width, height, true );
 		popupStage.getViewport().update( width, height, true );
 		Group bg = mainStage.getRoot().findActor( "Background" );
-		Vector2 scaled = Scaling.stretch.apply( 1280, 720, width, height );
-		bg.setSize( scaled.x, scaled.y );
+		Vector2 scaled = Scaling.fill.apply( bg.getWidth(), bg.getHeight(), width, height );
+		bg.setScale( Math.min( scaled.x / bg.getWidth(), scaled.y / bg.getHeight() ) );
 
 		// TODO: Re-layout Stages.
 
