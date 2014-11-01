@@ -46,19 +46,21 @@ public class ShipDoorsActor extends Group implements Disposable, ShipPropertyLis
 	}
 
 	protected float calcTileX( ShipCoordinate coord ) {
-		int wallThickness = 2;
+		// TODO: use the actor's frame size
+		float frameSize = tileSize;
 		if ( coord.v == ShipCoordinate.TYPE_DOOR_H )
-			return coord.x * tileSize + tileSize;
+			return coord.x * tileSize + frameSize;
 		else if ( coord.v == ShipCoordinate.TYPE_DOOR_V )
-			return coord.x * tileSize - tileSize / 2 + wallThickness / 2;
+			return Math.round( coord.x * tileSize - frameSize / 2 );
 		else
 			return 0;
 	}
 
 	protected float calcTileY( ShipCoordinate coord ) {
+		// TODO: use the actor's frame size
+		float frameSize = tileSize;
 		if ( coord.v == ShipCoordinate.TYPE_DOOR_H )
-			// Rounding errors cause H doors to be displaced by 1px on some resolutions
-			return Math.round( getHeight() - ( coord.y * tileSize ) + tileSize / 2 );
+			return Math.round( getHeight() - ( coord.y * tileSize ) + frameSize / 2 );
 		else if ( coord.v == ShipCoordinate.TYPE_DOOR_V )
 			return getHeight() - ( coord.y * tileSize );
 		else
@@ -75,7 +77,6 @@ public class ShipDoorsActor extends Group implements Disposable, ShipPropertyLis
 		DoorActor doorActor = new DoorActor( context );
 		doorActor.setDoorModel( context, doorRefId );
 		doorActor.setPosition( calcTileX( coord ), calcTileY( coord ) );
-		doorActor.setSize( 35, 35 );
 		doorActor.setRotation( coord.v == ShipCoordinate.TYPE_DOOR_H ? 90 : 0 );
 		doorActor.setAppearanceClosed();
 		addActor( doorActor );
@@ -103,10 +104,9 @@ public class ShipDoorsActor extends Group implements Disposable, ShipPropertyLis
 			ShipModel shipModel = context.getReferenceManager().getObject( shipModelRefId, ShipModel.class );
 			int doorUpgradeLevel = shipModel.getProperties().getInt( OVDConstants.DOOR_LEVEL );
 
-			// TODO: Interpret the door level into an imageSpec, eg.
-			// TODO: Need AnimSpec class or something
+			// TODO: Interpret the door level into an animSpec, eg.
 			// SystemModel system = shipModel.getSystemByType( OVDConstants.SYSTEM_DOOR );
-			// ImageSpec imgSpec = (ImageSpec) system.interpretIntValue( doorUpgradeLevel, OVDConstants.DOOR_SYSTEM_LEVEL );
+			// AnimSpec animSpec = (AnimSpec) system.interpretIntValue( doorUpgradeLevel, OVDConstants.DOOR_SYSTEM_LEVEL );
 			
 			for ( IntMap.Keys it = shipModel.getLayout().doorRefIds(); it.hasNext; ) {
 				int doorRefId = it.next();

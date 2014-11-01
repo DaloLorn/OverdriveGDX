@@ -177,6 +177,7 @@ public class DoorActor extends Actor implements Disposable, EventListener, DoorP
 				assetManager.finishLoading();
 				doorAnim = animSpec.create( context );
 				doorAnim.setPlayMode( playMode );
+				setSize( animSpec.getFrameWidth(), animSpec.getFrameHeight() );
 			}
 
 			boolean open = doorModel.getProperties().getBool( OVDConstants.DOOR_OPEN );
@@ -200,7 +201,7 @@ public class DoorActor extends Actor implements Disposable, EventListener, DoorP
 		// Door sheet's frame size is 35px, but the clickable area of the door is smaller
 		// TODO: find a way not to hardcode this
 		if ( touchable && getTouchable() != Touchable.enabled ) return null;
-		return x >= 11 && x < 23 && y >= 3 && y < 33 ? this : null;
+		return x >= 11 && x < 24 && y >= 3 && y < 33 ? this : null;
 	}
 
 	@Override
