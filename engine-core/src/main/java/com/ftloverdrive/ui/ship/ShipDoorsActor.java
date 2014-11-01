@@ -57,7 +57,8 @@ public class ShipDoorsActor extends Group implements Disposable, ShipPropertyLis
 
 	protected float calcTileY( ShipCoordinate coord ) {
 		if ( coord.v == ShipCoordinate.TYPE_DOOR_H )
-			return getHeight() - ( coord.y * tileSize ) + tileSize / 2;
+			// Rounding errors cause H doors to be displaced by 1px on some resolutions
+			return Math.round( getHeight() - ( coord.y * tileSize ) + tileSize / 2 );
 		else if ( coord.v == ShipCoordinate.TYPE_DOOR_V )
 			return getHeight() - ( coord.y * tileSize );
 		else
@@ -76,7 +77,7 @@ public class ShipDoorsActor extends Group implements Disposable, ShipPropertyLis
 		doorActor.setPosition( calcTileX( coord ), calcTileY( coord ) );
 		doorActor.setSize( 35, 35 );
 		doorActor.setRotation( coord.v == ShipCoordinate.TYPE_DOOR_H ? 90 : 0 );
-		doorActor.setStateClosed();
+		doorActor.setAppearanceClosed();
 		addActor( doorActor );
 
 		context.getScreenEventManager().addEventListener( doorActor, DoorPropertyListener.class );
