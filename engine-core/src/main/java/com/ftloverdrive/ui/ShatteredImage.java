@@ -17,8 +17,13 @@ import com.badlogic.gdx.utils.Array;
  */
 public class ShatteredImage extends Table {
 
+	private float completeWidth = 0;
+	private float completeHeight = 0;
+
 	public ShatteredImage( Array<? extends TextureRegion> tileRegions, int tileColumns ) {
 		super();
+
+		completeWidth = tileRegions.get(0).getRegionWidth() * tileColumns;
 
 		for ( int n=0; n < tileRegions.size; n++ ) {
 			Image tileImage = new Image( tileRegions.get(n) );
@@ -26,7 +31,22 @@ public class ShatteredImage extends Table {
 			if ( n % tileColumns == tileColumns-1 ) {
 				// This was the last tile in a row.
 				this.row();
+				completeHeight += tileImage.getHeight();
 			}
 		}
+	}
+
+	/**
+	 * Returns the width of the original, unshattered image.
+	 */
+	public float getCompleteWidth() {
+		return completeWidth;
+	}
+
+	/**
+	 * Returns the height of the original, unshattered image.
+	 */
+	public float getCompleteHeight() {
+		return completeHeight;
 	}
 }
