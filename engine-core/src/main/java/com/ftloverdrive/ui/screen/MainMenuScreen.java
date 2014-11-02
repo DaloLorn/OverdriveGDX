@@ -1,69 +1,44 @@
 package com.ftloverdrive.ui.screen;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.assets.loaders.FileHandleResolver;
 import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.Disposable;
-import com.badlogic.gdx.utils.Logger;
 import com.badlogic.gdx.utils.Pools;
-import com.badlogic.gdx.utils.Scaling;
+import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.ftloverdrive.core.OverdriveContext;
-import com.ftloverdrive.event.OVDEventManager;
-import com.ftloverdrive.script.OVDScriptManager;
 
-public class MainMenuScreen implements Disposable, OVDScreen {
-
-	private Logger log;
+public class MainMenuScreen extends AbstractScriptedScreen implements Disposable, OVDScreen {
 
 	private Stage mainStage;
 
 	private boolean renderedPreviousFrame = false;
 
-	private OVDStageManager stageManager = null;
-	private OVDEventManager eventManager = null;
-	private OVDScriptManager scriptManager = null;
-
-	private OverdriveContext context;
-
 
 	public MainMenuScreen( OverdriveContext srcContext ) {
-		this.context = Pools.get( OverdriveContext.class ).obtain();
-		this.context.init( srcContext );
-		this.context.setScreen( this );
+		super( srcContext );
 
-		log = new Logger( LoadingScreen.class.getCanonicalName(), Logger.INFO );
-
-		stageManager = new OVDStageManager();
-		eventManager = new OVDEventManager();
-		scriptManager = new OVDScriptManager();
-
-		mainStage = new Stage();
+		mainStage = new Stage(new ScreenViewport());
 		stageManager.putStage( "Main", mainStage );
 
-		// TODO: works in theory, but what about unloading assets?
-		// are scripts the right way to go, or is it too much "power"?
-		// maybe json-based data descriptors instead?
-
-		Map<String, Object> vars = new HashMap<String, Object>();
-		vars.put( "context", context );
-		vars.put( "stage", mainStage );
-
+		screenNameSpace = scriptManager.requestNewNameSpace( "MainMenuNameSpace" );
 		try {
-			FileHandleResolver resolver = context.getFileHandleResolver();
-			scriptManager.eval( resolver.resolve( "overdrive-assets/scripts/ui/screens/main-menu.java" ), vars );
+			screenNameSpace.setVariable( "stage", mainStage, false );
+		} catch (Exception e) {
+			log.error( "Error occured while setting variable.", e );
 		}
-		catch ( Exception e ) {
-			log.error( "Error evaluating script.", e );
-		}
+
+		runScript( "overdrive-assets/scripts/ui/screens/main-menu.java" );
 	}
 
 	@Override
-	public void render(float delta) {
+	public void resize( int width, int height ) {
+		mainStage.getViewport().update( width, height, true );
+		super.resize( width, height );
+	}
+
+	@Override
+	public void render( float delta ) {
 		if ( renderedPreviousFrame )
 			eventManager.secondsElapsed( delta );
 		eventManager.processEvents( context );
@@ -75,55 +50,34 @@ public class MainMenuScreen implements Disposable, OVDScreen {
 			mainStage.act( delta );
 
 		mainStage.draw();
+		super.render( delta );
 
 		renderedPreviousFrame = true;
 	}
 
 	@Override
-	public void resize(int width, int height) {
-		Vector2 scaledView = Scaling.stretch.apply( 800, 400, width, height );
-		mainStage.getViewport().update( (int) scaledView.x, (int) scaledView.y, true );
-	}
-
-	@Override
 	public void show() {
 		Gdx.input.setInputProcessor( mainStage );
+		super.show();
 	}
 
 	@Override
 	public void hide() {
 		Gdx.input.setInputProcessor( null );
 		renderedPreviousFrame = false;
+		super.hide();
 	}
 
 	@Override
 	public void pause() {
 		renderedPreviousFrame = false;
-	}
-
-	@Override
-	public void resume() {
+		super.pause();
 	}
 
 	@Override
 	public void dispose() {
+		super.dispose();
 		mainStage.dispose();
 		Pools.get( OverdriveContext.class ).free( context );
-	}
-
-
-	@Override
-	public OVDStageManager getStageManager() {
-		return stageManager;
-	}
-
-	@Override
-	public OVDEventManager getEventManager() {
-		return eventManager;
-	}
-
-	@Override
-	public OVDScriptManager getScriptManager() {
-		return scriptManager;
 	}
 }

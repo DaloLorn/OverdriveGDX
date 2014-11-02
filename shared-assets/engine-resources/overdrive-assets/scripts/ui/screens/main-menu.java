@@ -1,3 +1,6 @@
+import java.util.Map;
+import java.util.HashMap;
+
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.Stage;
@@ -9,15 +12,25 @@ import com.badlogic.gdx.scenes.scene2d.ui.Button.ButtonStyle;
 import com.badlogic.gdx.scenes.scene2d.ui.VerticalGroup;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.utils.Scaling;
+import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
 import com.ftloverdrive.bsh.ClickListener;
 import com.ftloverdrive.util.OVDConstants;
 import com.ftloverdrive.ui.ShatteredImage;
+import com.ftloverdrive.core.OverdriveContext;
 
-	// Preload resources
-	context.getAssetManager().load( OVDConstants.MENU_ATLAS, TextureAtlas.class );
-	context.getAssetManager().finishLoading();
+// Declare resources the script will be using. Overdrive handles un/loading internally.
+Map usingResources() {
+	Map resourceMap = new HashMap();
+	resourceMap.put( OVDConstants.MENU_ATLAS, TextureAtlas.class );
+	return resourceMap;
+}
 
+VerticalGroup menuTable = null;
+
+void init( OverdriveContext context ) {
 	// Set up layers for later use
 	Array<String> mainLayerNames = new Array<String>();
 	mainLayerNames.add( "Background" );
@@ -32,13 +45,14 @@ import com.ftloverdrive.ui.ShatteredImage;
 	// Set up the background image
 	TextureAtlas menuAtlas = context.getAssetManager().get( OVDConstants.MENU_ATLAS, TextureAtlas.class );
 	ShatteredImage bgImage = new ShatteredImage( menuAtlas.findRegions( "main-base2" ), 5 );
-	bgImage.setSize( bgImage.getCompleteWidth(), bgImage.getCompleteHeight() );
+	bgImage.setFillParent( true );
 
 	Group bg = stage.getRoot().findActor( "Background" );
+	bg.setSize( bgImage.getCompleteWidth(), bgImage.getCompleteHeight() );
 	bg.addActor( bgImage );
 
 	// Set up the main menu buttons
-	VerticalGroup menuTable = new VerticalGroup();
+	menuTable = new VerticalGroup();
 	TextureRegionDrawable temp = null;
 
 	ButtonStyle btnStylePlay = new ButtonStyle();
@@ -64,10 +78,6 @@ import com.ftloverdrive.ui.ShatteredImage;
 	menuTable.align( Align.right );
 	stage.addActor( menuTable );
 
-	// Relative to top-right corner.
-	// TODO: depends on current window size, fix that
-	menuTable.setPosition( -50, -250 );
-
 	buttonPlay.addListener( new ClickListener() {
 		public void clicked( InputEvent event, Float x, Float y ) {
 			context.getScreenManager().continueToNextScreen();
@@ -79,3 +89,21 @@ import com.ftloverdrive.ui.ShatteredImage;
 			System.exit(0);
 		}
 	});
+
+	// Layout
+	Vector2 scaled = Scaling.stretch.apply( bg.getWidth(), bg.getHeight(), stage.getWidth(), stage.getHeight() );
+	float scaleX = scaled.x / bg.getWidth();
+	float scaleY = scaled.y / bg.getHeight();
+	bg.setScale( scaleX, scaleY );
+	menuTable.setPosition( -50 * scaleX, -250 * scaleY );
+}
+
+void resize( int width, int height ) {
+	Group bg = stage.getRoot().findActor( "Background" );
+	Vector2 scaled = Scaling.stretch.apply( bg.getWidth(), bg.getHeight(), width, height );
+	float scaleX = scaled.x / bg.getWidth();
+	float scaleY = scaled.y / bg.getHeight();
+	bg.setScale( scaleX, scaleY );
+
+	menuTable.setPosition( -50 * scaleX, -250 * scaleY );
+}
