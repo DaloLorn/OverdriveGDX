@@ -1,6 +1,7 @@
 package com.ftloverdrive.event.ship;
 
 import com.badlogic.gdx.utils.Pool.Poolable;
+import com.ftloverdrive.event.AbstractPropertyEvent;
 
 
 public class ShipPropertyEvent extends AbstractPropertyEvent implements Poolable {

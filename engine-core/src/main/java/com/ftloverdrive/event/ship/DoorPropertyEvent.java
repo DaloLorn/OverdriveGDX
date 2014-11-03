@@ -1,11 +1,11 @@
 package com.ftloverdrive.event.ship;
 
 import com.badlogic.gdx.utils.Pool.Poolable;
+import com.ftloverdrive.event.AbstractPropertyEvent;
 
 
 public class DoorPropertyEvent extends AbstractPropertyEvent implements Poolable {
 	protected int doorRefId = -1;
-
 
 	public DoorPropertyEvent() {
 	}

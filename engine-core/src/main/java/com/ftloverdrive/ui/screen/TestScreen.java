@@ -36,11 +36,13 @@ import com.ftloverdrive.event.TickEvent;
 import com.ftloverdrive.event.TickListener;
 import com.ftloverdrive.event.game.GamePlayerShipChangeEvent;
 import com.ftloverdrive.event.game.GamePlayerShipChangeListener;
+import com.ftloverdrive.event.handler.DoorEventHandler;
 import com.ftloverdrive.event.handler.GameEventHandler;
 import com.ftloverdrive.event.handler.ShipEventHandler;
 import com.ftloverdrive.event.handler.TickEventHandler;
 import com.ftloverdrive.event.ship.ShipPropertyEvent;
 import com.ftloverdrive.event.ship.ShipPropertyListener;
+import com.ftloverdrive.io.AnimSpec;
 import com.ftloverdrive.model.DefaultGameModel;
 import com.ftloverdrive.model.DefaultPlayerModel;
 import com.ftloverdrive.model.GameModel;
@@ -63,7 +65,6 @@ public class TestScreen implements Disposable, OVDScreen {
 	private TextureAtlas bgAtlas;
 	private TextureAtlas rootAtlas;
 	private TextureAtlas miscAtlas;
-	private TextureAtlas peopleAtlas;
 	private SpriteBatch batch;
 
 	private boolean renderedPreviousFrame = false;
@@ -254,6 +255,10 @@ public class TestScreen implements Disposable, OVDScreen {
 		for ( Class c : shipHandler.getEventClasses() )
 			eventManager.setEventHandler( c, shipHandler );
 
+		DoorEventHandler doorHandler = new DoorEventHandler();
+		for ( Class c : doorHandler.getEventClasses() )
+			eventManager.setEventHandler( c, doorHandler );
+
 		eventManager.addEventListener( playerShipHullMonitor, GamePlayerShipChangeListener.class );
 		eventManager.addEventListener( playerShipHullMonitor, ShipPropertyListener.class );
 
@@ -294,7 +299,6 @@ public class TestScreen implements Disposable, OVDScreen {
 		GamePlayerShipChangeEvent shipChangeEvent = Pools.get( GamePlayerShipChangeEvent.class ).obtain();
 		shipChangeEvent.init( gameRefId, playerRefId, shipRefId );
 		eventManager.postDelayedEvent( shipChangeEvent );
-
 
 		try {
 			//FileHandleResolver resolver = context.getFileHandleResolver();
@@ -340,18 +344,9 @@ public class TestScreen implements Disposable, OVDScreen {
 	}
 
 	private void walkAnimDemo() {
-		peopleAtlas = context.getAssetManager().get( OVDConstants.PEOPLE_ATLAS, TextureAtlas.class );
 		// TODO FTL:AE introduced layers to color the base images
-		TextureRegion crewRegion = peopleAtlas.findRegion( "human-base" );
-
-		// FTL's animations.xml counts 0-based rows from the bottom.
-		TextureRegion[][] tmpFrames = crewRegion.split( 35, 35 );
-		TextureRegion[] walkFrames = new TextureRegion[ 4 ];
-		int walkStart = 4;
-		for ( int i=0; i < walkFrames.length; i++ ) {
-			walkFrames[i] = tmpFrames[0][ walkStart + i ];
-		}
-		walkAnim = new Animation( .3f, walkFrames );
+		AnimSpec crewAnimSpec = new AnimSpec( OVDConstants.PEOPLE_ATLAS, "human-base", 35, 35, 4, 0, 0, 1.2f );
+		walkAnim = crewAnimSpec.create( context );
 	}
 
 
@@ -360,6 +355,7 @@ public class TestScreen implements Disposable, OVDScreen {
 		hudStage.getViewport().update( width, height, true );
 		mainStage.getViewport().update( width, height, true );
 		popupStage.getViewport().update( width, height, true );
+
 		Group bg = mainStage.getRoot().findActor( "Background" );
 		Vector2 scaled = Scaling.fill.apply( bg.getWidth(), bg.getHeight(), width, height );
 		bg.setScale( Math.min( scaled.x / bg.getWidth(), scaled.y / bg.getHeight() ) );

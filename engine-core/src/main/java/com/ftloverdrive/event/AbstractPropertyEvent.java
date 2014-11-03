@@ -1,6 +1,5 @@
-package com.ftloverdrive.event.ship;
+package com.ftloverdrive.event;
 
-import com.ftloverdrive.event.AbstractOVDEvent;
 
 public abstract class AbstractPropertyEvent extends AbstractOVDEvent {
 	public static final int INT_TYPE = 0;
