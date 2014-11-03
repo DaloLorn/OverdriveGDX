@@ -107,17 +107,23 @@ public class OVDScriptManager {
 	}
 
 	/**
-	 * Evaluates the statements in the global namespace.
+	 * Creates and returns a dynamic proxy for the specified interface type.
+	 * 
+	 * This should allow to create new objects from scripts that can then be
+	 * used in Java code like normal objects.
+	 * 
+	 * However, objects created this way are not required to contain all
+	 * methods specified by the interface.
+	 * 
+	 * @param ns namespace containing the methods from which to create the object
+	 * @param interfClass the desired interface
 	 */
-	public Object eval( String script ) throws EvalError {
-		return bsh.eval( script );
-	}
-
-	/**
-	 * Evaluates the statements in the specified namespace.
-	 */
-	public Object eval( String script, NameSpace ns ) throws EvalError {
-		return bsh.eval( script, ns );
+	public <T> T getInterface( NameSpace ns, Class<T> interfClass ) {
+		if ( !interfClass.isInterface() )
+			throw new IllegalArgumentException( "Not an interface: " + interfClass.getName() );
+		Object result = ns.getThis( bsh ).getInterface( interfClass );
+		if ( result == null ) return null;
+		return interfClass.cast( result );
 	}
 
 	/**

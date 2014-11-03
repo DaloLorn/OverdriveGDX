@@ -1,5 +1,6 @@
 package com.ftloverdrive.ui.screen;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import bsh.EvalError;
@@ -50,16 +51,23 @@ public abstract class AbstractScriptedScreen implements OVDScreen, Disposable {
 		stageManager = new OVDStageManager();
 		eventManager = new OVDEventManager();
 		scriptManager = new OVDScriptManager();
+
+		resourceMap = new HashMap<String, Class>();
 	}
 
 	/**
-	 * Evaluates the specified script.
-	 * 
-	 * Automatically loads the resources specified in the script's usingResources() method,
-	 * and then runs the script's init() method.
+	 * Loads the specified script, and then executes its init() method.
+	 */
+	protected void runScript( String scriptPath ) {
+		loadScript( scriptPath );
+		invokeIfExists( M_INIT, context );
+	}
+
+	/**
+	 * Evaluates the specified script and loads the resources it declared.
 	 */
 	@SuppressWarnings("unchecked")
-	protected void runScript( String scriptPath ) {
+	protected void loadScript( String scriptPath ) {
 		if ( screenNameSpace == null )
 			throw new IllegalStateException( "Screen namespace has not yet been initialized!" );
 
@@ -70,16 +78,17 @@ public abstract class AbstractScriptedScreen implements OVDScreen, Disposable {
 			Object result = invokeIfExists( M_RESOURCES );
 
 			if ( result instanceof Map<?, ?> ) {
-				resourceMap = (Map<String, Class>)result;
-				for ( Map.Entry<String,Class> entry : resourceMap.entrySet() )
-					context.getAssetManager().load( entry.getKey(), entry.getValue() );
+				Map<String,Class> temp = (Map<String, Class>)result;
+				for ( Map.Entry<String,Class> entry : temp.entrySet() ) {
+					if ( !resourceMap.containsKey( entry.getKey() ) )
+						context.getAssetManager().load( entry.getKey(), entry.getValue() );
+					resourceMap.put( entry.getKey(), entry.getValue() );
+				}
 
 				context.getAssetManager().finishLoading();
 			} else if ( result != null ) {
 				log.error( "usingResources() method does not return a Map: " + result.getClass() );
 			}
-
-			invokeIfExists( M_INIT, context );
 		}
 		catch ( Exception e ) {
 			log.error( "Error evaluating script.", e );
@@ -115,10 +124,8 @@ public abstract class AbstractScriptedScreen implements OVDScreen, Disposable {
 	 * Unloads all resources loaded by the script, and clears the screens namespace, if it exists.
 	 */
 	public void dispose() {
-		if ( resourceMap != null ) {
-			for ( String key : resourceMap.keySet() )
-				context.getAssetManager().unload( key );
-		}
+		for ( String key : resourceMap.keySet() )
+			context.getAssetManager().unload( key );
 		if ( screenNameSpace != null )
 			screenNameSpace.clear();
 	}

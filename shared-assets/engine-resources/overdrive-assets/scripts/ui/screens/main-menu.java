@@ -95,7 +95,7 @@ void init( OverdriveContext context ) {
 	float scaleX = scaled.x / bg.getWidth();
 	float scaleY = scaled.y / bg.getHeight();
 	bg.setScale( scaleX, scaleY );
-	menuTable.setPosition( -50 * scaleX, -250 * scaleY );
+	menuTable.setPosition( -65 * scaleX, -250 * scaleY );
 }
 
 void resize( int width, int height ) {
@@ -105,5 +105,5 @@ void resize( int width, int height ) {
 	float scaleY = scaled.y / bg.getHeight();
 	bg.setScale( scaleX, scaleY );
 
-	menuTable.setPosition( -50 * scaleX, -250 * scaleY );
+	menuTable.setPosition( -65 * scaleX, -250 * scaleY );
 }
