@@ -5,7 +5,10 @@ import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.scenes.scene2d.Event;
+import com.badlogic.gdx.scenes.scene2d.EventListener;
 import com.badlogic.gdx.scenes.scene2d.Group;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.utils.SpriteDrawable;
 import com.badlogic.gdx.utils.Disposable;
@@ -22,7 +25,8 @@ import com.ftloverdrive.model.ship.ShipModel;
 import com.ftloverdrive.util.OVDConstants;
 
 
-public class ShipActor extends Group implements Disposable, GamePlayerShipChangeListener, ShipPropertyListener {
+public class ShipActor extends Group
+		implements Disposable, GamePlayerShipChangeListener, ShipPropertyListener, EventListener {
 	protected AssetManager assetManager;
 
 	protected Group shipFudgeGroup;
@@ -39,7 +43,7 @@ public class ShipActor extends Group implements Disposable, GamePlayerShipChange
 	protected ShipFloorLinesActor floorLines;
 	protected ShipRoomDecorsActor roomDecors;
 	protected ShipWallLinesActor wallLines;
-	protected ShipDoorsActor doors;
+	protected ShipDoorsActor doorsActor;
 
 	protected int shipModelRefId = -1;
 	protected ImageSpec shieldImgSpec = null;
@@ -99,8 +103,8 @@ public class ShipActor extends Group implements Disposable, GamePlayerShipChange
 		wallLines = new ShipWallLinesActor( context );
 		shipFloorplanGroup.addActor( wallLines );
 
-		doors = new ShipDoorsActor( context );
-		shipFloorplanGroup.addActor( doors );
+		doorsActor = new ShipDoorsActor( context );
+		shipFloorplanGroup.addActor( doorsActor );
 	}
 
 
@@ -180,8 +184,8 @@ public class ShipActor extends Group implements Disposable, GamePlayerShipChange
 			wallLines.clear();
 			wallLines.setSize( 0, 0 );
 
-			doors.clear();
-			doors.setSize( 0, 0 );
+			doorsActor.clear();
+			doorsActor.setSize( 0, 0 );
 
 			this.setSize( 0, 0 );
 		}
@@ -300,12 +304,12 @@ public class ShipActor extends Group implements Disposable, GamePlayerShipChange
 				wallLines.addTile( coord, shipModel.getLayout().getAllShipCoords() );
 			}
 
-			doors.clear();
-			doors.setSize( shipModel.getHullWidth(), shipModel.getHullHeight() );
-			doors.setTileSize( 35 );
+			doorsActor.clear();
+			doorsActor.setSize( shipModel.getHullWidth(), shipModel.getHullHeight() );
+			doorsActor.setTileSize( 35 );
 			for ( IntMap.Keys it = shipModel.getLayout().doorRefIds(); it.hasNext; ) {
 				int doorRefId = it.next();
-				doors.addTile( context, shipModel.getLayout().getDoorCoords( doorRefId ), doorRefId );
+				doorsActor.addTile( context, shipModel.getLayout().getDoorCoords( doorRefId ), doorRefId );
 			}
 		}
 	}
@@ -330,5 +334,13 @@ public class ShipActor extends Group implements Disposable, GamePlayerShipChange
 		roomDecors.dispose();
 		assetManager.unload( OVDConstants.SHIP_ATLAS );
 		assetManager.unload( OVDConstants.ROOT_ATLAS );
+	}
+
+	public boolean handle( Event e ) {
+		if ( e instanceof InputEvent ) {
+			return doorsActor.handle( e );
+		}
+
+		return false;
 	}
 }

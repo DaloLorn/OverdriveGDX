@@ -52,7 +52,6 @@ import com.ftloverdrive.script.OVDScriptManager;
 import com.ftloverdrive.ui.ShatteredImage;
 import com.ftloverdrive.ui.hud.PlayerShipDoorHighlighter;
 import com.ftloverdrive.ui.hud.PlayerShipHullMonitor;
-import com.ftloverdrive.ui.ship.DoorActor;
 import com.ftloverdrive.ui.ship.ShipActor;
 import com.ftloverdrive.util.OVDConstants;
 
@@ -195,52 +194,24 @@ public class TestScreen implements Disposable, OVDScreen {
 		playerShipHullMonitor = new PlayerShipHullMonitor( context );
 		playerShipHullMonitor.setPosition( 0, hudStage.getHeight()-playerShipHullMonitor.getHeight() );
 		hudStage.addActor( playerShipHullMonitor );
-		
+
 		doorHighlighter = new PlayerShipDoorHighlighter( context );
 		doorHighlighter.setVisible( false );
 		hudStage.addActor( doorHighlighter );
+		mainStage.addListener( doorHighlighter );
 
 		shipActor = new ShipActor( context );
 		// Ship's offset from the window's top left corner in FTL: X + 350, Y + 170
 		// At this point, shipActor's height is 0...
 		shipActor.setPosition( 350, mainStage.getHeight() - shipActor.getHeight() - 170 );
 		mainStage.addActor( shipActor );
+		mainStage.addListener( shipActor );
 
 		inputMultiplexer = new InputMultiplexer();
 		inputMultiplexer.addProcessor( popupStage );
 		inputMultiplexer.addProcessor( hudStage );
 		inputMultiplexer.addProcessor( mainStage );
 
-		mainStage.addListener(new InputListener() {
-			@Override
-			public boolean touchDown( InputEvent event, float x, float y, int pointer, int button ) {
-				Actor actor = event.getTarget();
-				if ( actor instanceof EventListener )
-					return ( (EventListener)actor ).handle( event );
-				return false;
-			}
-
-			@Override
-			public void enter( InputEvent event, float x, float y, int pointer, Actor fromActor ) {
-				Actor actor = event.getTarget();
-				if ( actor instanceof DoorActor ) {
-					float r = actor.getRotation();
-					doorHighlighter.setVisible( true );
-					Vector2 pos = new Vector2( 0, 0 );
-					pos = actor.localToStageCoordinates( pos );
-					doorHighlighter.setPosition( pos.x - ( r == 0 ? 0 : doorHighlighter.getWidth() ), pos.y );
-					doorHighlighter.setRotation( r );
-				}
-			}
-
-			@Override
-			public void exit( InputEvent event, float x, float y, int pointer, Actor toActor ) {
-				Actor actor = event.getTarget();
-				if ( actor instanceof DoorActor && event.getPointer() == -1 ) {
-					doorHighlighter.setVisible( false );
-				}
-			}
-		});
 
 		// Wire up the event manager...
 		TickEventHandler tickHandler = new TickEventHandler();

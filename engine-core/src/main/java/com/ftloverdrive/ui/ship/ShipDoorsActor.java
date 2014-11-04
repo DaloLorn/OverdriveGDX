@@ -2,10 +2,16 @@ package com.ftloverdrive.ui.ship;
 
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.g2d.Batch;
+import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.Event;
+import com.badlogic.gdx.scenes.scene2d.EventListener;
 import com.badlogic.gdx.scenes.scene2d.Group;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.InputEvent.Type;
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.IntMap;
 import com.ftloverdrive.core.OverdriveContext;
+import com.ftloverdrive.event.TickListener;
 import com.ftloverdrive.event.ship.DoorPropertyListener;
 import com.ftloverdrive.event.ship.ShipPropertyEvent;
 import com.ftloverdrive.event.ship.ShipPropertyListener;
@@ -14,7 +20,8 @@ import com.ftloverdrive.model.ship.ShipCoordinate;
 import com.ftloverdrive.model.ship.ShipModel;
 import com.ftloverdrive.util.OVDConstants;
 
-public class ShipDoorsActor extends Group implements Disposable, ShipPropertyListener {
+public class ShipDoorsActor extends Group
+		implements Disposable, ShipPropertyListener, EventListener {
 	protected AssetManager assetManager;
 
 	protected float tileSize = 35;
@@ -82,6 +89,7 @@ public class ShipDoorsActor extends Group implements Disposable, ShipPropertyLis
 		addActor( doorActor );
 
 		context.getScreenEventManager().addEventListener( doorActor, DoorPropertyListener.class );
+		context.getScreenEventManager().addEventListener( doorActor, TickListener.class );
 	}
 
 	public void shipPropertyChanged( OverdriveContext context, ShipPropertyEvent e ) {
@@ -118,5 +126,18 @@ public class ShipDoorsActor extends Group implements Disposable, ShipPropertyLis
 
 	public void dispose() {
 		// TODO ?
+	}
+
+	@Override
+	public boolean handle( Event e ) {
+		if ( e instanceof InputEvent ) {
+			Actor target = e.getTarget();
+			InputEvent event = (InputEvent)e;
+
+			if ( event.getType() == Type.touchDown && target instanceof DoorActor )
+				return ( (DoorActor)target ).handle( event );
+		}
+
+		return false;
 	}
 }

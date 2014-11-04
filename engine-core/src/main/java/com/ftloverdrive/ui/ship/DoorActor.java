@@ -15,18 +15,22 @@ import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.Pools;
 import com.ftloverdrive.core.OverdriveContext;
 import com.ftloverdrive.event.OVDEventManager;
+import com.ftloverdrive.event.TickEvent;
+import com.ftloverdrive.event.TickListener;
 import com.ftloverdrive.event.ship.DoorPropertyEvent;
 import com.ftloverdrive.event.ship.DoorPropertyListener;
 import com.ftloverdrive.io.AnimSpec;
 import com.ftloverdrive.model.ship.DoorModel;
+import com.ftloverdrive.net.OVDNetManager;
 import com.ftloverdrive.util.OVDConstants;
 
 /**
  * An actor that represents a single door.
  */
-public class DoorActor extends Actor implements Disposable, EventListener, DoorPropertyListener {
+public class DoorActor extends Actor implements Disposable, EventListener, DoorPropertyListener, TickListener {
 	protected AssetManager assetManager;
 	protected OVDEventManager eventManager;
+	protected OVDNetManager netManager;
 
 	protected AnimSpec animSpec;
 	protected Animation doorAnim;
@@ -43,6 +47,7 @@ public class DoorActor extends Actor implements Disposable, EventListener, DoorP
 		super();
 		this.assetManager = context.getAssetManager();
 		this.eventManager = context.getScreenEventManager();
+		this.netManager = context.getNetManager();
 	}
 
 	@Override
@@ -161,11 +166,12 @@ public class DoorActor extends Actor implements Disposable, EventListener, DoorP
 		else {
 			DoorModel doorModel = context.getReferenceManager().getObject( doorModelRefId, DoorModel.class );
 			AnimSpec newAnimSpec = doorModel.getAnimSpec();
+			boolean wantOpen = doorModel.getProperties().getBool( OVDConstants.DOOR_OPEN );
 
-			// Save for when the door's AnimSpec has been changed.
-			PlayMode playMode = PlayMode.REVERSED;
+			// Update the animation
+			PlayMode playMode = wantOpen ? PlayMode.NORMAL : PlayMode.REVERSED;
 			if ( doorAnim != null )
-				playMode = doorAnim.getPlayMode();
+				playMode = doorAnim.getPlayMode(); // Save for when the door's AnimSpec has been changed.
 
 			if ( animSpec != null && !animSpec.equals( newAnimSpec ) ) {
 				assetManager.unload( animSpec.getAtlasPath() );
@@ -180,15 +186,14 @@ public class DoorActor extends Actor implements Disposable, EventListener, DoorP
 				setSize( animSpec.getFrameWidth(), animSpec.getFrameHeight() );
 			}
 
-			boolean open = doorModel.getProperties().getBool( OVDConstants.DOOR_OPEN );
-			if ( open ) {
-				if ( isAppearanceClosed() || isPlayingClose() )
+			if ( wantOpen ) {
+				if ( isAppearanceClosed() || isPlayingClose() || isPlayingOpen() )
 					playOpen();
 				else
 					setAppearanceOpen();
 			}
 			else {
-				if ( isAppearanceOpen() || isPlayingOpen() )
+				if ( isAppearanceOpen() || isPlayingOpen() || isPlayingClose() )
 					playClose();
 				else
 					setAppearanceClosed();
@@ -205,11 +210,35 @@ public class DoorActor extends Actor implements Disposable, EventListener, DoorP
 	}
 
 	@Override
-	public void doorPropertyChanged(OverdriveContext context, DoorPropertyEvent e) {
+	public void doorPropertyChanged( OverdriveContext context, DoorPropertyEvent e ) {
 		if ( e.getDoorRefId() != doorModelRefId ) return;
 
 		if ( e.getPropertyType() == DoorPropertyEvent.BOOL_TYPE ) {
 			updateDoorInfo( context );
+		}
+		else if ( e.getPropertyType() == DoorPropertyEvent.INT_TYPE ) {
+			if ( e.getPropertyKey().equals( OVDConstants.DOOR_HEALTH ) ) {
+				DoorModel doorModel = context.getReferenceManager().getObject( doorModelRefId, DoorModel.class );
+				int curHealth = doorModel.getProperties().getInt( OVDConstants.DOOR_HEALTH );
+				if ( curHealth <= 0 ) {
+					DoorPropertyEvent ev = Pools.get( DoorPropertyEvent.class ).obtain();
+					ev.init( doorModelRefId, DoorPropertyEvent.BOOL_TYPE, DoorPropertyEvent.SET_ACTION, OVDConstants.DOOR_OPEN, true );
+					ev.setSource( netManager.getLocalPlayerRefId() );
+					eventManager.postDelayedEvent( ev );
+
+					ev = Pools.get( DoorPropertyEvent.class ).obtain();
+					ev.init( doorModelRefId, DoorPropertyEvent.BOOL_TYPE, DoorPropertyEvent.SET_ACTION, OVDConstants.DOOR_LOCKED, true );
+					ev.setSource( netManager.getLocalPlayerRefId() );
+					eventManager.postDelayedEvent( ev );
+				}
+				else if ( curHealth == doorModel.getProperties().getInt( OVDConstants.DOOR_HEALTH_MAX ) &&
+						doorModel.getProperties().getBool( OVDConstants.DOOR_LOCKED ) ) {
+					DoorPropertyEvent ev = Pools.get( DoorPropertyEvent.class ).obtain();
+					ev.init( doorModelRefId, DoorPropertyEvent.BOOL_TYPE, DoorPropertyEvent.SET_ACTION, OVDConstants.DOOR_LOCKED, false );
+					ev.setSource( netManager.getLocalPlayerRefId() );
+					eventManager.postDelayedEvent( ev );
+				}
+			}
 		}
 	}
 
@@ -219,12 +248,19 @@ public class DoorActor extends Actor implements Disposable, EventListener, DoorP
 			InputEvent e = (InputEvent)event;
 			switch ( e.getType() ) {
 				case touchDown:
-					if ( e.getButton() != Buttons.LEFT )
-						return false;
-					DoorPropertyEvent ev = Pools.get( DoorPropertyEvent.class ).obtain();
-					ev.init( doorModelRefId, DoorPropertyEvent.BOOL_TYPE, DoorPropertyEvent.TOGGLE_ACTION, OVDConstants.DOOR_OPEN, false );
-					eventManager.postDelayedEvent( ev );
-					return true;
+					if ( e.getButton() == Buttons.LEFT ) {
+						DoorPropertyEvent ev = Pools.get( DoorPropertyEvent.class ).obtain();
+						ev.init( doorModelRefId, DoorPropertyEvent.BOOL_TYPE, DoorPropertyEvent.TOGGLE_ACTION, OVDConstants.DOOR_OPEN, false );
+						ev.setSource( netManager.getLocalPlayerRefId() );
+						eventManager.postDelayedEvent( ev );
+						return true;
+					}
+					else if ( e.getButton() == Buttons.RIGHT ) {
+						DoorPropertyEvent ev = Pools.get( DoorPropertyEvent.class ).obtain();
+						ev.init( doorModelRefId, DoorPropertyEvent.INT_TYPE, DoorPropertyEvent.INCREMENT_ACTION, OVDConstants.DOOR_HEALTH, -50 );
+						eventManager.postDelayedEvent( ev );
+						return true;
+					}
 				default:
 					return false;
 			}
@@ -235,5 +271,12 @@ public class DoorActor extends Actor implements Disposable, EventListener, DoorP
 	@Override
 	public void dispose() {
 		assetManager.unload( animSpec.getAtlasPath() );
+	}
+
+	@Override
+	public void ticksAccumulated( TickEvent e ) {
+		DoorPropertyEvent ev = Pools.get( DoorPropertyEvent.class ).obtain();
+		ev.init( doorModelRefId, DoorPropertyEvent.INT_TYPE, DoorPropertyEvent.INCREMENT_ACTION, OVDConstants.DOOR_HEALTH, 10 );
+		eventManager.postDelayedEvent( ev );
 	}
 }

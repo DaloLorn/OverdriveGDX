@@ -82,6 +82,11 @@ public class OVDConstants {
 	public static final String DOOR_HEALTH_MAX = "DoorHeathMax";
 	public static final String DOOR_HEALTH = "DoorHeath";
 	public static final String DOOR_OPEN = "DoorOpen";
+	/** If true, the door is locked and the player is unable to control it.
+	 *  For example when boarders have busted the door, when crew is currently passsing through it,
+	 *  when the ship has no door subsystem installed, or when the door is hacked.
+	 */
+	public static final String DOOR_LOCKED = "DoorLocked";
 	
 	/*
 	 * ========================================
