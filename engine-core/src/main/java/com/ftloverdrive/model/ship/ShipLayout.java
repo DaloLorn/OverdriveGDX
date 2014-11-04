@@ -73,7 +73,7 @@ public class ShipLayout {
 	/**
 	 * Returns a reference id for the door placed at the ShipCoordinate, or -1.
 	 * 
-	 * TODO: Two doors can be placed at single ShipCoordinate. As such this method is very reliable. Remove?
+	 * TODO: Two doors can be placed at single ShipCoordinate. As such this method is not very reliable. Remove?
 	 */
 	public int getDoorRefIdOfCoords( ShipCoordinate coord ) {
 		return coordToDoorRefIdMap.get( coord, -1 );
@@ -109,6 +109,14 @@ public class ShipLayout {
 	 */
 	public IntMap.Keys doorRefIds() {
 		return doorRefIdToCoordsMap.keys();
+	}
+
+	public boolean hasDoor( int doorRefId ) {
+		return doorRefIdToCoordsMap.containsKey( doorRefId );
+	}
+
+	public boolean hasRoom( int roomRefId ) {
+		return roomRefIdToCoordsMap.containsKey( roomRefId );
 	}
 
 
