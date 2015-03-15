@@ -1,0 +1,187 @@
+
+frames.png
+size: 1024,512
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+main-frame
+  rotate: false
+  xy: 0, 0
+  size: 256, 238
+  orig: 256, 238
+  offset: 0, 0
+  index: 1
+main-frame
+  rotate: false
+  xy: 256, 0
+  size: 256, 238
+  orig: 256, 238
+  offset: 0, 0
+  index: 2
+main-frame
+  rotate: false
+  xy: 512, 0
+  size: 256, 238
+  orig: 256, 238
+  offset: 0, 0
+  index: 3
+main-frame
+  rotate: false
+  xy: 768, 0
+  size: 256, 238
+  orig: 256, 238
+  offset: 0, 0
+  index: 4
+main-frame
+  rotate: false
+  xy: 0, 256
+  size: 250, 238
+  orig: 250, 238
+  offset: 0, 0
+  index: 5
+start-frame
+  rotate: false
+  xy: 256, 256
+  size: 282, 100
+  orig: 282, 100
+  offset: 0, 0
+  index: -1
+achiev-frame
+  rotate: false
+  xy: 256, 356
+  size: 289, 128
+  orig: 289, 128
+  offset: 0, 0
+  index: -1
+layout-frame
+  rotate: false
+  xy: 545, 256
+  size: 188, 238
+  orig: 188, 238
+  offset: 0, 0
+  index: -1
+ae-frame
+  rotate: false
+  xy: 733, 256
+  size: 263, 74
+  orig: 263, 74
+  offset: 0, 0
+  index: -1
+aug-box
+  rotate: false
+  xy: 733, 330
+  size: 9, 9
+  orig: 9, 9
+  offset: 0, 0
+  index: -1
+
+background.png
+size: 1024,1024
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+hangar-bg
+  rotate: false
+  xy: 0, 0
+  size: 256, 256
+  orig: 256, 256
+  offset: 0, 0
+  index: 1
+hangar-bg
+  rotate: false
+  xy: 256, 0
+  size: 256, 256
+  orig: 256, 256
+  offset: 0, 0
+  index: 2
+hangar-bg
+  rotate: false
+  xy: 512, 0
+  size: 256, 256
+  orig: 256, 256
+  offset: 0, 0
+  index: 3
+hangar-bg
+  rotate: false
+  xy: 768, 0
+  size: 256, 256
+  orig: 256, 256
+  offset: 0, 0
+  index: 4
+hangar-bg
+  rotate: false
+  xy: 0, 256
+  size: 256, 256
+  orig: 256, 256
+  offset: 0, 0
+  index: 5
+hangar-bg
+  rotate: false
+  xy: 256, 256
+  size: 256, 256
+  orig: 256, 256
+  offset: 0, 0
+  index: 6
+hangar-bg
+  rotate: false
+  xy: 512, 256
+  size: 256, 256
+  orig: 256, 256
+  offset: 0, 0
+  index: 7
+hangar-bg
+  rotate: false
+  xy: 768, 256
+  size: 256, 256
+  orig: 256, 256
+  offset: 0, 0
+  index: 8
+hangar-bg
+  rotate: false
+  xy: 0, 512
+  size: 256, 256
+  orig: 256, 256
+  offset: 0, 0
+  index: 9
+hangar-bg
+  rotate: false
+  xy: 256, 512
+  size: 256, 256
+  orig: 256, 256
+  offset: 0, 0
+  index: 10
+hangar-bg
+  rotate: false
+  xy: 512, 512
+  size: 256, 208
+  orig: 256, 208
+  offset: 0, 0
+  index: 11
+hangar-bg
+  rotate: false
+  xy: 768, 512
+  size: 256, 208
+  orig: 256, 208
+  offset: 0, 0
+  index: 12
+hangar-bg
+  rotate: false
+  xy: 0, 768
+  size: 256, 208
+  orig: 256, 208
+  offset: 0, 0
+  index: 13
+hangar-bg
+  rotate: false
+  xy: 256, 768
+  size: 256, 208
+  orig: 256, 208
+  offset: 0, 0
+  index: 14
+hangar-bg
+  rotate: false
+  xy: 512, 768
+  size: 256, 208
+  orig: 256, 208
+  offset: 0, 0
+  index: 15

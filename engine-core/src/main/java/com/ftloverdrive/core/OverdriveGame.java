@@ -17,6 +17,8 @@ import com.ftloverdrive.io.FreeTypeFontLoader;
 import com.ftloverdrive.io.RelativeFileHandleResolver;
 import com.ftloverdrive.io.URIFileHandleResolver;
 import com.ftloverdrive.net.OVDNetManager;
+import com.ftloverdrive.script.ScriptLoader;
+import com.ftloverdrive.script.ScriptResource;
 import com.ftloverdrive.ui.screen.OVDScreenManager;
 import com.ftloverdrive.util.OVDReferenceManager;
 
@@ -42,19 +44,21 @@ public class OverdriveGame implements ApplicationListener {
 	private OVDNetManager netManager;
 	private Screen currentScreen = null;
 
-	//private com.ftloverdrive.net.NetworkTest networkTest;  // TODO: Remove me.
+
+	// private com.ftloverdrive.net.NetworkTest networkTest; // TODO: Remove me.
 
 
 	@Override
-	public void create () {
+	public void create() {
 		Gdx.app.setLogLevel( Application.LOG_DEBUG );
 		log = new Logger( OverdriveGame.class.getCanonicalName(), Logger.DEBUG );
 		log.info( String.format( "%s v%s", APP_NAME, APP_VERSION ) );
-		log.info( String.format( "%s %s", System.getProperty("os.name"), System.getProperty("os.version") ) );
-		log.info( String.format( "%s, %s, %s", System.getProperty("java.vm.name"), System.getProperty("java.version"), System.getProperty("os.arch") ) );
+		log.info( String.format( "%s %s", System.getProperty( "os.name" ), System.getProperty( "os.version" ) ) );
+		log.info( String.format( "%s, %s, %s", System.getProperty( "java.vm.name" ), System.getProperty( "java.version" ),
+				System.getProperty( "os.arch" ) ) );
 
 		appDir = new File( "." );
-		log.info( "CWD: "+ appDir.getAbsolutePath() );
+		log.info( "CWD: " + appDir.getAbsolutePath() );
 
 		String envAppPath = System.getenv( ENV_APP_PATH );
 		if ( envAppPath != null && envAppPath.length() > 0 ) {
@@ -62,19 +66,20 @@ public class OverdriveGame implements ApplicationListener {
 			if ( envAppDir.exists() ) {
 				log.info( String.format( "Environment var (%s) changed app path: %s", ENV_APP_PATH, envAppPath ) );
 				appDir = envAppDir;
-			} else {
+			}
+			else {
 				log.error( String.format( "Environment var (%s) set a non-existent app path: %s", ENV_APP_PATH, envAppPath ) );
 			}
 		}
 
 		resourcesDir = new File( appDir, "resources" );
 
-		java.nio.IntBuffer buf = com.badlogic.gdx.utils.BufferUtils.newIntBuffer(16);
+		java.nio.IntBuffer buf = com.badlogic.gdx.utils.BufferUtils.newIntBuffer( 16 );
 		Gdx.gl.glGetIntegerv( GL20.GL_MAX_TEXTURE_SIZE, buf );
 		int maxTextureSize = buf.get();
-		log.debug( "Device Estimated Max Texture Size: "+ maxTextureSize );
+		log.debug( "Device Estimated Max Texture Size: " + maxTextureSize );
 
-		log.debug( "Device GL30: "+ Gdx.graphics.isGL30Available() );
+		log.debug( "Device GL30: " + Gdx.graphics.isGL30Available() );
 
 		fileHandleResolver = new URIFileHandleResolver();
 		fileHandleResolver.setResolver( "internal:", new InternalFileHandleResolver(), true );
@@ -88,6 +93,7 @@ public class OverdriveGame implements ApplicationListener {
 
 		assetManager = new AssetManager( fileHandleResolver );
 		assetManager.setLoader( BitmapFont.class, new FreeTypeFontLoader( fileHandleResolver ) );
+		assetManager.setLoader( ScriptResource.class, new ScriptLoader( fileHandleResolver ) );
 
 		OverdriveContext context = new OverdriveContext();
 		context.init( this, null, -1 );
@@ -95,8 +101,8 @@ public class OverdriveGame implements ApplicationListener {
 
 		screenManager.showScreen( screenManager.getInitScreenKey() );
 
-		//networkTest = new com.ftloverdrive.net.NetworkTest();
-		//networkTest.init();
+		// networkTest = new com.ftloverdrive.net.NetworkTest();
+		// networkTest.init();
 	}
 
 
@@ -104,19 +110,19 @@ public class OverdriveGame implements ApplicationListener {
 	 * Returns the main FileHandleResolver.
 	 *
 	 * Usage:
-	 *   FileHandle fh = getFileHandleResolver().resolve( pathString );
-	 *   // If you need a File object...
-	 *   File f = fh.file();
+	 * FileHandle fh = getFileHandleResolver().resolve( pathString );
+	 * // If you need a File object...
+	 * File f = fh.file();
 	 *
 	 * Given a string, this resolver will look in several locations.
-	 *   {current_dir|APP_PATH}/resources/...
-	 *   {current_dir|APP_PATH}/...
-	 *   {internal}/...
+	 * {current_dir|APP_PATH}/resources/...
+	 * {current_dir|APP_PATH}/...
+	 * {internal}/...
 	 *
 	 * If a URI prefix is found, that will be stripped, and a specific
 	 * location will be checked instead.
-	 *   internal://... - Root of the jar, and current dir on desktop.
-	 *   external://... - Android SD card, or desktop user's home dir.
+	 * internal://... - Root of the jar, and current dir on desktop.
+	 * external://... - Android SD card, or desktop user's home dir.
 	 */
 	public FileHandleResolver getFileHandleResolver() {
 		return fileHandleResolver;
@@ -126,10 +132,10 @@ public class OverdriveGame implements ApplicationListener {
 	 * Returns a manager to load assets.
 	 *
 	 * This one can load ttf fonts:
-	 *   String assetString = ".../myfont.ttf?size=10";
-	 *   assetManager.load( assetString, BitmapFont.class );
-	 *   assetManager.finishLoading();
-	 *   BitmapFont font = assetManager.get( assetString, BitmapFont.class );
+	 * String assetString = ".../myfont.ttf?size=10";
+	 * assetManager.load( assetString, BitmapFont.class );
+	 * assetManager.finishLoading();
+	 * BitmapFont font = assetManager.get( assetString, BitmapFont.class );
 	 */
 	public AssetManager getAssetManager() {
 		return assetManager;
@@ -197,10 +203,10 @@ public class OverdriveGame implements ApplicationListener {
 	}
 
 	@Override
-	public void dispose () {
+	public void dispose() {
 		if ( currentScreen != null ) currentScreen.dispose();
 		screenManager.dispose();
 		assetManager.dispose();
-		//networkTest.shutdown();
+		// networkTest.shutdown();
 	}
 }
