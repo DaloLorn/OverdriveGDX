@@ -1,58 +1,69 @@
 package com.ftloverdrive.ui.ship;
 
 import com.badlogic.gdx.Input.Buttons;
-import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.Animation.PlayMode;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.Actor;
-import com.badlogic.gdx.scenes.scene2d.Event;
-import com.badlogic.gdx.scenes.scene2d.EventListener;
-import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.Pools;
+import com.ftloverdrive.command.DoorToggleCommand;
+import com.ftloverdrive.command.ModelCommand;
 import com.ftloverdrive.core.OverdriveContext;
-import com.ftloverdrive.event.OVDEventManager;
 import com.ftloverdrive.event.TickEvent;
 import com.ftloverdrive.event.TickListener;
+import com.ftloverdrive.event.local.LocalActorClickedEvent;
+import com.ftloverdrive.event.local.LocalActorClickedListener;
 import com.ftloverdrive.event.ship.DoorPropertyEvent;
 import com.ftloverdrive.event.ship.DoorPropertyListener;
 import com.ftloverdrive.io.AnimSpec;
 import com.ftloverdrive.model.ship.DoorModel;
-import com.ftloverdrive.net.OVDNetManager;
+import com.ftloverdrive.ui.ModelActor;
 import com.ftloverdrive.util.OVDConstants;
+
 
 /**
  * An actor that represents a single door.
  */
-public class DoorActor extends Actor implements Disposable, EventListener, DoorPropertyListener, TickListener {
-	protected AssetManager assetManager;
-	protected OVDEventManager eventManager;
-	protected OVDNetManager netManager;
+public class DoorActor extends ModelActor
+		implements Disposable, DoorPropertyListener, TickListener, LocalActorClickedListener {
 
 	protected AnimSpec animSpec;
 	protected Animation doorAnim;
-	/* 
+	private TextureRegion roomFloor;
+
+	protected boolean horizontal = false;
+
+	/**
 	 * Keep the elapsed time as a field so that the animation will move smoothly
 	 * between closing and opening states when the user clicks mid-animation,
 	 * instead of starting from the first frame.
 	 */
 	private float elapsed = 0;
 
-	protected int doorModelRefId = -1;
 
-	public DoorActor( OverdriveContext context ) {
-		super();
-		this.assetManager = context.getAssetManager();
-		this.eventManager = context.getScreenEventManager();
-		this.netManager = context.getNetManager();
+	public DoorActor( OverdriveContext context, TextureRegion floorRegion, boolean horizontal ) {
+		super( context );
+		this.horizontal = horizontal;
+		roomFloor = floorRegion;
 	}
 
 	@Override
 	public void draw( Batch batch, float parentAlpha ) {
-		if ( doorModelRefId != -1 ) {
+		if ( modelRefId != -1 ) {
+			if ( !isAppearanceClosed() ) {
+				// Draw part of floor to mask the wall underneath
+				int w = horizontal ? 20 : 4;
+				int h = horizontal ? 4 : 20;
+				float x = getX() + ( getWidth() - w ) / 2 - ( horizontal ? 35 : 0 );
+				float y = getY() + ( getHeight() - h - 1 ) / 2;
+				batch.draw( roomFloor, x, y, w, h );
+			}
+
+			// Draw the door proper
 			batch.draw( doorAnim.getKeyFrame( elapsed ), getX(), getY(), 0, 0,
 					getWidth(), getHeight(), 1, 1, getRotation() );
 		}
@@ -66,10 +77,153 @@ public class DoorActor extends Actor implements Disposable, EventListener, DoorP
 	}
 
 	/**
+	 * Updates everything to match the current DoorModel.
+	 */
+	protected void updateInfo( OverdriveContext context ) {
+		if ( modelRefId == -1 ) {
+		}
+		else {
+			DoorModel doorModel = context.getReferenceManager().getObject( modelRefId, DoorModel.class );
+			AnimSpec newAnimSpec = doorModel.getAnimSpec();
+			boolean wantOpen = doorModel.getProperties().getBool( OVDConstants.DOOR_OPEN );
+			boolean animSpecChanged = false;
+
+			// Update the animation
+			PlayMode playMode = wantOpen ? PlayMode.NORMAL : PlayMode.REVERSED;
+			if ( doorAnim != null )
+				playMode = doorAnim.getPlayMode(); // Save for when the door's AnimSpec has been changed.
+
+			if ( animSpec != null && !animSpec.equals( newAnimSpec ) ) {
+				context.getAssetManager().unload( animSpec.getAtlasPath() );
+				animSpec = null;
+				animSpecChanged = true;
+			}
+			if ( animSpec == null && newAnimSpec != null ) {
+				animSpec = newAnimSpec;
+				context.getAssetManager().load( animSpec.getAtlasPath(), TextureAtlas.class );
+				context.getAssetManager().finishLoading();
+				doorAnim = animSpec.create( context );
+				doorAnim.setPlayMode( playMode );
+				setSize( animSpec.getFrameWidth(), animSpec.getFrameHeight() );
+			}
+
+			// Don't touch the animation state if the anim spec was changed, to avoid visual glitches
+			if ( !animSpecChanged ) {
+				if ( wantOpen ) {
+					if ( isAppearanceClosed() || isPlayingClose() || isPlayingOpen() )
+						playOpen();
+					else
+						setAppearanceOpen();
+				}
+				else {
+					if ( isAppearanceOpen() || isPlayingOpen() || isPlayingClose() )
+						playClose();
+					else
+						setAppearanceClosed();
+				}
+			}
+		}
+	}
+
+	@Override
+	public Actor hit( float x, float y, boolean touchable ) {
+		// Door sheet's frame size is 35px, but the clickable area of the door is smaller
+		// TODO: find a way not to hardcode this?
+		if ( touchable && getTouchable() != Touchable.enabled ) return null;
+		return x >= 6 && x < 27 && y >= 3 && y < 33 ? this : null;
+	}
+
+	@Override
+	public void doorPropertyChanged( OverdriveContext context, DoorPropertyEvent e ) {
+		if ( e.getDoorRefId() != modelRefId ) return;
+
+		if ( e.getPropertyKey() == OVDConstants.DOOR_OPEN ) {
+			updateInfo( context );
+		}
+		else if ( e.getPropertyKey().equals( OVDConstants.DOOR_HEALTH ) ) {
+			DoorModel doorModel = context.getReferenceManager().getObject( modelRefId, DoorModel.class );
+			int curHealth = doorModel.getProperties().getInt( OVDConstants.DOOR_HEALTH );
+			if ( curHealth <= 0 ) {
+				// Open the door
+				DoorPropertyEvent ev = Pools.get( DoorPropertyEvent.class ).obtain();
+				ev.init( modelRefId, DoorPropertyEvent.BOOL_TYPE, DoorPropertyEvent.SET_ACTION, OVDConstants.DOOR_OPEN, true );
+				ev.setSource( context.getNetManager().getLocalPlayerRefId() );
+				context.getScreenEventManager().postDelayedEvent( ev );
+
+				// Lock it in that state
+				ev = Pools.get( DoorPropertyEvent.class ).obtain();
+				ev.init( modelRefId, DoorPropertyEvent.BOOL_TYPE, DoorPropertyEvent.SET_ACTION, OVDConstants.DOOR_LOCKED, true );
+				ev.setSource( context.getNetManager().getLocalPlayerRefId() );
+				context.getScreenEventManager().postDelayedEvent( ev );
+			}
+			else if ( curHealth == doorModel.getProperties().getInt( OVDConstants.DOOR_HEALTH_MAX ) &&
+					doorModel.getProperties().getBool( OVDConstants.DOOR_LOCKED ) ) {
+				// Unlock the door
+				DoorPropertyEvent ev = Pools.get( DoorPropertyEvent.class ).obtain();
+				ev.init( modelRefId, DoorPropertyEvent.BOOL_TYPE, DoorPropertyEvent.SET_ACTION, OVDConstants.DOOR_LOCKED, false );
+				ev.setSource( context.getNetManager().getLocalPlayerRefId() );
+				context.getScreenEventManager().postDelayedEvent( ev );
+			}
+		}
+		else if ( e.getPropertyKey() == OVDConstants.DOOR_ANIM_SPEC ) {
+			// TODO: Get the spec from event
+			AnimSpec newSpec = new AnimSpec( OVDConstants.EFFECTS_ATLAS, "door-sheet", 35, 35, 5, 0, 1, 0.25f );
+
+			DoorModel doorModel = context.getReferenceManager().getObject( modelRefId, DoorModel.class );
+			doorModel.setAnimSpec( newSpec );
+
+			updateInfo( context );
+		}
+	}
+
+	@Override
+	public void ticksAccumulated( TickEvent e ) {
+		// TODO: Test code, remove later
+		DoorPropertyEvent ev = Pools.get( DoorPropertyEvent.class ).obtain();
+		ev.init( modelRefId, DoorPropertyEvent.INT_TYPE, DoorPropertyEvent.INCREMENT_ACTION, OVDConstants.DOOR_HEALTH, 10 );
+		context.getScreenEventManager().postDelayedEvent( ev );
+		// End test code
+	}
+
+	@Override
+	public void actorClicked( OverdriveContext context, LocalActorClickedEvent e ) {
+		if ( e.getTarget() instanceof DoorActor ) {
+			DoorActor target = (DoorActor)e.getTarget();
+
+			if ( target.getModelRefId() != modelRefId ) return;
+
+			if ( e.getButton() == Buttons.LEFT ) {
+				ModelCommand command = new DoorToggleCommand();
+
+				command.setAffectedModel( target.getModelRefId() );
+				command.setSourcePlayer( context.getNetManager().getLocalPlayerRefId() );
+				command.execute( context );
+			}
+			else if ( e.getButton() == Buttons.RIGHT ) {
+				// TODO: Remove this entire if case, used only for testing
+				DoorPropertyEvent ev = Pools.get( DoorPropertyEvent.class ).obtain();
+				// ev.init( target.getDoorModel(), DoorPropertyEvent.INT_TYPE, DoorPropertyEvent.INCREMENT_ACTION, OVDConstants.DOOR_HEALTH, -50 );
+				ev.init( target.getModelRefId(), DoorPropertyEvent.INT_TYPE, DoorPropertyEvent.INCREMENT_ACTION, OVDConstants.DOOR_ANIM_SPEC, 0 );
+				context.getScreenEventManager().postDelayedEvent( ev );
+			}
+		}
+	}
+
+	@Override
+	public void dispose() {
+		context.getAssetManager().unload( animSpec.getAtlasPath() );
+	}
+
+	/*
+	 * ==============================================
+	 * Animation state control.
+	 */
+
+	/**
 	 * Plays the opening animation, gradually transiting from closed to open state.
 	 */
-	public void playOpen() {
-		if ( doorModelRefId == -1 ) return;
+	protected void playOpen() {
+		if ( modelRefId == -1 ) throw new IllegalArgumentException( "RefID is -1!" );
 
 		doorAnim.setPlayMode( PlayMode.NORMAL );
 		if ( elapsed > 0 )
@@ -79,8 +233,8 @@ public class DoorActor extends Actor implements Disposable, EventListener, DoorP
 	/**
 	 * Plays the closing animation, gradually transiting from open to closed state.
 	 */
-	public void playClose() {
-		if ( doorModelRefId == -1 ) return;
+	protected void playClose() {
+		if ( modelRefId == -1 ) throw new IllegalArgumentException( "RefID is -1!" );
 
 		doorAnim.setPlayMode( PlayMode.REVERSED );
 		if ( elapsed > 0 )
@@ -91,8 +245,8 @@ public class DoorActor extends Actor implements Disposable, EventListener, DoorP
 	 * Instantly changes the actor's appearance to the 'closed' state.
 	 * This method does not change the door's actual open/closed state.
 	 */
-	public void setAppearanceClosed() {
-		if ( doorModelRefId == -1 ) return;
+	protected void setAppearanceClosed() {
+		if ( modelRefId == -1 ) throw new IllegalArgumentException( "RefID is -1!" );
 
 		doorAnim.setPlayMode( PlayMode.REVERSED );
 		elapsed = doorAnim.getAnimationDuration();
@@ -102,19 +256,24 @@ public class DoorActor extends Actor implements Disposable, EventListener, DoorP
 	 * Instantly changes the actor's appearance to the 'opened' state.
 	 * This method does not change the door's actual open/closed state.
 	 */
-	public void setAppearanceOpen() {
-		if ( doorModelRefId == -1 ) return;
+	protected void setAppearanceOpen() {
+		if ( modelRefId == -1 ) throw new IllegalArgumentException( "RefID is -1!" );
 
 		doorAnim.setPlayMode( PlayMode.NORMAL );
 		elapsed = doorAnim.getAnimationDuration();
 	}
+
+	/*
+	 * ==============================================
+	 * Animation state querying.
+	 */
 
 	/**
 	 * Returns true if the actor's appearance indicates that the door is
 	 * closed, false otherwise, or if the animation is playing.
 	 */
 	public boolean isAppearanceClosed() {
-		if ( doorModelRefId == -1 ) return false;
+		if ( modelRefId == -1 ) throw new IllegalArgumentException( "RefID is -1!" );
 		return ( doorAnim.getPlayMode() == PlayMode.REVERSED && elapsed >= doorAnim.getAnimationDuration() ) ||
 				( doorAnim.getPlayMode() == PlayMode.NORMAL && elapsed == 0 );
 	}
@@ -124,7 +283,7 @@ public class DoorActor extends Actor implements Disposable, EventListener, DoorP
 	 * open, false otherwise, or if the animation is playing.
 	 */
 	public boolean isAppearanceOpen() {
-		if ( doorModelRefId == -1 ) return false;
+		if ( modelRefId == -1 ) throw new IllegalArgumentException( "RefID is -1!" );
 		return ( doorAnim.getPlayMode() == PlayMode.NORMAL && elapsed >= doorAnim.getAnimationDuration() ) ||
 				( doorAnim.getPlayMode() == PlayMode.REVERSED && elapsed == 0 );
 	}
@@ -133,7 +292,7 @@ public class DoorActor extends Actor implements Disposable, EventListener, DoorP
 	 * Returns true if the door is currently playing the close animation, false otherwise.
 	 */
 	public boolean isPlayingClose() {
-		if ( doorModelRefId == -1 ) return false;
+		if ( modelRefId == -1 ) throw new IllegalArgumentException( "RefID is -1!" );
 		return doorAnim.getPlayMode() == PlayMode.REVERSED && elapsed < doorAnim.getAnimationDuration();
 	}
 
@@ -141,142 +300,7 @@ public class DoorActor extends Actor implements Disposable, EventListener, DoorP
 	 * Returns true if the door is currently playing the open animation, false otherwise.
 	 */
 	public boolean isPlayingOpen() {
-		if ( doorModelRefId == -1 ) return false;
+		if ( modelRefId == -1 ) throw new IllegalArgumentException( "RefID is -1!" );
 		return doorAnim.getPlayMode() == PlayMode.NORMAL && elapsed < doorAnim.getAnimationDuration();
-	}
-
-	public void setDoorModel( OverdriveContext context, int doorModelRefId ) {
-		this.doorModelRefId = doorModelRefId;
-		updateDoorInfo( context );
-	}
-
-	public int getDoorModel() {
-		return doorModelRefId;
-	}
-
-	/**
-	 * Updates everything to match the current DoorModel.
-	 */
-	private void updateDoorInfo( OverdriveContext context ) {
-		if ( doorModelRefId == -1 ) {
-			setPosition( 0, 0 );
-			setSize( 0, 0 );
-			setBounds( 0, 0, 0, 0 );
-		}
-		else {
-			DoorModel doorModel = context.getReferenceManager().getObject( doorModelRefId, DoorModel.class );
-			AnimSpec newAnimSpec = doorModel.getAnimSpec();
-			boolean wantOpen = doorModel.getProperties().getBool( OVDConstants.DOOR_OPEN );
-
-			// Update the animation
-			PlayMode playMode = wantOpen ? PlayMode.NORMAL : PlayMode.REVERSED;
-			if ( doorAnim != null )
-				playMode = doorAnim.getPlayMode(); // Save for when the door's AnimSpec has been changed.
-
-			if ( animSpec != null && !animSpec.equals( newAnimSpec ) ) {
-				assetManager.unload( animSpec.getAtlasPath() );
-				animSpec = null;
-			}
-			if ( animSpec == null && newAnimSpec != null ) {
-				animSpec = newAnimSpec;
-				assetManager.load( animSpec.getAtlasPath(), TextureAtlas.class );
-				assetManager.finishLoading();
-				doorAnim = animSpec.create( context );
-				doorAnim.setPlayMode( playMode );
-				setSize( animSpec.getFrameWidth(), animSpec.getFrameHeight() );
-			}
-
-			if ( wantOpen ) {
-				if ( isAppearanceClosed() || isPlayingClose() || isPlayingOpen() )
-					playOpen();
-				else
-					setAppearanceOpen();
-			}
-			else {
-				if ( isAppearanceOpen() || isPlayingOpen() || isPlayingClose() )
-					playClose();
-				else
-					setAppearanceClosed();
-			}
-		}
-	}
-
-	@Override
-	public Actor hit( float x, float y, boolean touchable ) {
-		// Door sheet's frame size is 35px, but the clickable area of the door is smaller
-		// TODO: find a way not to hardcode this
-		if ( touchable && getTouchable() != Touchable.enabled ) return null;
-		return x >= 11 && x < 24 && y >= 3 && y < 33 ? this : null;
-	}
-
-	@Override
-	public void doorPropertyChanged( OverdriveContext context, DoorPropertyEvent e ) {
-		if ( e.getDoorRefId() != doorModelRefId ) return;
-
-		if ( e.getPropertyType() == DoorPropertyEvent.BOOL_TYPE ) {
-			updateDoorInfo( context );
-		}
-		else if ( e.getPropertyType() == DoorPropertyEvent.INT_TYPE ) {
-			if ( e.getPropertyKey().equals( OVDConstants.DOOR_HEALTH ) ) {
-				DoorModel doorModel = context.getReferenceManager().getObject( doorModelRefId, DoorModel.class );
-				int curHealth = doorModel.getProperties().getInt( OVDConstants.DOOR_HEALTH );
-				if ( curHealth <= 0 ) {
-					DoorPropertyEvent ev = Pools.get( DoorPropertyEvent.class ).obtain();
-					ev.init( doorModelRefId, DoorPropertyEvent.BOOL_TYPE, DoorPropertyEvent.SET_ACTION, OVDConstants.DOOR_OPEN, true );
-					ev.setSource( netManager.getLocalPlayerRefId() );
-					eventManager.postDelayedEvent( ev );
-
-					ev = Pools.get( DoorPropertyEvent.class ).obtain();
-					ev.init( doorModelRefId, DoorPropertyEvent.BOOL_TYPE, DoorPropertyEvent.SET_ACTION, OVDConstants.DOOR_LOCKED, true );
-					ev.setSource( netManager.getLocalPlayerRefId() );
-					eventManager.postDelayedEvent( ev );
-				}
-				else if ( curHealth == doorModel.getProperties().getInt( OVDConstants.DOOR_HEALTH_MAX ) &&
-						doorModel.getProperties().getBool( OVDConstants.DOOR_LOCKED ) ) {
-					DoorPropertyEvent ev = Pools.get( DoorPropertyEvent.class ).obtain();
-					ev.init( doorModelRefId, DoorPropertyEvent.BOOL_TYPE, DoorPropertyEvent.SET_ACTION, OVDConstants.DOOR_LOCKED, false );
-					ev.setSource( netManager.getLocalPlayerRefId() );
-					eventManager.postDelayedEvent( ev );
-				}
-			}
-		}
-	}
-
-	@Override
-	public boolean handle( Event event ) {
-		if ( event instanceof InputEvent ) {
-			InputEvent e = (InputEvent)event;
-			switch ( e.getType() ) {
-				case touchDown:
-					if ( e.getButton() == Buttons.LEFT ) {
-						DoorPropertyEvent ev = Pools.get( DoorPropertyEvent.class ).obtain();
-						ev.init( doorModelRefId, DoorPropertyEvent.BOOL_TYPE, DoorPropertyEvent.TOGGLE_ACTION, OVDConstants.DOOR_OPEN, false );
-						ev.setSource( netManager.getLocalPlayerRefId() );
-						eventManager.postDelayedEvent( ev );
-						return true;
-					}
-					else if ( e.getButton() == Buttons.RIGHT ) {
-						DoorPropertyEvent ev = Pools.get( DoorPropertyEvent.class ).obtain();
-						ev.init( doorModelRefId, DoorPropertyEvent.INT_TYPE, DoorPropertyEvent.INCREMENT_ACTION, OVDConstants.DOOR_HEALTH, -50 );
-						eventManager.postDelayedEvent( ev );
-						return true;
-					}
-				default:
-					return false;
-			}
-		}
-		return false;
-	}
-
-	@Override
-	public void dispose() {
-		assetManager.unload( animSpec.getAtlasPath() );
-	}
-
-	@Override
-	public void ticksAccumulated( TickEvent e ) {
-		DoorPropertyEvent ev = Pools.get( DoorPropertyEvent.class ).obtain();
-		ev.init( doorModelRefId, DoorPropertyEvent.INT_TYPE, DoorPropertyEvent.INCREMENT_ACTION, OVDConstants.DOOR_HEALTH, 10 );
-		eventManager.postDelayedEvent( ev );
 	}
 }

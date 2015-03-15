@@ -11,6 +11,7 @@ public interface DoorModel extends OVDModel {
 	 */
 	public NamedProperties getProperties();
 
+
 	public void setAnimSpec( AnimSpec spec );
 	public AnimSpec getAnimSpec();
 }

@@ -22,6 +22,14 @@ public class OVDConstants {
 
 	/*
 	 * ========================================
+	 * Player properties.
+	 */
+
+	/** Player property. */
+	public static final String SCRAP = "Scrap";
+
+	/*
+	 * ========================================
 	 * Ship properties.
 	 */
 
@@ -36,9 +44,6 @@ public class OVDConstants {
 
 	/** Ship property. */
 	public static final String POWER = "Power";
-
-	/** Ship property. */
-	public static final String SCRAP = "Scrap"; // TODO player property instead?
 
 	/** Ship property. */
 	public static final String FUEL = "Fuel";
@@ -58,13 +63,17 @@ public class OVDConstants {
 	/** Ship property. */
 	public static final String AUGMENT_SLOTS = "AugmentSlots";
 
+	/** Ship property. */
+	public static final String CREW_SLOTS = "CrewSlots";
+
 	/** In enemy ships, indicates the minimum sector in which the ship can start appearing. */
 	public static final String SECTOR_MIN = "SectorMin";
 
 	/** In enemy ships, indicates the maximum sector in which the ship can still appear. */
 	public static final String SECTOR_MAX = "SectorMax";
 
-	/** Strength of the ship's doors. Determines which sprite to use to represent the door.
+	/**
+	 * Strength of the ship's doors. Determines which sprite to use to represent the door.
 	 * -1 - hacked (pink-ish sprite)
 	 * 0 - default sprite tinted red
 	 * 1 - default (orange) sprite
@@ -82,12 +91,14 @@ public class OVDConstants {
 	public static final String DOOR_HEALTH_MAX = "DoorHeathMax";
 	public static final String DOOR_HEALTH = "DoorHeath";
 	public static final String DOOR_OPEN = "DoorOpen";
-	/** If true, the door is locked and the player is unable to control it.
-	 *  For example when boarders have busted the door, when crew is currently passsing through it,
-	 *  when the ship has no door subsystem installed, or when the door is hacked.
+	/**
+	 * If true, the door is locked and the player is unable to control it.
+	 * For example when boarders have busted the door, when crew is currently passsing through it,
+	 * when the ship has no door subsystem installed, or when the door is hacked.
 	 */
 	public static final String DOOR_LOCKED = "DoorLocked";
-	
+	public static final String DOOR_ANIM_SPEC = "DoorAnimSpec";
+
 	/*
 	 * ========================================
 	 * Atlas paths.
@@ -96,6 +107,7 @@ public class OVDConstants {
 	public static final String ROOT_ATLAS = "img/.atlas.atlas";
 	public static final String BUTTONS_FTL_ATLAS = "img/buttons/FTL/.atlas.atlas";
 	public static final String COMBATUI_ATLAS = "img/combatUI/.atlas.atlas";
+	public static final String HANGARUI_ATLAS = "img/customizeUI/.atlas.atlas";
 	public static final String EFFECTS_ATLAS = "img/effects/.atlas.atlas";
 	public static final String ICONS_ATLAS = "img/icons/.atlas.atlas";
 	public static final String MISC_ATLAS = "img/misc/.atlas.atlas";
@@ -109,4 +121,5 @@ public class OVDConstants {
 	public static final String MENU_ATLAS = "img/main_menus/.atlas.atlas";
 
 	public static final String FLOORPLAN_ATLAS = "internal://overdrive-assets/images/floorplan.atlas";
+	public static final String CUSTOM_HANGAR_ATLAS = "internal://overdrive-assets/images/hangar-ui/hangar.atlas";
 }

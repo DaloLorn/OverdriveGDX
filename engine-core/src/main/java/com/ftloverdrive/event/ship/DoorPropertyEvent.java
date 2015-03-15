@@ -7,6 +7,7 @@ import com.ftloverdrive.event.AbstractPropertyEvent;
 public class DoorPropertyEvent extends AbstractPropertyEvent implements Poolable {
 	protected int doorRefId = -1;
 
+
 	public DoorPropertyEvent() {
 	}
 
@@ -21,6 +22,9 @@ public class DoorPropertyEvent extends AbstractPropertyEvent implements Poolable
 		this.intValue = intValue;
 	}
 
+	/**
+	 * Pseudo-constructor for a boolean property change.
+	 */
 	public void init( int doorRefId, int propertyType, int action, String propertyKey, boolean boolValue ) {
 		this.doorRefId = doorRefId;
 		this.propertyType = propertyType;

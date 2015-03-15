@@ -3,11 +3,13 @@ package com.ftloverdrive.bsh;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 
 /**
- * Bug with Beanshell: overriding methods that have primitive parameters causes
- * a java.lang.VerifyError due to mismatched types. Workaround is to use wrappers.
+ * Overdrive wrapper for libgdx's ClickListeer
+ * 
+ * @see {@link com.ftloverdrive.bsh}
  */
 public class ClickListener extends com.badlogic.gdx.scenes.scene2d.utils.ClickListener {
 
+	/** Override this to implement the listener's functionality. */
 	public void clicked( InputEvent event, Float x, Float y ) {
 	}
 

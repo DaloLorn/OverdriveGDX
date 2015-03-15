@@ -2,35 +2,40 @@ package com.ftloverdrive.ui.ship;
 
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.g2d.Batch;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.Actor;
-import com.badlogic.gdx.scenes.scene2d.Event;
-import com.badlogic.gdx.scenes.scene2d.EventListener;
 import com.badlogic.gdx.scenes.scene2d.Group;
-import com.badlogic.gdx.scenes.scene2d.InputEvent;
-import com.badlogic.gdx.scenes.scene2d.InputEvent.Type;
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.IntMap;
 import com.ftloverdrive.core.OverdriveContext;
 import com.ftloverdrive.event.TickListener;
+import com.ftloverdrive.event.local.LocalActorClickedListener;
 import com.ftloverdrive.event.ship.DoorPropertyListener;
 import com.ftloverdrive.event.ship.ShipPropertyEvent;
 import com.ftloverdrive.event.ship.ShipPropertyListener;
-import com.ftloverdrive.model.ship.DoorModel;
 import com.ftloverdrive.model.ship.ShipCoordinate;
 import com.ftloverdrive.model.ship.ShipModel;
 import com.ftloverdrive.util.OVDConstants;
 
 public class ShipDoorsActor extends Group
-		implements Disposable, ShipPropertyListener, EventListener {
+		implements Disposable, ShipPropertyListener {
 	protected AssetManager assetManager;
 
-	protected float tileSize = 35;
+	protected float tileSize;
+	private TextureRegion floorTileRegion;
 
 	protected int shipModelRefId = -1;
 
 	public ShipDoorsActor( OverdriveContext context ) {
 		super();
 		assetManager = context.getAssetManager();
+
+		assetManager.load( OVDConstants.FLOORPLAN_ATLAS, TextureAtlas.class );
+		assetManager.finishLoading();
+
+		TextureAtlas floorAtlas = assetManager.get( OVDConstants.FLOORPLAN_ATLAS, TextureAtlas.class );
+		floorTileRegion = floorAtlas.findRegion( "floor-tile" );
 	}
 
 	/**
@@ -78,16 +83,20 @@ public class ShipDoorsActor extends Group
 	 * Adds a tile to represent a ShipCoordinate.
 	 */
 	public void addTile( OverdriveContext context, ShipCoordinate coord, int doorRefId ) {
-		if ( coord.v != ShipCoordinate.TYPE_DOOR_H && coord.v != ShipCoordinate.TYPE_DOOR_V )
+		if ( coord.v != ShipCoordinate.TYPE_DOOR_H && coord.v != ShipCoordinate.TYPE_DOOR_V ) {
 			return;
+		}
 
-		DoorActor doorActor = new DoorActor( context );
-		doorActor.setDoorModel( context, doorRefId );
+		boolean horizontal = coord.v == ShipCoordinate.TYPE_DOOR_H;
+
+		DoorActor doorActor = new DoorActor( context, floorTileRegion, horizontal );
+		doorActor.setModelRefId( doorRefId );
 		doorActor.setPosition( calcTileX( coord ), calcTileY( coord ) );
-		doorActor.setRotation( coord.v == ShipCoordinate.TYPE_DOOR_H ? 90 : 0 );
+		doorActor.setRotation( horizontal ? 90 : 0 );
 		doorActor.setAppearanceClosed();
 		addActor( doorActor );
 
+		context.getScreenEventManager().addEventListener( doorActor, LocalActorClickedListener.class );
 		context.getScreenEventManager().addEventListener( doorActor, DoorPropertyListener.class );
 		context.getScreenEventManager().addEventListener( doorActor, TickListener.class );
 	}
@@ -117,27 +126,19 @@ public class ShipDoorsActor extends Group
 			// AnimSpec animSpec = (AnimSpec) system.interpretIntValue( doorUpgradeLevel, OVDConstants.DOOR_SYSTEM_LEVEL );
 			
 			for ( IntMap.Keys it = shipModel.getLayout().doorRefIds(); it.hasNext; ) {
-				int doorRefId = it.next();
-				DoorModel doorModel = context.getReferenceManager().getObject( doorRefId, DoorModel.class );
+				//int doorRefId = it.next();
+				//DoorModel doorModel = context.getReferenceManager().getObject( doorRefId, DoorModel.class );
 				//doorModel.setAnimSpec(  );
 			}
 		}
 	}
 
 	public void dispose() {
-		// TODO ?
-	}
-
-	@Override
-	public boolean handle( Event e ) {
-		if ( e instanceof InputEvent ) {
-			Actor target = e.getTarget();
-			InputEvent event = (InputEvent)e;
-
-			if ( event.getType() == Type.touchDown && target instanceof DoorActor )
-				return ( (DoorActor)target ).handle( event );
+		assetManager.unload( OVDConstants.FLOORPLAN_ATLAS );
+		for ( Actor actor : getChildren() ) {
+			if ( actor instanceof Disposable )
+				((Disposable) actor).dispose();
 		}
-
-		return false;
+		// TODO ?
 	}
 }

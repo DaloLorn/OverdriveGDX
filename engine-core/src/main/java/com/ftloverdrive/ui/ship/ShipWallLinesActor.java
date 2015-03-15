@@ -129,6 +129,7 @@ public class ShipWallLinesActor extends Actor implements Disposable {
 		if ( allCoords.contains( tmpCoord ) ) seCorner = true;
 
 		String regionName = null;
+
 		// Sides
 		if ( nWall && sWall && wWall && eWall ) {
 			regionName = "wall-side-n,s,e,w";
@@ -175,6 +176,7 @@ public class ShipWallLinesActor extends Actor implements Disposable {
 		else if ( nWall && sWall && wWall && !eWall                                                     ) {
 			regionName = "wall-side-n,s,w";
 		}
+
 		// Corners
 		else if ( !nWall && !sWall && !wWall && !eWall && nwCorner && !neCorner && !swCorner && !seCorner ) {
 			regionName = "wall-corner-nw";

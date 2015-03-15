@@ -10,8 +10,8 @@ public class OverdriveGameDesktop {
 		LwjglApplicationConfiguration config = new LwjglApplicationConfiguration();
 		config.title = "Overdrive";
 		config.useGL30 = false;
-		config.width = 1024;
-		config.height = 650;
+		config.width = 1280;
+		config.height = 720;
 		config.fullscreen = false;
 		config.vSyncEnabled = true;  // See also Gdx.graphics.setVSync( true );
 		config.foregroundFPS = 41;   // If CPU can't keep up, the render thread won't sleep, pegging the CPU.

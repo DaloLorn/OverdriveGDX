@@ -7,6 +7,7 @@ package com.ftloverdrive.ui.screen;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
+import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.math.Interpolation;
@@ -14,6 +15,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.Logger;
 import com.badlogic.gdx.utils.Pools;
@@ -109,6 +111,42 @@ public class LoadingScreen implements Disposable, OVDScreen {
 		context.getAssetManager().load( OVDConstants.MISC_ATLAS, TextureAtlas.class );
 		context.getAssetManager().load( OVDConstants.MENU_ATLAS, TextureAtlas.class );
 		//context.getAssetManager().load( OVDConstants.WEAPONS_ATLAS, TextureAtlas.class );
+
+		// XXX: Commented out script loading, moving stuff from scripts to hard-code directly
+		/*
+		// Preload scripts.
+		FileHandle scriptsFolder = context.getFileHandleResolver().resolve("overdrive-assets/scripts");
+		FilenameFilter scriptFilter = new FilenameFilter() {
+			@Override
+			public boolean accept( File dir, String name ) {
+				return name.endsWith(".java") || name.endsWith(".bsh");
+			}
+		};
+		Array<FileHandle> scriptHandles = new Array<FileHandle>();
+		getHandles( scriptsFolder, scriptHandles );
+		for ( FileHandle scriptFile : scriptHandles ) {
+			if ( scriptFilter.accept( null, scriptFile.name() ) ) {
+				context.getAssetManager().load( scriptFile.path(), ScriptResource.class );
+			}
+		}
+		*/
+	}
+
+	/**
+	 * Recursively scans all subdirectories, starting at the handle provided in argument,
+	 * and adds files contained within them to the list passed in argument.
+	 * 
+	 * Note: folders located within the .jar show up as having 0 children.
+	 */
+	private void getHandles( FileHandle begin, Array<FileHandle> handles ) {
+	    FileHandle[] newHandles = begin.list();
+	    for ( FileHandle fh : newHandles ) {
+	        if ( fh.isDirectory() ) {
+	            getHandles( fh, handles );
+	        } else {
+	            handles.add( fh );
+	        }
+	    }
 	}
 
 
@@ -220,5 +258,15 @@ public class LoadingScreen implements Disposable, OVDScreen {
 	@Override
 	public OVDScriptManager getScriptManager() {
 		return scriptManager;
+	}
+
+	@Override
+	public int getScreenWidth() {
+		return (int)mainStage.getWidth();
+	}
+
+	@Override
+	public int getScreenHeight() {
+		return (int)mainStage.getHeight();
 	}
 }

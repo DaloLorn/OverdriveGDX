@@ -1,0 +1,37 @@
+package com.ftloverdrive.ui;
+
+import com.badlogic.gdx.scenes.scene2d.EventListener;
+import com.ftloverdrive.core.OverdriveContext;
+import com.ftloverdrive.model.ship.ShipCoordinate;
+
+
+/**
+ * An actor that represents a Model it is associated with.
+ *
+ */
+public abstract class ModelActor extends LocalActor implements EventListener {
+
+	protected int modelRefId = -1;
+	protected ShipCoordinate nextWaypoint = null;
+
+
+	public ModelActor( OverdriveContext context ) {
+		super( context );
+	}
+
+	/**
+	 * Updates the actor to match the model it is associated with, and accurately represent it.
+	 *
+	 * TODO: Keep context in argument; will be needed once context is no longer passed in constructor.
+	 */
+	protected abstract void updateInfo( OverdriveContext context );
+
+	public void setModelRefId( int modelRefId ) {
+		this.modelRefId = modelRefId;
+		updateInfo( context );
+	}
+
+	public int getModelRefId() {
+		return modelRefId;
+	}
+}

@@ -14,4 +14,10 @@ public interface OVDScreen extends Screen {
 	public OVDEventManager getEventManager();
 
 	public OVDScriptManager getScriptManager();
+
+	/** Returns the entire screen's current width. */
+	public int getScreenWidth();
+
+	/** Returns the entire screen's current height. */
+	public int getScreenHeight();
 }

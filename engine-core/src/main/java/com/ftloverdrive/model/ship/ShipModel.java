@@ -15,6 +15,20 @@ public interface ShipModel extends OVDModel {
 	 */
 	public ShipLayout getLayout();
 
+	/**
+	 * Returns an array of ref ids of the ship's crew.
+	 */
+	public Integer[] crewRefIds();
+
+	/**
+	 * Adds the CrewModel specified by the ref id to the ship, essentially making them crew of the ship,
+	 * and changing the owner of the crew to the player owning the ship.
+	 * 
+	 * To just place the crew in the layout space of another ship, use {@link ShipLayout#placeCrew(int, ShipCoordinate)}
+	 * 
+	 * Returns true if crew was successfully added; false otherwise (eg. already at max crew capacity)
+	 */
+	public boolean addCrew( int crewRefId );
 
 	/**
 	 * Shifts *all* graphics (hull images, shield and rooms).
@@ -27,7 +41,9 @@ public interface ShipModel extends OVDModel {
 	 * There, +X was right, +Y was down.
 	 */
 	public void setShipOffset( float x, float y );
+
 	public float getShipOffsetX();
+
 	public float getShipOffsetY();
 
 	/**
@@ -40,7 +56,9 @@ public interface ShipModel extends OVDModel {
 	 * There, +X was right, +Y was down.
 	 */
 	public void setHullOffset( float x, float y );
+
 	public float getHullOffsetX();
+
 	public float getHullOffsetY();
 
 	/**
@@ -52,13 +70,15 @@ public interface ShipModel extends OVDModel {
 	 * The original FTL set this in snipname.xml.
 	 * The img tag's w and h attributes behaved similarly.
 	 * 
-	 * TODO: since AE, hull size is no longer really used for anything (both 
+	 * TODO: since AE, hull size is no longer really used for anything (both
 	 * floor and cloak are drawn as they are, without any scaling), remove?
 	 */
 	public void setHullSize( float width, float height );
+
 	public float getHullWidth();
+
 	public float getHullHeight();
-	
+
 	/**
 	 * Shifts the floor image only.
 	 * 
@@ -69,7 +89,9 @@ public interface ShipModel extends OVDModel {
 	 * There, +X was right, +Y was down.
 	 */
 	public void setFloorOffset( float x, float y );
+
 	public float getFloorOffsetX();
+
 	public float getFloorOffsetY();
 
 	/**
@@ -82,7 +104,9 @@ public interface ShipModel extends OVDModel {
 	 * There, +X was right, +Y was down.
 	 */
 	public void setCloakOffset( float x, float y );
+
 	public float getCloakOffsetX();
+
 	public float getCloakOffsetY();
 
 
@@ -107,9 +131,13 @@ public interface ShipModel extends OVDModel {
 	 * There, +X was right, +Y was down.
 	 */
 	public void setShieldEllipse( float x, float y, float semiMajorAxis, float semiMinorAxis );
+
 	public float getShieldEllipseOffsetX();
+
 	public float getShieldEllipseOffsetY();
+
 	public float getShieldEllipseSemiMajorAxis();
+
 	public float getShieldEllipseSemiMinorAxis();
 
 
@@ -117,23 +145,27 @@ public interface ShipModel extends OVDModel {
 	 * Sets the ship's base image.
 	 */
 	public void setBaseImageSpec( ImageSpec imageSpec );
+
 	public ImageSpec getBaseImageSpec();
 
 	/**
 	 * Sets the ship's cloak image.
 	 */
 	public void setCloakImageSpec( ImageSpec imageSpec );
+
 	public ImageSpec getCloakImageSpec();
 
 	/**
 	 * Sets the ship's floor image.
 	 */
 	public void setFloorImageSpec( ImageSpec imageSpec );
+
 	public ImageSpec getFloorImageSpec();
 
 	/**
 	 * Sets the ship's shield image.
 	 */
 	public void setShieldImageSpec( ImageSpec imageSpec );
+
 	public ImageSpec getShieldImageSpec();
 }

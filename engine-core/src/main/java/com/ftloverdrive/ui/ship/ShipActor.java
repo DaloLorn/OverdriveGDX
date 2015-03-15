@@ -5,10 +5,11 @@ import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Event;
 import com.badlogic.gdx.scenes.scene2d.EventListener;
 import com.badlogic.gdx.scenes.scene2d.Group;
-import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.utils.SpriteDrawable;
 import com.badlogic.gdx.utils.Disposable;
@@ -16,6 +17,8 @@ import com.badlogic.gdx.utils.IntMap;
 import com.ftloverdrive.core.OverdriveContext;
 import com.ftloverdrive.event.game.GamePlayerShipChangeEvent;
 import com.ftloverdrive.event.game.GamePlayerShipChangeListener;
+import com.ftloverdrive.event.local.LocalActorClickedListener;
+import com.ftloverdrive.event.player.OrderListener;
 import com.ftloverdrive.event.ship.ShipPropertyEvent;
 import com.ftloverdrive.event.ship.ShipPropertyListener;
 import com.ftloverdrive.io.ImageSpec;
@@ -27,6 +30,7 @@ import com.ftloverdrive.util.OVDConstants;
 
 public class ShipActor extends Group
 		implements Disposable, GamePlayerShipChangeListener, ShipPropertyListener, EventListener {
+
 	protected AssetManager assetManager;
 
 	protected Group shipFudgeGroup;
@@ -43,7 +47,8 @@ public class ShipActor extends Group
 	protected ShipFloorLinesActor floorLines;
 	protected ShipRoomDecorsActor roomDecors;
 	protected ShipWallLinesActor wallLines;
-	protected ShipDoorsActor doorsActor;
+	protected ShipDoorsActor doorGroup;
+	protected Group crewGroup;
 
 	protected int shipModelRefId = -1;
 	protected ImageSpec shieldImgSpec = null;
@@ -92,19 +97,30 @@ public class ShipActor extends Group
 		shipHullGroup.addActor( floorImage );
 
 		floorTiles = new ShipFloorTilesActor( context );
+		floorTiles.setTouchable( Touchable.childrenOnly );
+		context.getScreenEventManager().addEventListener( floorTiles, LocalActorClickedListener.class );
 		shipFloorplanGroup.addActor( floorTiles );
 
 		floorLines = new ShipFloorLinesActor( context );
+		floorLines.setTouchable( Touchable.disabled );
 		shipFloorplanGroup.addActor( floorLines );
 
 		roomDecors = new ShipRoomDecorsActor( context );
+		roomDecors.setTouchable( Touchable.disabled );
 		shipFloorplanGroup.addActor( roomDecors );
 
 		wallLines = new ShipWallLinesActor( context );
+		wallLines.setTouchable( Touchable.disabled );
 		shipFloorplanGroup.addActor( wallLines );
 
-		doorsActor = new ShipDoorsActor( context );
-		shipFloorplanGroup.addActor( doorsActor );
+		doorGroup = new ShipDoorsActor( context );
+		doorGroup.setTouchable( Touchable.childrenOnly );
+		shipFloorplanGroup.addActor( doorGroup );
+
+		// TODO: Where to draw crew layer?
+		crewGroup = new Group();
+		crewGroup.setTouchable( Touchable.childrenOnly );
+		shipFloorplanGroup.addActor( crewGroup );
 	}
 
 
@@ -129,17 +145,18 @@ public class ShipActor extends Group
 		}
 
 		setShipModel( context, e.getShipRefId() );
+		setPosition( 350, context.getScreen().getScreenHeight() - getHeight() - 170 );
 	}
 
 	@Override
 	public void shipPropertyChanged( OverdriveContext context, ShipPropertyEvent e ) {
 		if ( e.getShipRefId() != shipModelRefId ) return;
 
-		//if ( e.getPropertyType() == ShipPropertyEvent.INT_TYPE ) {
-		//	if ( OVDConstants.HULL.equals( e.getPropertyKey() ) || OVDConstants.HULL_MAX.equals( e.getPropertyKey() ) ) {
-		//		updateShipInfo( context );
-		//	}
-		//}
+		// if ( e.getPropertyType() == ShipPropertyEvent.INT_TYPE ) {
+		// if ( OVDConstants.HULL.equals( e.getPropertyKey() ) || OVDConstants.HULL_MAX.equals( e.getPropertyKey() ) ) {
+		// updateShipInfo( context );
+		// }
+		// }
 	}
 
 
@@ -161,12 +178,12 @@ public class ShipActor extends Group
 			baseImage.setDrawable( nullDrawable );
 			baseImage.setBounds( 0, 0, 0, 0 );
 			baseImage.validate();
-			
+
 			floorImgSpec = null;
 			floorImage.setDrawable( nullDrawable );
 			floorImage.setBounds( 0, 0, 0, 0 );
 			floorImage.validate();
-			
+
 			cloakImgSpec = null;
 			cloakImage.setDrawable( nullDrawable );
 			cloakImage.setBounds( 0, 0, 0, 0 );
@@ -184,8 +201,11 @@ public class ShipActor extends Group
 			wallLines.clear();
 			wallLines.setSize( 0, 0 );
 
-			doorsActor.clear();
-			doorsActor.setSize( 0, 0 );
+			doorGroup.clear();
+			doorGroup.setSize( 0, 0 );
+
+			crewGroup.clear();
+			crewGroup.setSize( 0, 0 );
 
 			this.setSize( 0, 0 );
 		}
@@ -203,7 +223,8 @@ public class ShipActor extends Group
 				Sprite baseSprite = shipAtlas.createSprite( baseImgSpec.getRegionName() );
 				if ( baseSprite != null ) {
 					baseImage.setDrawable( new SpriteDrawable( baseSprite ) );
-				} else {
+				}
+				else {
 					baseImage.setDrawable( nullDrawable );
 				}
 
@@ -220,7 +241,8 @@ public class ShipActor extends Group
 				Sprite shieldSprite = shipAtlas.createSprite( shieldImgSpec.getRegionName() );
 				if ( shieldSprite != null ) {
 					shieldImage.setDrawable( new SpriteDrawable( shieldSprite ) );
-				} else {
+				}
+				else {
 					shieldImage.setDrawable( nullDrawable );
 				}
 
@@ -228,7 +250,8 @@ public class ShipActor extends Group
 				layoutSize.x *= 35;
 				layoutSize.y *= 35;
 				shieldImage.setX( layoutSize.x / 2 + shipModel.getShieldEllipseOffsetX() - shipModel.getShieldEllipseSemiMajorAxis() );
-				shieldImage.setY( -shipModel.getShieldEllipseSemiMinorAxis() + baseImage.getHeight() - layoutSize.y / 2 - shipModel.getShieldEllipseOffsetY() );
+				shieldImage.setY( -shipModel.getShieldEllipseSemiMinorAxis() + baseImage.getHeight() - layoutSize.y / 2
+						- shipModel.getShieldEllipseOffsetY() );
 				shieldImage.setSize( shipModel.getShieldEllipseSemiMajorAxis() * 2, shipModel.getShieldEllipseSemiMinorAxis() * 2 );
 				shieldImage.validate();
 			}
@@ -240,14 +263,15 @@ public class ShipActor extends Group
 				Sprite cloakSprite = shipAtlas.createSprite( cloakImgSpec.getRegionName() );
 				if ( cloakSprite != null ) {
 					cloakImage.setDrawable( new SpriteDrawable( cloakSprite ) );
-				} else {
+				}
+				else {
 					cloakImage.setDrawable( nullDrawable );
 				}
 
 				// Relative to base image's bottom-left corner
 				// Ie. X values calculated normally, but Y needs some adjustments...
 				cloakImage.setPosition( shipModel.getCloakOffsetX(),
-						baseImage.getHeight() - cloakImage.getPrefHeight() -shipModel.getCloakOffsetY() );
+						baseImage.getHeight() - cloakImage.getPrefHeight() - shipModel.getCloakOffsetY() );
 				cloakImage.setSize( cloakImage.getPrefWidth(), cloakImage.getPrefHeight() );
 				cloakImage.validate();
 			}
@@ -259,14 +283,15 @@ public class ShipActor extends Group
 				Sprite floorSprite = shipAtlas.createSprite( floorImgSpec.getRegionName() );
 				if ( floorSprite != null ) {
 					floorImage.setDrawable( new SpriteDrawable( floorSprite ) );
-				} else {
+				}
+				else {
 					floorImage.setDrawable( nullDrawable );
 				}
 
 				// Relative to base image's bottom-left corner
 				// Ie. X values calculated normally, but Y needs some adjustments...
 				floorImage.setPosition( shipModel.getFloorOffsetX(),
-						baseImage.getHeight() - floorImage.getPrefHeight() -shipModel.getFloorOffsetY() );
+						baseImage.getHeight() - floorImage.getPrefHeight() - shipModel.getFloorOffsetY() );
 				floorImage.setSize( floorImage.getPrefWidth(), floorImage.getPrefHeight() );
 				floorImage.validate();
 			}
@@ -304,12 +329,28 @@ public class ShipActor extends Group
 				wallLines.addTile( coord, shipModel.getLayout().getAllShipCoords() );
 			}
 
-			doorsActor.clear();
-			doorsActor.setSize( shipModel.getHullWidth(), shipModel.getHullHeight() );
-			doorsActor.setTileSize( 35 );
+			doorGroup.clear();
+			doorGroup.setSize( shipModel.getHullWidth(), shipModel.getHullHeight() );
+			doorGroup.setTileSize( 35 );
 			for ( IntMap.Keys it = shipModel.getLayout().doorRefIds(); it.hasNext; ) {
 				int doorRefId = it.next();
-				doorsActor.addTile( context, shipModel.getLayout().getDoorCoords( doorRefId ), doorRefId );
+				doorGroup.addTile( context, shipModel.getLayout().getDoorCoords( doorRefId ), doorRefId );
+			}
+
+			crewGroup.clear();
+			crewGroup.setSize( shipModel.getHullWidth(), shipModel.getHullHeight() );
+			for ( IntMap.Keys it = shipModel.getLayout().crewRefIds(); it.hasNext; ) {
+				int crewRefId = it.next();
+				ShipCoordinate coord = shipModel.getLayout().getCrewCoords( crewRefId );
+
+				CrewActor crewActor = new CrewActor( context );
+				crewActor.setModelRefId( crewRefId );
+
+				crewGroup.addActor( crewActor );
+				crewActor.setPosition( coord.x * 35, crewGroup.getHeight() - coord.y * 35 );
+
+				context.getScreenEventManager().addEventListener( crewActor, LocalActorClickedListener.class );
+				context.getScreenEventManager().addEventListener( crewActor, OrderListener.class );
 			}
 		}
 	}
@@ -337,8 +378,9 @@ public class ShipActor extends Group
 	}
 
 	public boolean handle( Event e ) {
-		if ( e instanceof InputEvent ) {
-			return doorsActor.handle( e );
+		Actor target = e.getTarget();
+		if ( target instanceof EventListener ) {
+			return ( (EventListener)target ).handle( e );
 		}
 
 		return false;

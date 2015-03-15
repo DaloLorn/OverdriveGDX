@@ -1,7 +1,6 @@
 package com.ftloverdrive.model.ship;
 
-import com.ftloverdrive.model.ship.Coordinatable;
-import com.ftloverdrive.model.ship.ShipCoordinate;
+import java.util.Collection;
 
 
 /**
@@ -30,6 +29,8 @@ public interface Ambulator extends Coordinatable {
 	 */
 	public void setAmbulationGoal( ShipCoordinate coord );
 	public ShipCoordinate getAmbulationGoal();
+	
+	public void setAmbulationPath( Collection<ShipCoordinate> path );
 
 
 	/** Returns true if this is currently moving toward a destination. */

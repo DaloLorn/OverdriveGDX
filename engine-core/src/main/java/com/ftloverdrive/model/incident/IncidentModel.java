@@ -4,8 +4,6 @@ import java.util.List;
 
 import com.ftloverdrive.core.OverdriveContext;
 import com.ftloverdrive.model.OVDModel;
-import com.ftloverdrive.model.incident.Consequence;
-import com.ftloverdrive.model.incident.PlotBranch;
 
 
 /**

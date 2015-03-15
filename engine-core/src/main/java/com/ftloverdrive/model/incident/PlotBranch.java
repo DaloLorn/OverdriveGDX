@@ -25,7 +25,7 @@ public interface PlotBranch {
 	 * of all their spoilers... or null. */
 	public String getSpoilerText();
 
-	/** Toggles desired visibility of the spoiler text.
+	/** Toggles desired visibility of the spoiler text. */
 	public void setSpoilerVisible( boolean b );
 
 	/** Returns true if this branch *wants* its spoiler to be shown, false otherwise. */

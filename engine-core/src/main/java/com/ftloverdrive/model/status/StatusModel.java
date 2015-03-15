@@ -1,22 +1,24 @@
 package com.ftloverdrive.model.status;
 
-import com.ftloverdrive.model.ship.Coordinatable;
 
 /**
- * A common interface for effects that affect rooms (and by extension, the system
- * or crew located therein) -- for example fire, breach, stun, ion, power limit/div/set
+ * A common interface for effects that affect other entities -- for example
+ * fire, breach, stun, ion, power limit/div/set
  *
- * An effect can optionally have a timed life (eg. ion damage), or specify an
- * action that crew members can execute over the status (eg. extinguish fire,
- * repair breach)
+ * Effects could be applied as a result of incidents, or by an entity within a room
+ * (FireEntity, IonDummyEntity, etc)
+ * 
+ * TODO: Stub
  */
-public interface StatusModel extends Coordinatable {
+public interface StatusModel {
 
-	// TODO: Come up with API that is generic enough to accomodate all usage cases...
+	// stacks: multiple fires deal more damage, multiple breaches suck out oxygen faster, etc...
 
-	public void periodicEffect(); // or differentiate into PeriodicStatus subclass?
+	public boolean isStackable();
+	public void setStackable(boolean stacks);
 
-	public void applyEffect(); // ?
+	public int getStackCount();
+	public void setStackCount(int stacks);
 
-	public void removeEffect(); // ?
+	
 }

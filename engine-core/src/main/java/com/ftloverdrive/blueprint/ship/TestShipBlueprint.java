@@ -1,9 +1,13 @@
 package com.ftloverdrive.blueprint.ship;
 
 import com.badlogic.gdx.utils.Pools;
+import com.ftloverdrive.blueprint.ShipBlueprint;
 import com.ftloverdrive.core.OverdriveContext;
 import com.ftloverdrive.event.ship.ShipCreationEvent;
+import com.ftloverdrive.event.ship.ShipCrewAddEvent;
+import com.ftloverdrive.event.ship.ShipCrewCreationEvent;
 import com.ftloverdrive.event.ship.ShipDoorCreationEvent;
+import com.ftloverdrive.event.ship.ShipLayoutCrewPlacementEvent;
 import com.ftloverdrive.event.ship.ShipLayoutDoorAddEvent;
 import com.ftloverdrive.event.ship.ShipLayoutRoomAddEvent;
 import com.ftloverdrive.event.ship.ShipRoomCreationEvent;
@@ -14,14 +18,22 @@ import com.ftloverdrive.model.ship.ShipLayout;
 import com.ftloverdrive.util.OVDConstants;
 
 
-public class TestShipBlueprint implements ShipBlueprint {
+public class TestShipBlueprint extends ShipBlueprint {
+
+	private static final String SHIP_ID = "SHIP_ID";
+
+	public TestShipBlueprint( ShipBlueprint prototype ) {
+		super( prototype );
+
+		propertyMap.put( SHIP_ID, "Test" );
+	}
 
 	@Override
 	public int createShip( OverdriveContext context ) {
 		int shipRefId = context.getNetManager().requestNewRefId();
 
 		ShipCreationEvent shipCreateEvent = Pools.get( ShipCreationEvent.class ).obtain();
-		shipCreateEvent.init( shipRefId, "Test" );
+		shipCreateEvent.init( shipRefId, getClass().getSimpleName() );
 		context.getScreenEventManager().postDelayedEvent( shipCreateEvent );
 
 		int roomRefId = -1;
@@ -99,6 +111,7 @@ public class TestShipBlueprint implements ShipBlueprint {
 		int doorRefId = -1;
 		ShipCoordinate doorCoords = null;
 
+		// The Y-offset is 1 higher than the original FTL's layout.txt.
 		int doorsXYLRH[][] = new int[][] {
 			new int[] { 14,  4,  0,  1, 1 },
 			new int[] { 12,  4,  1,  3, 1 },
@@ -128,10 +141,13 @@ public class TestShipBlueprint implements ShipBlueprint {
 			new int[] {  7,  1,  6, -1, 0 }
 		};
 
-		for ( int i=0; i < doorsXYLRH.length; i++ ) {
+		for ( int i = 0; i < doorsXYLRH.length; i++ ) {
 			int[] xylrh = doorsXYLRH[i];
 			doorRefId = context.getNetManager().requestNewRefId();
-			doorCoords = ShipCoordinate.door( xylrh[0], xylrh[1], xylrh[4] == 0 )[0];
+			if ( xylrh[4] == 0 )
+				doorCoords = ShipCoordinate.doorHorizontal( xylrh[0], xylrh[1] )[0];
+			else
+				doorCoords = ShipCoordinate.doorVertical( xylrh[0], xylrh[1] )[0];
 
 			ShipDoorCreationEvent doorCreateEvent = Pools.get( ShipDoorCreationEvent.class ).obtain();
 			doorCreateEvent.init( doorRefId );
@@ -141,6 +157,22 @@ public class TestShipBlueprint implements ShipBlueprint {
 			doorAddEvent.init( shipRefId, doorRefId, doorCoords );
 			context.getScreenEventManager().postDelayedEvent( doorAddEvent );
 		}
+
+		// TODO Test crew code
+		int crewRefId = context.getNetManager().requestNewRefId();
+		ShipCrewCreationEvent crewCreateEvent = Pools.get( ShipCrewCreationEvent.class ).obtain();
+		crewCreateEvent.init( crewRefId );
+		context.getScreenEventManager().postDelayedEvent( crewCreateEvent );
+
+		ShipCrewAddEvent crewAddEvent = Pools.get( ShipCrewAddEvent.class ).obtain();
+		crewAddEvent.init( shipRefId, crewRefId );
+		context.getScreenEventManager().postDelayedEvent( crewAddEvent );
+
+		ShipLayoutCrewPlacementEvent crewPlaceEvent = Pools.get( ShipLayoutCrewPlacementEvent.class ).obtain();
+		ShipCoordinate coord = Pools.get( ShipCoordinate.class ).obtain();
+		coord.init( 14, 3, ShipCoordinate.TYPE_SQUARE );
+		crewPlaceEvent.init( shipRefId, crewRefId, coord );
+		context.getScreenEventManager().postDelayedEvent( crewPlaceEvent );
 
 		return shipRefId;
 	}

@@ -61,10 +61,17 @@ public class ShipCoordinate implements Poolable {
 	}
 
 
-	public static ShipCoordinate[] door( int x, int y, boolean horizontal ) {
+	public static ShipCoordinate[] doorHorizontal( int x, int y ) {
 		ShipCoordinate[] result = new ShipCoordinate[1];
 		result[0] = Pools.get( ShipCoordinate.class ).obtain();
-		result[0].init( x, y, horizontal ? TYPE_DOOR_H : TYPE_DOOR_V );
+		result[0].init( x, y, TYPE_DOOR_H );
+		return result;
+	}
+	
+	public static ShipCoordinate[] doorVertical( int x, int y ) {
+		ShipCoordinate[] result = new ShipCoordinate[1];
+		result[0] = Pools.get( ShipCoordinate.class ).obtain();
+		result[0].init( x, y, TYPE_DOOR_V );
 		return result;
 	}
 
@@ -304,5 +311,16 @@ public class ShipCoordinate implements Poolable {
 		x = 0;
 		y = 0;
 		v = 0;
+	}
+	
+	public String toString() {
+		String s = "ShipCoord { ";
+		s += x;
+		s += ", ";
+		s += y;
+		s += ", ";
+		s += v;
+		s += " }";
+		return s;
 	}
 }

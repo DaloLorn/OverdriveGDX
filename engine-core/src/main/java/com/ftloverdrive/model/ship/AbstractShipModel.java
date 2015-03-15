@@ -1,10 +1,9 @@
 package com.ftloverdrive.model.ship;
 
+import com.badlogic.gdx.utils.Array;
 import com.ftloverdrive.io.ImageSpec;
 import com.ftloverdrive.model.AbstractOVDModel;
 import com.ftloverdrive.model.NamedProperties;
-import com.ftloverdrive.model.ship.ShipLayout;
-import com.ftloverdrive.model.ship.ShipModel;
 import com.ftloverdrive.util.OVDConstants;
 
 
@@ -14,9 +13,11 @@ public class AbstractShipModel extends AbstractOVDModel implements ShipModel {
 
 	protected ShipLayout shipLayout;
 
+	protected Array<Integer> crewArray;
+
 	protected float shipOffsetX = 0f;
 	protected float shipOffsetY = 0f;
-	
+
 	protected float hullOffsetX = 0f;
 	protected float hullOffsetY = 0f;
 	// TODO hull width/height are not really used for anything in AE anymore,
@@ -43,16 +44,18 @@ public class AbstractShipModel extends AbstractOVDModel implements ShipModel {
 		super();
 		shipProperties.setInt( OVDConstants.HULL_MAX, 0 );
 		shipProperties.setInt( OVDConstants.HULL, 0 );
-		shipProperties.setInt( OVDConstants.POWER_MAX, 0);
-		shipProperties.setInt( OVDConstants.POWER, 0);
+		shipProperties.setInt( OVDConstants.POWER_MAX, 0 );
+		shipProperties.setInt( OVDConstants.POWER, 0 );
 		shipProperties.setInt( OVDConstants.SCRAP, 0 );
 		shipProperties.setInt( OVDConstants.FUEL, 0 );
 		shipProperties.setInt( OVDConstants.MISSILES, 0 );
 		shipProperties.setInt( OVDConstants.DRONE_PARTS, 0 );
-		shipProperties.setInt( OVDConstants.WEAPON_SLOTS, 0);
-		shipProperties.setInt( OVDConstants.DRONE_SLOTS, 0);
-		shipProperties.setInt( OVDConstants.AUGMENT_SLOTS, 0);
+		shipProperties.setInt( OVDConstants.WEAPON_SLOTS, 0 );
+		shipProperties.setInt( OVDConstants.DRONE_SLOTS, 0 );
+		shipProperties.setInt( OVDConstants.AUGMENT_SLOTS, 0 );
+		shipProperties.setInt( OVDConstants.CREW_SLOTS, 1 );
 		shipLayout = new ShipLayout();
+		crewArray = new Array<Integer>( true, 8 );
 	}
 
 
@@ -222,5 +225,21 @@ public class AbstractShipModel extends AbstractOVDModel implements ShipModel {
 	@Override
 	public ImageSpec getShieldImageSpec() {
 		return shieldImageSpec;
+	}
+
+
+	@Override
+	public Integer[] crewRefIds() {
+		return crewArray.toArray();
+	}
+
+	@Override
+	public boolean addCrew( int crewRefId ) {
+		if ( crewArray.size >= shipProperties.getInt( OVDConstants.CREW_SLOTS ) ) {
+			return false;
+		}
+
+		crewArray.add( crewRefId );
+		return true;
 	}
 }

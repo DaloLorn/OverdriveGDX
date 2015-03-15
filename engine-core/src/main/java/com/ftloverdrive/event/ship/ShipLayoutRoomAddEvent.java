@@ -1,7 +1,6 @@
 package com.ftloverdrive.event.ship;
 
 import com.badlogic.gdx.utils.Pool.Poolable;
-
 import com.ftloverdrive.event.AbstractOVDEvent;
 import com.ftloverdrive.model.ship.ShipCoordinate;
 

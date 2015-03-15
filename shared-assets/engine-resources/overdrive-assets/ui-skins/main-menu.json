@@ -1,6 +1,0 @@
-{
-	button-play: {
-		type: com.badlogic.gdx.scene.scene2d.ui.Button,
-		
-	}
-}

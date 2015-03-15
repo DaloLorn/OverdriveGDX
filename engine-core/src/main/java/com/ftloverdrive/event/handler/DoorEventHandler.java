@@ -7,10 +7,7 @@ import com.ftloverdrive.event.OVDEvent;
 import com.ftloverdrive.event.OVDEventHandler;
 import com.ftloverdrive.event.ship.DoorPropertyEvent;
 import com.ftloverdrive.event.ship.DoorPropertyListener;
-import com.ftloverdrive.event.ship.ShipPropertyEvent;
-import com.ftloverdrive.model.GameModel;
 import com.ftloverdrive.model.ship.DoorModel;
-import com.ftloverdrive.model.ship.ShipModel;
 import com.ftloverdrive.util.OVDConstants;
 
 public class DoorEventHandler implements OVDEventHandler {
@@ -39,6 +36,7 @@ public class DoorEventHandler implements OVDEventHandler {
 	@Override
 	public void handle( OverdriveContext context, OVDEvent e, Object[] listeners ) {
 		if ( !scrutinize( context, e ) ) {
+			// TODO: This part would normally be performed by the server when it received the event.
 			e.cancel();
 			return;
 		}
@@ -48,24 +46,24 @@ public class DoorEventHandler implements OVDEventHandler {
 
 			int doorRefId = event.getDoorRefId();
 			DoorModel doorModel = context.getReferenceManager().getObject( doorRefId, DoorModel.class );
-			if ( event.getPropertyType() == DoorPropertyEvent.BOOL_TYPE ) {
-				if ( event.getAction() == DoorPropertyEvent.SET_ACTION ) {
+			if ( event.getPropertyType() == AbstractPropertyEvent.BOOL_TYPE ) {
+				if ( event.getAction() == AbstractPropertyEvent.SET_ACTION ) {
 					boolean value = event.getBoolValue();
 					String key = event.getPropertyKey();
 					doorModel.getProperties().setBool( key, value );
 				}
-				else if ( event.getAction() == ShipPropertyEvent.TOGGLE_ACTION ) {
+				else if ( event.getAction() == AbstractPropertyEvent.TOGGLE_ACTION ) {
 					String key = event.getPropertyKey();
 					doorModel.getProperties().toggleBool( key );
 				}
 			}
-			else if ( event.getPropertyType() == DoorPropertyEvent.INT_TYPE ) {
-				if ( event.getAction() == DoorPropertyEvent.SET_ACTION ) {
+			else if ( event.getPropertyType() == AbstractPropertyEvent.INT_TYPE ) {
+				if ( event.getAction() == AbstractPropertyEvent.SET_ACTION ) {
 					int value = event.getIntValue();
 					String key = event.getPropertyKey();
 					doorModel.getProperties().setInt( key, value );
 				}
-				else if ( event.getAction() == DoorPropertyEvent.INCREMENT_ACTION ) {
+				else if ( event.getAction() == AbstractPropertyEvent.INCREMENT_ACTION ) {
 					int value = event.getIntValue();
 					String key = event.getPropertyKey();
 					doorModel.getProperties().incrementInt( key, value );
@@ -90,22 +88,8 @@ public class DoorEventHandler implements OVDEventHandler {
 	private boolean scrutinize( OverdriveContext context, OVDEvent e ) {
 		if ( e instanceof DoorPropertyEvent ) {
 			DoorPropertyEvent event = (DoorPropertyEvent)e;
-	
-			if ( event.getPropertyType() == AbstractPropertyEvent.BOOL_TYPE ) {
-				if ( event.getPropertyKey().equals( OVDConstants.DOOR_OPEN ) ) {
-					DoorModel doorModel = context.getReferenceManager().getObject( event.getDoorRefId(), DoorModel.class );
-					if ( doorModel.getProperties().getBool( OVDConstants.DOOR_LOCKED ) )
-						return false;
-			
-					int localPlayerId = context.getNetManager().getLocalPlayerRefId();
-					GameModel gameModel = context.getReferenceManager().getObject( context.getGameModelRefId(), GameModel.class );
-					int shipId = gameModel.getPlayerShip( localPlayerId );
-					ShipModel shipModel = context.getReferenceManager().getObject( shipId, ShipModel.class );
-			
-					return shipModel.getLayout().hasDoor( event.getDoorRefId() );
-				}
-			}
-			else if ( event.getPropertyType() == AbstractPropertyEvent.INT_TYPE ) {
+
+			if ( event.getPropertyType() == AbstractPropertyEvent.INT_TYPE ) {
 				if ( event.getPropertyKey().equals( OVDConstants.DOOR_HEALTH ) ) {
 					if ( event.getAction() == AbstractPropertyEvent.SET_ACTION ) {
 					}

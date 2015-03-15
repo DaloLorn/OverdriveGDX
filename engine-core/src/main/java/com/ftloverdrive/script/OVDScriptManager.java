@@ -2,7 +2,6 @@ package com.ftloverdrive.script;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Map;
 
 import bsh.BshMethod;
 import bsh.CallStack;
@@ -13,7 +12,6 @@ import bsh.Primitive;
 import bsh.UtilEvalError;
 
 import com.badlogic.gdx.files.FileHandle;
-import com.badlogic.gdx.utils.Logger;
 import com.ftloverdrive.util.TextUtilities;
 
 
@@ -25,68 +23,10 @@ import com.ftloverdrive.util.TextUtilities;
  * @see bsh.Interpreter
  */
 public class OVDScriptManager {
-	private Logger log;
 	private Interpreter bsh;
 
-
 	public OVDScriptManager() {
-		log = new Logger( OVDScriptManager.class.getCanonicalName(), Logger.INFO );
 		bsh = new Interpreter();
-	}
-
-	/**
-	 * Returns a new NameSpace object that can be used to hold variables and methods loaded
-	 * by scripts that use the same namespace. Global namespace is still visible.
-	 * 
-	 * Remember to call namespace.clear() when done.
-	 * 
-	 * @param name identifier of the namespace
-	 */
-	public NameSpace requestNewNameSpace( String name ) {
-		return new NameSpace( bsh.getNameSpace(), name );
-	}
-
-	/**
-	 * Returns a new NameSpace object that can be used to hold variables and methods loaded
-	 * by scripts that use the same namespace. Global namespace is still visible.
-	 * 
-	 * Remember to call namespace.clear() when done.
-	 * 
-	 * @param name identifier of the namespace
-	 * @param map
-	 *            A map of identifiers to objects -- the script will be able to access the objects
-	 *            by these identifiers. Basically, a way to setup variables available in the namespace.
-	 */
-	public NameSpace requestNewNameSpace( String name, Map<String, Object> vars ) {
-		NameSpace ns = new NameSpace( bsh.getNameSpace(), name );
-
-		try {
-			for ( Map.Entry<String, Object> entry : vars.entrySet() ) {
-				ns.setVariable( entry.getKey(),
-						Primitive.wrap( entry.getValue(), entry.getValue().getClass() ), false );
-			}
-		} catch ( UtilEvalError e ) {
-			log.error( "Error while evaluating variables.", e );
-		}
-
-		return ns;
-	}
-
-	/**
-	 * Evaluates a script file in the global namespace.
-	 *
-	 * @see TextUtilities.decodeText(InputStream srcStream, String srcDescription)
-	 */
-	public void eval( FileHandle f ) throws IOException, EvalError {
-		InputStream is = null;
-		try {
-			is = f.read();
-			bsh.eval( TextUtilities.decodeText( is, f.name() ).text );
-		}
-		finally {
-			try {if ( is != null ) is.close();}
-			catch ( IOException e ) {}
-		}
 	}
 
 	/**
@@ -94,16 +34,20 @@ public class OVDScriptManager {
 	 * 
 	 * @see TextUtilities.decodeText(InputStream srcStream, String srcDescription)
 	 */
-	public void eval( FileHandle f, NameSpace ns ) throws EvalError, IOException {
+	public ScriptResource eval( FileHandle f ) throws EvalError, IOException {
 		InputStream is = null;
+		String id = f.path();
+		NameSpace ns = new NameSpace( bsh.getNameSpace(), id );
+		ScriptResource script = new DefaultScriptResource( ns );
 		try {
 			is = f.read();
-			bsh.eval( TextUtilities.decodeText( is, f.name() ).text, ns );
+			bsh.eval( TextUtilities.decodeText( is, id ).text, ns );
 		}
 		finally {
 			try {if ( is != null ) is.close();}
 			catch ( IOException e ) {}
 		}
+		return script;
 	}
 
 	/**
@@ -117,11 +61,13 @@ public class OVDScriptManager {
 	 * 
 	 * @param ns namespace containing the methods from which to create the object
 	 * @param interfClass the desired interface
+	 * 
+	 * @throws IllegalArgumentException if the class passed in argument is not an interface
 	 */
-	public <T> T getInterface( NameSpace ns, Class<T> interfClass ) {
+	public <T> T getInterface( ScriptResource script, Class<T> interfClass ) {
 		if ( !interfClass.isInterface() )
 			throw new IllegalArgumentException( "Not an interface: " + interfClass.getName() );
-		Object result = ns.getThis( bsh ).getInterface( interfClass );
+		Object result = script.getNamespace().getThis( bsh ).getInterface( interfClass );
 		if ( result == null ) return null;
 		return interfClass.cast( result );
 	}
@@ -138,7 +84,7 @@ public class OVDScriptManager {
 	 * 
 	 * @throws NoSuchMethodException when the requested method could not be found
 	 */
-	public Object invoke( NameSpace ns, String methodName, Object... args )
+	public Object invoke( ScriptResource script, String methodName, Object... args )
 			throws EvalError, NoSuchMethodException {
 		// Wrap args in Beanshell's wrappers
 		for ( int i = 0; i < args.length; i++ )
@@ -149,6 +95,7 @@ public class OVDScriptManager {
 		for ( int i = 0; i < args.length; i++ )
 			sig[i] = args[i].getClass();
 
+		NameSpace ns = script.getNamespace();
 		BshMethod method = null;
 		try {
 			method = ns.getMethod(methodName, sig, true);

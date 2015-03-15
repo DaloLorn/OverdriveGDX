@@ -48,7 +48,7 @@ public class OVDEventManager {
 				h.disposeEvent( event );
 			}
 			else {
-				//System.out.println( "Unhandled event: "+ event );
+				System.out.println( "Unhandled event: "+ event );
 			}
 		}
 		while ( (event = outQueue.poll()) != null ) {
@@ -75,6 +75,9 @@ public class OVDEventManager {
 	 * Adds an event to the end of the outbound queue. (thread-safe)
 	 */
 	public void postDelayedEvent( OVDEvent e ) {
+		if ( e instanceof AbstractLocalEvent ) {
+			throw new IllegalArgumentException( "Attempted to post a local event to outbound queue." );
+		}
 		outQueue.addLast( e );
 	}
 
@@ -82,6 +85,9 @@ public class OVDEventManager {
 	 * Adds an event to the start of the outbound queue. (thread-safe)
 	 */
 	public void postPreemptiveEvent( OVDEvent e ) {
+		if ( e instanceof AbstractLocalEvent ) {
+			throw new IllegalArgumentException( "Attempted to post a local event to outbound queue." );
+		}
 		outQueue.addFirst( e );
 	}
 
