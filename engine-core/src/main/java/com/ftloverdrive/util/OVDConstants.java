@@ -3,6 +3,9 @@ package com.ftloverdrive.util;
 
 public class OVDConstants {
 
+
+	public static final String PLOT_FONT = "fonts/JustinFont12Bold.ttf?size=13";
+
 	/*
 	 * ========================================
 	 * Orientation / direction / facing.
@@ -122,4 +125,5 @@ public class OVDConstants {
 
 	public static final String FLOORPLAN_ATLAS = "internal://overdrive-assets/images/floorplan.atlas";
 	public static final String CUSTOM_HANGAR_ATLAS = "internal://overdrive-assets/images/hangar-ui/hangar.atlas";
+	public static final String INCIDENT_DIALOG_SKIN = "internal://overdrive-assets/skins/incident-dialog.json";
 }

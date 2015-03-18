@@ -1,0 +1,9 @@
+{
+  com.badlogic.gdx.graphics.g2d.BitmapFont: {
+    default: { file: arial-15.fnt }
+  },
+
+  com.badlogic.gdx.scenes.scene2d.ui.Window$WindowStyle: {
+    default: { titleFont: default }
+  }
+}

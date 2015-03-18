@@ -11,7 +11,7 @@ public class TestShipModel extends AbstractShipModel {
 
 		// Info for later:
 		// X + 350, Y + 170 --> ship's offset from the window's top left corner in FTL
-		// Shield alpha --> 0.4 + 0.17 per level (1: 0.57, 2: 0.74, 3: 0.91, 4: 1.00) 
+		// Shield alpha --> 0.4 + 0.17 per level (1: 0.57, 2: 0.74, 3: 0.91, 4: 1.00)
 
 		this.setShipOffset( 0, 70 );
 		this.setHullOffset( -59, -103 );
@@ -19,7 +19,7 @@ public class TestShipModel extends AbstractShipModel {
 		this.setFloorOffset( 45, 93 );
 		this.setCloakOffset( 19, 19 );
 		this.setShieldEllipse( -30, 0, 350, 220 );
-		
+
 		this.setShieldImageSpec( new ImageSpec( OVDConstants.SHIP_ATLAS, "kestral-shields1" ) );
 		this.setBaseImageSpec( new ImageSpec( OVDConstants.SHIP_ATLAS, "kestral-base" ) );
 		this.setCloakImageSpec( new ImageSpec( OVDConstants.SHIP_ATLAS, "kestral-cloak" ) );

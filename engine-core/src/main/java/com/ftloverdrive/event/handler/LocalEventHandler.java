@@ -24,7 +24,7 @@ public class LocalEventHandler implements OVDEventHandler {
 			LocalActorBoundaryListener.class
 		};
 	}
-	
+
 	@Override
 	public Class[] getEventClasses() {
 		return eventClasses;

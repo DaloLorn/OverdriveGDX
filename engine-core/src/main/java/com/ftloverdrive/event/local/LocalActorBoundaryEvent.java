@@ -6,14 +6,19 @@ import com.badlogic.gdx.scenes.scene2d.InputEvent.Type;
 import com.badlogic.gdx.utils.Pool.Poolable;
 import com.ftloverdrive.event.AbstractLocalEvent;
 
+
+/**
+ * OVD wrapper event for GDX mouse enter/exit events.
+ */
 public class LocalActorBoundaryEvent extends AbstractLocalEvent implements Poolable {
-	
+
 	protected Actor targetActor = null;
 	protected Actor relatedActor = null;
 	protected int pointer = -1;
 	protected float x = -1;
 	protected float y = -1;
 	protected boolean enter = false;
+
 
 	public LocalActorBoundaryEvent() {
 		super();
@@ -27,7 +32,8 @@ public class LocalActorBoundaryEvent extends AbstractLocalEvent implements Poola
 			x = e.getStageX();
 			y = e.getStageY();
 			enter = e.getType() == Type.enter;
-		} else {
+		}
+		else {
 			throw new IllegalArgumentException( "Tried to construct LocalActorBoundaryEvent from non- enter/exit event." );
 		}
 	}
@@ -63,7 +69,7 @@ public class LocalActorBoundaryEvent extends AbstractLocalEvent implements Poola
 	@Override
 	public void reset() {
 		super.reset();
-		
+
 		targetActor = null;
 		relatedActor = null;
 		pointer = -1;

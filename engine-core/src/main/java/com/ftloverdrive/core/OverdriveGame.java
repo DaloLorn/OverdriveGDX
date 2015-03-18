@@ -13,6 +13,7 @@ import com.badlogic.gdx.assets.loaders.resolvers.InternalFileHandleResolver;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.utils.Logger;
+import com.ftloverdrive.blueprint.OVDBlueprintManager;
 import com.ftloverdrive.io.FreeTypeFontLoader;
 import com.ftloverdrive.io.RelativeFileHandleResolver;
 import com.ftloverdrive.io.URIFileHandleResolver;
@@ -41,6 +42,7 @@ public class OverdriveGame implements ApplicationListener {
 	private AssetManager assetManager;
 	private OVDScreenManager screenManager;
 	private OVDReferenceManager refManager;
+	private OVDBlueprintManager blueManager;
 	private OVDNetManager netManager;
 	private Screen currentScreen = null;
 
@@ -89,6 +91,7 @@ public class OverdriveGame implements ApplicationListener {
 		fileHandleResolver.addDefaultResolver( new InternalFileHandleResolver() );
 
 		refManager = new OVDReferenceManager();
+		blueManager = new OVDBlueprintManager();
 		netManager = new OVDNetManager();
 
 		assetManager = new AssetManager( fileHandleResolver );
@@ -154,6 +157,13 @@ public class OverdriveGame implements ApplicationListener {
 	public OVDReferenceManager getReferenceManager() {
 		return refManager;
 	}
+	
+	/**
+	 * Returns a manager to link unique string identifiers with blueprints.
+	 */
+	public OVDBlueprintManager getBlueprintManager() {
+		return blueManager;
+	}
 
 	/**
 	 * Returns a manager to request new reference ids.
@@ -161,7 +171,6 @@ public class OverdriveGame implements ApplicationListener {
 	public OVDNetManager getNetManager() {
 		return netManager;
 	}
-
 
 	/**
 	 * Hides the current screen and shows another.

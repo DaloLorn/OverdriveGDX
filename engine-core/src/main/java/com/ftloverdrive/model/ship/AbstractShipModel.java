@@ -1,13 +1,17 @@
 package com.ftloverdrive.model.ship;
 
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.Pools;
+import com.ftloverdrive.core.OverdriveContext;
+import com.ftloverdrive.event.ship.ShipPropertyEvent;
 import com.ftloverdrive.io.ImageSpec;
 import com.ftloverdrive.model.AbstractOVDModel;
+import com.ftloverdrive.model.Damagable;
 import com.ftloverdrive.model.NamedProperties;
 import com.ftloverdrive.util.OVDConstants;
 
 
-public class AbstractShipModel extends AbstractOVDModel implements ShipModel {
+public class AbstractShipModel extends AbstractOVDModel implements ShipModel, Damagable {
 
 	protected NamedProperties shipProperties = new NamedProperties();
 
@@ -241,5 +245,15 @@ public class AbstractShipModel extends AbstractOVDModel implements ShipModel {
 
 		crewArray.add( crewRefId );
 		return true;
+	}
+
+
+	@Override
+	public void damage( OverdriveContext context, int value ) {
+		int selfRefId = context.getReferenceManager().getId( this );
+
+		ShipPropertyEvent event = Pools.get( ShipPropertyEvent.class ).obtain();
+		event.init( selfRefId, ShipPropertyEvent.INT_TYPE, ShipPropertyEvent.INCREMENT_ACTION, OVDConstants.HULL, -value );
+		context.getScreenEventManager().postDelayedEvent( event );
 	}
 }

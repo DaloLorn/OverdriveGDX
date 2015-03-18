@@ -73,8 +73,6 @@ public class ShipEventHandler implements OVDEventHandler {
 			ShipCreationEvent event = (ShipCreationEvent)e;
 
 			int shipRefId = event.getShipRefId();
-
-			// TODO map of ship types to models
 			ShipModel shipModel = new TestShipModel();
 
 			context.getReferenceManager().addObject( shipModel, shipRefId );
@@ -128,7 +126,6 @@ public class ShipEventHandler implements OVDEventHandler {
 			int shipRefId = event.getShipRefId();
 			ShipModel shipModel = context.getReferenceManager().getObject( shipRefId, ShipModel.class );
 			int roomRefId = event.getRoomRefId();
-			// RoomModel roomModel = context.getReferenceManager().getObject( roomRefId, RoomModel.class );
 			ShipCoordinate[] roomCoords = event.getRoomCoords();
 
 			shipModel.getLayout().addRoom( roomRefId, roomCoords );
@@ -147,7 +144,6 @@ public class ShipEventHandler implements OVDEventHandler {
 			int shipRefId = event.getShipRefId();
 			ShipModel shipModel = context.getReferenceManager().getObject( shipRefId, ShipModel.class );
 			int doorRefId = event.getDoorRefId();
-			// DoorModel doorModel = context.getReferenceManager().getObject( doorRefId, DoorModel.class );
 
 			shipModel.getLayout().addDoor( doorRefId, event.getDoorCoords() );
 		}

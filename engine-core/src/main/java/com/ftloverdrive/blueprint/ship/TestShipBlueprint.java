@@ -1,7 +1,6 @@
 package com.ftloverdrive.blueprint.ship;
 
 import com.badlogic.gdx.utils.Pools;
-import com.ftloverdrive.blueprint.ShipBlueprint;
 import com.ftloverdrive.core.OverdriveContext;
 import com.ftloverdrive.event.ship.ShipCreationEvent;
 import com.ftloverdrive.event.ship.ShipCrewAddEvent;
@@ -29,7 +28,7 @@ public class TestShipBlueprint extends ShipBlueprint {
 	}
 
 	@Override
-	public int createShip( OverdriveContext context ) {
+	public int construct( OverdriveContext context ) {
 		int shipRefId = context.getNetManager().requestNewRefId();
 
 		ShipCreationEvent shipCreateEvent = Pools.get( ShipCreationEvent.class ).obtain();

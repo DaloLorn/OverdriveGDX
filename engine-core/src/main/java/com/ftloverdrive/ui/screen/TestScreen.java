@@ -1,22 +1,18 @@
 package com.ftloverdrive.ui.screen;
 
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
-import com.badlogic.gdx.graphics.g2d.NinePatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Group;
-import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.Label;
-import com.badlogic.gdx.scenes.scene2d.ui.Window;
-import com.badlogic.gdx.scenes.scene2d.utils.Align;
-import com.badlogic.gdx.scenes.scene2d.utils.NinePatchDrawable;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Pools;
 import com.badlogic.gdx.utils.Scaling;
-import com.badlogic.gdx.utils.viewport.ScreenViewport;
+import com.ftloverdrive.blueprint.incident.ConsequenceBlueprint;
+import com.ftloverdrive.blueprint.incident.DamageConsequenceBlueprint;
+import com.ftloverdrive.blueprint.incident.IncidentBlueprint;
+import com.ftloverdrive.blueprint.incident.PlotBranchBlueprint;
 import com.ftloverdrive.blueprint.ship.TestShipBlueprint;
 import com.ftloverdrive.core.OverdriveContext;
 import com.ftloverdrive.event.TickEvent;
@@ -24,16 +20,21 @@ import com.ftloverdrive.event.TickListener;
 import com.ftloverdrive.event.game.GamePlayerShipChangeEvent;
 import com.ftloverdrive.event.game.GamePlayerShipChangeListener;
 import com.ftloverdrive.event.handler.DoorEventHandler;
+import com.ftloverdrive.event.handler.EngineEventHandler;
 import com.ftloverdrive.event.handler.GameEventHandler;
+import com.ftloverdrive.event.handler.IncidentEventHandler;
 import com.ftloverdrive.event.handler.LocalEventHandler;
 import com.ftloverdrive.event.handler.ShipEventHandler;
 import com.ftloverdrive.event.handler.TickEventHandler;
+import com.ftloverdrive.event.incident.IncidentTriggerEvent;
 import com.ftloverdrive.event.ship.ShipPropertyEvent;
 import com.ftloverdrive.event.ship.ShipPropertyListener;
+import com.ftloverdrive.model.Damagable;
 import com.ftloverdrive.model.DefaultGameModel;
 import com.ftloverdrive.model.DefaultPlayerModel;
 import com.ftloverdrive.model.GameModel;
 import com.ftloverdrive.model.PlayerModel;
+import com.ftloverdrive.model.incident.DeferredIncidentModel;
 import com.ftloverdrive.model.ship.ShipModel;
 import com.ftloverdrive.ui.ShatteredImage;
 import com.ftloverdrive.ui.hud.PlayerShipDoorHighlighter;
@@ -45,15 +46,10 @@ import com.ftloverdrive.util.OVDConstants;
 
 public class TestScreen extends BaseScreen {
 
-	protected static final String PLOT_FONT = "fonts/JustinFont12Bold.ttf?size=13";
-
 	private TextureAtlas bgAtlas;
 	private TextureAtlas rootAtlas;
 	private TextureAtlas miscAtlas;
 
-	private Stage mainStage;
-	private Stage hudStage;
-	private Stage popupStage;
 	private Matrix4 projMatrix;
 
 	private PlayerShipHullMonitor playerShipHullMonitor;
@@ -65,20 +61,6 @@ public class TestScreen extends BaseScreen {
 
 	public TestScreen( OverdriveContext srcContext ) {
 		super( srcContext );
-
-		// Stages use StretchViewport by default, which causes everything that is drawn
-		// on the stage to be stretched to fit the new dimensions.
-		// ScreenViewport instead adds more area to the stage, allowing things to retain
-		// their original size. The downside is that higher resolutions have an advantage
-		// over lower ones (due to more of the game world being visible), but that's not
-		// really an issue for a game like FTL.
-		// https://github.com/libgdx/libgdx/wiki/Viewports
-		mainStage = new Stage( new ScreenViewport() );
-		stageManager.putStage( "Main", mainStage );
-		hudStage = new Stage( new ScreenViewport() );
-		stageManager.putStage( "HUD", hudStage );
-		popupStage = new Stage( new ScreenViewport() );
-		stageManager.putStage( "Popup", popupStage );
 
 		// These layers are mainly notes. Many will probably be moved inside actors.
 		Array<String> mainLayerNames = new Array<String>();
@@ -128,11 +110,12 @@ public class TestScreen extends BaseScreen {
 		// Group lowerLayer = (Group)stageRoot.findActor( layerName );
 		// stageRoot.addActorAfter( lowerLayer, newGroup );
 
+		context.getAssetManager().load( OVDConstants.INCIDENT_DIALOG_SKIN, Skin.class );
 		context.getAssetManager().load( OVDConstants.BKG_ATLAS, TextureAtlas.class );
 		context.getAssetManager().load( OVDConstants.ROOT_ATLAS, TextureAtlas.class );
 		context.getAssetManager().load( OVDConstants.MISC_ATLAS, TextureAtlas.class );
 		context.getAssetManager().load( OVDConstants.PEOPLE_ATLAS, TextureAtlas.class );
-		context.getAssetManager().load( PLOT_FONT, BitmapFont.class );
+		context.getAssetManager().load( OVDConstants.PLOT_FONT, BitmapFont.class );
 		context.getAssetManager().finishLoading();
 
 		bgAtlas = context.getAssetManager().get( OVDConstants.BKG_ATLAS, TextureAtlas.class );
@@ -141,8 +124,6 @@ public class TestScreen extends BaseScreen {
 		Group bg = mainStage.getRoot().findActor( "Background" );
 		bg.setSize( bgImage.getCompleteWidth(), bgImage.getCompleteHeight() );
 		bg.addActor( bgImage );
-
-		textWindowDemo();
 
 		int playerRefId = context.getNetManager().requestNewRefId();
 		PlayerModel playerModel = new DefaultPlayerModel();
@@ -170,15 +151,14 @@ public class TestScreen extends BaseScreen {
 		mainStage.addActor( shipActor );
 		mainStage.addListener( shipActor );
 
-		inputMultiplexer.addProcessor( popupStage );
-		inputMultiplexer.addProcessor( hudStage );
-		inputMultiplexer.addProcessor( mainStage );
-
-
 		// Wire up the event manager...
 		TickEventHandler tickHandler = new TickEventHandler();
 		for ( Class c : tickHandler.getEventClasses() )
 			eventManager.setEventHandler( c, tickHandler );
+
+		EngineEventHandler engineHandler = new EngineEventHandler();
+		for ( Class c : engineHandler.getEventClasses() )
+			eventManager.setEventHandler( c, engineHandler );
 
 		LocalEventHandler localHandler = new LocalEventHandler();
 		for ( Class c : localHandler.getEventClasses() )
@@ -195,6 +175,10 @@ public class TestScreen extends BaseScreen {
 		DoorEventHandler doorHandler = new DoorEventHandler();
 		for ( Class c : doorHandler.getEventClasses() )
 			eventManager.setEventHandler( c, doorHandler );
+
+		IncidentEventHandler incHandler = new IncidentEventHandler();
+		for ( Class c : incHandler.getEventClasses() )
+			eventManager.setEventHandler( c, incHandler );
 
 		eventManager.addEventListener( playerShipHullMonitor, GamePlayerShipChangeListener.class );
 		eventManager.addEventListener( playerShipHullMonitor, ShipPropertyListener.class );
@@ -230,43 +214,50 @@ public class TestScreen extends BaseScreen {
 		}, TickListener.class );
 
 		// Create a test ship.
-		int shipRefId = new TestShipBlueprint( null ).createShip( context );
+		int shipRefId = new TestShipBlueprint( null ).construct( context );
 
 		// Set it as the player's ship.
 		GamePlayerShipChangeEvent shipChangeEvent = Pools.get( GamePlayerShipChangeEvent.class ).obtain();
 		shipChangeEvent.init( gameRefId, playerRefId, shipRefId );
 		eventManager.postDelayedEvent( shipChangeEvent );
 
+		incidentWindowDemo();
+
 		resize( getScreenWidth(), getScreenHeight() );
 	}
 
+	private void incidentWindowDemo() {
+		String loremIpsum = "Lorem ipsum dolor sit amet, consectetur adipisicing elit, " +
+				"sed do eiusmod tempor incididunt ut labore et dolore magna aliqua." +
+				"\n\nThis window is draggable.\n\n" +
+				"This window intercepts all user input while it is visible. " +
+				"Click on the choice below (or press corresponding number key) to dismiss the window.";
 
-	private void textWindowDemo() {
-		BitmapFont plotFont = context.getAssetManager().get( PLOT_FONT, BitmapFont.class );
+		// TODO: Blueprints would normally be created and registered by parsing the data files
+		IncidentBlueprint incBlueprint = new IncidentBlueprint( "TEST_INCIDENT_1" );
+		incBlueprint.setTextTemplate( loremIpsum );
 
-		String loremIpsum = "Lorem ipsum dolor sit amet, consectetur adipisicing elit, ";
-		loremIpsum += "sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.";
-		loremIpsum += "\n\nThis window is draggable.";
+		PlotBranchBlueprint branchBlueprint = new PlotBranchBlueprint( "TEST_INCIDENT_2", "Go to event 2" );
+		incBlueprint.addPlotBranch( branchBlueprint );
+		incBlueprint.addPlotBranch( new PlotBranchBlueprint() );
 
-		rootAtlas = context.getAssetManager().get( OVDConstants.ROOT_ATLAS, TextureAtlas.class );
-		// TODO box_text1 no longer available in AE, use the nearest equivalent
-		TextureRegion plotDlgRegion = rootAtlas.findRegion( "window-base-alpha" );
-		NinePatchDrawable plotDlgBgDrawable = new NinePatchDrawable( new NinePatch( plotDlgRegion, 22, 22, 36, 22 ) );
+		context.getBlueprintManager().storeBlueprint( "TEST_INCIDENT_1", incBlueprint, DeferredIncidentModel.class );
+		int incRefId = incBlueprint.construct( context );
 
-		Window plotDlg = new Window( "Test", new Window.WindowStyle( plotFont, new Color( 1f, 1f, 1f, 1f ), plotDlgBgDrawable ) );
-		plotDlg.setKeepWithinStage( true );
-		plotDlg.setMovable( true );
-		plotDlg.setSize( 200, 250 );
-		plotDlg.setPosition( 765, 60 );
+		incBlueprint = new IncidentBlueprint( "TEST_INCIDENT_2" );
+		incBlueprint.setTextTemplate( "This is a looped event!" );
 
-		plotDlg.row().top().expand().fill();
-		Label plotLbl = new Label( loremIpsum, new Label.LabelStyle( plotFont, new Color( 1f, 1f, 1f, 1f ) ) );
-		plotLbl.setAlignment( Align.top | Align.left, Align.center | Align.left );
-		plotLbl.setWrap( true );
-		plotDlg.add( plotLbl );
+		ConsequenceBlueprint cseqBlueprint = new DamageConsequenceBlueprint( 5 );
+		incBlueprint.addConsequence( cseqBlueprint );
 
-		// setKeepWithinStage() only applies if added to the stage root. :/
-		popupStage.addActor( plotDlg );
+		branchBlueprint = new PlotBranchBlueprint( "TEST_INCIDENT_1", "Go to event 1" );
+		incBlueprint.addPlotBranch( branchBlueprint );
+
+		context.getBlueprintManager().storeBlueprint( "TEST_INCIDENT_2", incBlueprint, DeferredIncidentModel.class );
+
+		IncidentTriggerEvent incTriggerE = Pools.get( IncidentTriggerEvent.class ).obtain();
+		incTriggerE.init( incRefId );
+		context.getScreenEventManager().postDelayedEvent( incTriggerE );
 	}
 
 	@Override
@@ -319,7 +310,7 @@ public class TestScreen extends BaseScreen {
 		context.getAssetManager().unload( OVDConstants.ROOT_ATLAS );
 		context.getAssetManager().unload( OVDConstants.MISC_ATLAS );
 		context.getAssetManager().unload( OVDConstants.PEOPLE_ATLAS );
-		context.getAssetManager().unload( PLOT_FONT );
+		context.getAssetManager().unload( OVDConstants.PLOT_FONT );
 		Pools.get( OverdriveContext.class ).free( context );
 	}
 

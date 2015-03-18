@@ -6,12 +6,18 @@ import com.badlogic.gdx.scenes.scene2d.InputEvent.Type;
 import com.badlogic.gdx.utils.Pool.Poolable;
 import com.ftloverdrive.event.AbstractLocalEvent;
 
+
+/**
+ * OVD wrapper event for GDX touchDown/touchUp events.
+ */
 public class LocalActorClickedEvent extends AbstractLocalEvent implements Poolable {
-	
+
 	protected Actor targetActor = null;
 	protected int button = -1;
 	protected int pointer = -1;
-	//protected boolean release = false; // differentiate between click / release
+
+
+	// protected boolean release = false; // differentiate between click / release
 
 	public LocalActorClickedEvent() {
 		super();
@@ -22,8 +28,9 @@ public class LocalActorClickedEvent extends AbstractLocalEvent implements Poolab
 			targetActor = e.getTarget();
 			button = e.getButton();
 			pointer = e.getPointer();
-			//release = e.getType() == Type.touchUp;
-		} else {
+			// release = e.getType() == Type.touchUp;
+		}
+		else {
 			throw new IllegalArgumentException( "Tried to construct LocalActorClickedEvent from non-click event." );
 		}
 	}
@@ -35,7 +42,7 @@ public class LocalActorClickedEvent extends AbstractLocalEvent implements Poolab
 	public int getButton() {
 		return button;
 	}
-	
+
 	public int getPointer() {
 		return pointer;
 	}
@@ -43,10 +50,10 @@ public class LocalActorClickedEvent extends AbstractLocalEvent implements Poolab
 	@Override
 	public void reset() {
 		super.reset();
-		
+
 		targetActor = null;
 		button = -1;
 		pointer = -1;
-		//release = false;
+		// release = false;
 	}
 }

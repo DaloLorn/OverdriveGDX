@@ -1,19 +1,11 @@
 package com.ftloverdrive.model.incident;
 
-import java.util.List;
-
 import com.ftloverdrive.core.OverdriveContext;
 import com.ftloverdrive.model.OVDModel;
 
 
 /**
  * What the original game referred to as an event.
- *
- * TODO: Retrofit code to use reference ids and OVDEvents.
- *
- * TODO: A DeferredIncidentModel class, which constructs a named Incident
- * at the last minute, probably from an IncidentBlueprint. That would make
- * event loops possible.
  */
 public interface IncidentModel extends OVDModel {
 
@@ -32,19 +24,20 @@ public interface IncidentModel extends OVDModel {
 	 */
 	public String getText();
 
+	public void setText( String text );
 
 	/** Returns a list of Consequences, all of which trigger at the start of this Incident. */
-	public List<Consequence> getConsequences();
+	public Integer[] consequenceRefIds();
 
-	public void addConsequence( Consequence cseq );
+	public void addConsequence( int cseqRefId );
 
-	public void removeConsequence( Consequence cseq );
+	// public void removeConsequence( int cseqRefId );
 
 
 	/** Returns choices which may lead to further Incidents. */
-	public List<PlotBranch> getPlotBranches();
+	public Integer[] branchRefIds();
 
-	public void addPlotBranch( PlotBranch branch );
+	public void addPlotBranch( int branchRefId );
 
-	public void removePlotBranch( PlotBranch branch );
+	// public void removePlotBranch( int branchRefId );
 }

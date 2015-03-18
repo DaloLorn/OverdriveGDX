@@ -4,12 +4,14 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
+import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.Button.ButtonStyle;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.Logger;
 import com.badlogic.gdx.utils.Pools;
+import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.ftloverdrive.core.OverdriveContext;
 import com.ftloverdrive.event.OVDEventManager;
 import com.ftloverdrive.script.OVDScriptManager;
@@ -20,6 +22,10 @@ import com.ftloverdrive.script.OVDScriptManager;
  */
 public abstract class BaseScreen implements Disposable, OVDScreen {
 
+	public static final String MAIN_STAGE_ID = "mainStage";
+	public static final String HUD_STAGE_ID = "hudStage";
+	public static final String POPUP_STAGE_ID = "popupStage";
+
 	protected Logger log;
 
 	protected OVDStageManager stageManager = null;
@@ -29,6 +35,10 @@ public abstract class BaseScreen implements Disposable, OVDScreen {
 	protected InputMultiplexer inputMultiplexer;
 
 	protected OverdriveContext context;
+
+	protected Stage mainStage;
+	protected Stage hudStage;
+	protected Stage popupStage;
 
 	protected boolean renderedPreviousFrame = false;
 	protected float elapsed = 0;
@@ -45,6 +55,25 @@ public abstract class BaseScreen implements Disposable, OVDScreen {
 		eventManager = new OVDEventManager();
 		scriptManager = new OVDScriptManager();
 		inputMultiplexer = new InputMultiplexer();
+
+		// Stages use StretchViewport by default, which causes everything that is drawn
+		// on the stage to be stretched to fit the new dimensions.
+		// ScreenViewport instead adds more area to the stage, allowing things to retain
+		// their original size. The downside is that higher resolutions have an advantage
+		// over lower ones (due to more of the game world being visible), but that's not
+		// really an issue for a game like FTL.
+		// https://github.com/libgdx/libgdx/wiki/Viewports
+		mainStage = new Stage( new ScreenViewport() );
+		stageManager.putStage( MAIN_STAGE_ID, mainStage );
+		hudStage = new Stage( new ScreenViewport() );
+		stageManager.putStage( HUD_STAGE_ID, hudStage );
+		popupStage = new Stage( new ScreenViewport() );
+		stageManager.putStage( POPUP_STAGE_ID, popupStage );
+
+		// Add the stages in reverse order -- that way the higher-up stage intercepts events
+		inputMultiplexer.addProcessor( popupStage );
+		inputMultiplexer.addProcessor( hudStage );
+		inputMultiplexer.addProcessor( mainStage );
 	}
 
 	public void render( float delta ) {

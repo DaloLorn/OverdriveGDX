@@ -1,5 +1,6 @@
 package com.ftloverdrive.blueprint;
 
+import com.ftloverdrive.core.OverdriveContext;
 
 
 /**
@@ -24,9 +25,7 @@ public interface OVDBlueprint {
 	public OVDBlueprint getPrototype();
 
 	/**
-	 * Scans the blueprint, looking for the specified property name.
-	 * If not found, looks it up in the prototype.
-	 * If it's not found anywhere, returns null. // TODO or throws an exception?
+	 * Constructs the model from this blueprint and returns its reference id.
 	 */
-	public <T> T getProperty( String propertyName, Class<T> type );
+	public int construct( OverdriveContext context );
 }

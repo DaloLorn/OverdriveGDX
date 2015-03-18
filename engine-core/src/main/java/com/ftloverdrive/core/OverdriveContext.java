@@ -3,8 +3,7 @@ package com.ftloverdrive.core;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.assets.loaders.FileHandleResolver;
 import com.badlogic.gdx.utils.Pool.Poolable;
-
-import com.ftloverdrive.core.OverdriveGame;
+import com.ftloverdrive.blueprint.OVDBlueprintManager;
 import com.ftloverdrive.event.OVDEventManager;
 import com.ftloverdrive.net.OVDNetManager;
 import com.ftloverdrive.script.OVDScriptManager;
@@ -108,12 +107,16 @@ public class OverdriveContext implements Poolable {
 		if ( game != null ) return game.getReferenceManager();
 		else return null;
 	}
+	
+	public OVDBlueprintManager getBlueprintManager() {
+		if ( game != null ) return game.getBlueprintManager();
+		else return null;
+	}
 
 	public OVDNetManager getNetManager() {
 		if ( game != null ) return game.getNetManager();
 		else return null;
 	}
-
 
 	public void setScreen( OVDScreen screen ) {
 		this.screen = screen;

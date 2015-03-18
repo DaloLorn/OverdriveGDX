@@ -10,25 +10,18 @@ import com.badlogic.gdx.scenes.scene2d.EventListener;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputEvent.Type;
-import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.ButtonGroup;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Scaling;
-import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.ftloverdrive.core.OverdriveContext;
 import com.ftloverdrive.ui.ShatteredImage;
 import com.ftloverdrive.util.OVDConstants;
 
 
 public class HangarScreen extends BaseScreen implements EventListener {
-
-	public static final String MAIN_STAGE_ID = "Main";
-
-	protected Stage mainStage;
-
 
 	private Group grpBg = null;
 
@@ -51,11 +44,6 @@ public class HangarScreen extends BaseScreen implements EventListener {
 
 	public HangarScreen( OverdriveContext srcContext ) {
 		super( srcContext );
-
-		mainStage = new Stage( new ScreenViewport() );
-		stageManager.putStage( MAIN_STAGE_ID, mainStage );
-
-		inputMultiplexer.addProcessor( mainStage );
 
 		// Set up layers for later use
 		Array<String> mainLayerNames = new Array<String>();
