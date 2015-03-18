@@ -103,8 +103,8 @@ mvn -P desktop -pl engine-core,engine-desktop clean integration-test
 
 Dependencies
 
-libGDX 0.9.9 Nightly Snapshot
-	http://libgdx.badlogicgames.com/index.html
+libGDX 1.4.1
+  http://libgdx.badlogicgames.com/index.html
   http://libgdx.badlogicgames.com/nightlies/docs/api/
 
 BeanShell2
