@@ -1,6 +1,5 @@
 package com.ftloverdrive.io;
 
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import com.badlogic.gdx.Gdx;
@@ -10,9 +9,6 @@ import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
-import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator.FreeTypeBitmapFontData;
-import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator.FreeTypeFontParameter;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.utils.Json;
@@ -51,8 +47,12 @@ public class OVDSkin extends Skin {
 		this.resolver = resolver;
 	}
 
-	protected FileHandle resolve( String fileName ) {
-		return resolver.resolve( scrub( fileName ) );
+	protected FileHandle resolve( FileHandle skinFile, String path ) {
+		FileHandle fontFile = skinFile.parent().child( path );
+		if ( !fontFile.exists() ) fontFile = Gdx.files.internal( path );
+		if ( !fontFile.exists() ) fontFile = resolver.resolve( scrub( path ) );
+		if ( !fontFile.exists() ) throw new SerializationException( "Font file not found: " + fontFile );
+		return fontFile;
 	}
 
 	protected String scrub( String path ) {
@@ -75,34 +75,17 @@ public class OVDSkin extends Skin {
 				int scaledSize = json.readValue( "scaledSize", int.class, -1, jsonData );
 				Boolean flip = json.readValue( "flip", Boolean.class, false, jsonData );
 
-				FileHandle fontFile = skinFile.parent().child( path );
-				if ( !fontFile.exists() ) fontFile = Gdx.files.internal( path );
-				if ( !fontFile.exists() ) fontFile = resolve( path );
-				if ( !fontFile.exists() ) throw new SerializationException( "Font file not found: " + fontFile );
+				FileHandle fontFile = resolve( skinFile, path );
+
+				// if ( manager.isLoaded( path, BitmapFont.class ) )
+				// return manager.get( path, BitmapFont.class );
 
 				String scrubbedPath = scrub( path );
 				if ( scrubbedPath.endsWith( ".ttf" ) ) {
-					int qMark = path.lastIndexOf( "?" );
-					Matcher m = argsPtn.matcher( path );
-					m.region( qMark + 1, path.length() );
-					int fontSize = 0;
-					while ( m.lookingAt() ) {
-						if ( m.group( 1 ).equals( "size" ) ) {
-							fontSize = Integer.parseInt( m.group( 2 ) );
-						}
-						if ( m.group( 3 ).length() > 0 ) break; // Hit the "#" separator.
-						m.region( m.end(), path.length() );
-
-						FreeTypeFontGenerator generator = new FreeTypeFontGenerator( fontFile );
-						FreeTypeFontParameter param = new FreeTypeFontParameter();
-						param.size = fontSize;
-						param.characters = FreeTypeFontGenerator.DEFAULT_CHARS;
-						param.flip = flip;
-						FreeTypeBitmapFontData data = generator.generateData( param );
-						generator.dispose();
-
-						return new BitmapFont( data, data.getTextureRegions(), true );
-					}
+					FreeTypeFontLoader fontLoader = new FreeTypeFontLoader( resolver );
+					BitmapFont font = fontLoader.loadSync( manager, path, fontFile, null );
+					skin.add( path, font );
+					return font;
 				}
 
 				// Use a region with the same name as the font, else use a PNG file in the same directory as the FNT file.
@@ -121,6 +104,7 @@ public class OVDSkin extends Skin {
 					}
 					// Scaled size is the desired cap height to scale the font to.
 					if ( scaledSize != -1 ) font.setScale( scaledSize / font.getCapHeight() );
+					skin.add( path, font );
 					return font;
 				}
 				catch ( RuntimeException ex ) {
@@ -145,6 +129,15 @@ public class OVDSkin extends Skin {
 			}
 		} );
 
+		json.setSerializer( FileHandle.class, new ReadOnlySerializer<FileHandle>() {
+
+			public FileHandle read( Json json, JsonValue jsonData, Class type ) {
+				FileHandle fh = resolve( skinFile, json.readValue( "path", String.class, jsonData ) );
+				System.out.println( fh );
+				return fh;
+			}
+		} );
+
 		return json;
 	}
 
@@ -153,5 +146,9 @@ public class OVDSkin extends Skin {
 		if ( drawable != null ) return drawable;
 
 		return super.getDrawable( name );
+	}
+
+	public void dispose() {
+		super.dispose();
 	}
 }

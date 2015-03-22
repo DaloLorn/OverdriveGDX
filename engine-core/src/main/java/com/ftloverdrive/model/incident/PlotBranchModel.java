@@ -1,6 +1,5 @@
 package com.ftloverdrive.model.incident;
 
-import com.ftloverdrive.core.OverdriveContext;
 import com.ftloverdrive.model.AbstractOVDModel;
 
 
@@ -31,17 +30,6 @@ public class PlotBranchModel extends AbstractOVDModel implements PlotBranch {
 	@Override
 	public String getText() {
 		return choiceText;
-	}
-
-	@Override
-	public String getSpoilerText( OverdriveContext context ) {
-		if ( incRefId == -1 ) {
-			return null;
-		}
-		else {
-			// TODO return the linked incident's consequence box actor?
-			return null;
-		}
 	}
 
 	@Override

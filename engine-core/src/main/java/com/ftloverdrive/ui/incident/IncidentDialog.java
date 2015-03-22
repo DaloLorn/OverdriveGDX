@@ -4,14 +4,13 @@ import com.badlogic.gdx.Input.Buttons;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
-import com.badlogic.gdx.graphics.g2d.NinePatch;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Event;
 import com.badlogic.gdx.scenes.scene2d.EventListener;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.scenes.scene2d.ui.Cell;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle;
@@ -19,7 +18,6 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.Window;
 import com.badlogic.gdx.scenes.scene2d.utils.Align;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
-import com.badlogic.gdx.scenes.scene2d.utils.NinePatchDrawable;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.Pools;
@@ -28,13 +26,15 @@ import com.ftloverdrive.event.engine.DisposeListener;
 import com.ftloverdrive.event.incident.IncidentSelectionEvent;
 import com.ftloverdrive.io.OVDSkin;
 import com.ftloverdrive.model.incident.Consequence;
+import com.ftloverdrive.model.incident.IncidentModel;
 import com.ftloverdrive.model.incident.PlotBranch;
+import com.ftloverdrive.ui.ShaderLabel;
 
 
 public class IncidentDialog extends Window implements Disposable, EventListener {
 
 	private static final WindowStyle defaultWindowStyle = new WindowStyle( new BitmapFont(), new Color(), null );
-	private static final int MAX_CHOICE_COUNT = 10;
+	private static final int maxChoiceCount = 10;
 
 	public static final String SKIN_PATH = "internal://overdrive-assets/skins/incident-dialog/window.json";
 	public static final String ACTOR_NAME = "IncidentDialog";
@@ -54,19 +54,18 @@ public class IncidentDialog extends Window implements Disposable, EventListener 
 	protected Array<DisposeListener> disposeListeners = new Array<DisposeListener>( false, 1 );
 
 	protected OverdriveContext context;
+	protected OVDSkin skin;
 
 	protected LabelStyle normalStyle;
 	protected LabelStyle hoverStyle;
-	protected LabelStyle goodStyle;
-	protected LabelStyle badStyle;
 
-	protected Label lblIncText;
+	protected ShaderLabel lblIncText;
 	protected Table choiceTable;
-	protected Table conseqTable;
+	protected ConsequenceBox conseqBox;
 
 	// Only 10 keys on the numeric keyboard, so we can only support 10 hotkeyed plot branches
 	private int choiceCount = 0;
-	private PlotBranch[] choices = new PlotBranch[MAX_CHOICE_COUNT];
+	private PlotBranch[] choices = new PlotBranch[maxChoiceCount];
 
 	private boolean captureInput = false;
 
@@ -83,13 +82,13 @@ public class IncidentDialog extends Window implements Disposable, EventListener 
 
 		context.getAssetManager().load( SKIN_PATH, OVDSkin.class );
 		context.getAssetManager().finishLoading();
-		OVDSkin skin = context.getAssetManager().get( SKIN_PATH, OVDSkin.class );
+		skin = context.getAssetManager().get( SKIN_PATH, OVDSkin.class );
 
 		LabelStyle incStyle = skin.get( "incident-text", LabelStyle.class );
 		normalStyle = skin.get( "choice-normal", LabelStyle.class );
 		hoverStyle = skin.get( "choice-hover", LabelStyle.class );
-		goodStyle = skin.get( "conseq-good", LabelStyle.class );
-		badStyle = skin.get( "conseq-bad", LabelStyle.class );
+
+		// DistanceFieldFontShader fontShader = new DistanceFieldFontShader( 1.0f / 8.0f );
 
 		sepChoices = skin.get( "choice-separator", Integer.class );
 		sepTextConseq = skin.get( "text-conseq-separator", Integer.class );
@@ -102,37 +101,37 @@ public class IncidentDialog extends Window implements Disposable, EventListener 
 		frameBodyWidth = d.getMinWidth() - ( d.getLeftWidth() + d.getRightWidth() );
 		frameBodyHeight = d.getMinHeight() - ( d.getTopHeight() + d.getBottomHeight() );
 
-		lblIncText = new Label( "", incStyle );
+		lblIncText = new ShaderLabel( "", incStyle );
 		lblIncText.setAlignment( Align.top | Align.left, Align.center | Align.left );
 		lblIncText.setWrap( true );
+		// lblIncText.setShader( fontShader );
 		row().top().expandX().fillX().spaceBottom( sepTextConseq );
 		add( lblIncText );
 
-		TextureRegion conseqRegion = skin.getAtlas().findRegion( "consequence-box" );
-		NinePatch conseqPatch = new NinePatch( conseqRegion, 2, 2, 2, 2 );
-		NinePatchDrawable conseqBackground = new NinePatchDrawable( conseqPatch );
-		conseqTable = new Table();
-		conseqTable.setBackground( conseqBackground );
+		conseqBox = new ConsequenceBox( skin );
 		row().center().spaceBottom( sepConseqChoice );
-		add( conseqTable );
+		add( conseqBox );
 
 		choiceTable = new Table();
-		row().left().expandX();
+		choiceTable.align( Align.left );
+		row().expandX().fillX().left();
 		add( choiceTable );
 
 		addListener( new IncidentDialogInputListener() );
 		setWidth( computePreferredWidth( skin.get( "window-width", Integer.class ) ) );
+
+		ConsequenceBox test = new ConsequenceBox( skin );
 	}
 
 	public void showConseequenceBox( boolean show ) {
-		conseqTable.setVisible( show );
+		conseqBox.setVisible( show );
 		if ( show ) {
 			getCell( lblIncText ).spaceBottom( sepTextConseq );
-			getCell( conseqTable ).spaceBottom( sepConseqChoice );
+			getCell( conseqBox ).spaceBottom( sepConseqChoice );
 		}
 		else {
 			getCell( lblIncText ).spaceBottom( sepConseqChoice );
-			getCell( conseqTable ).spaceBottom( 0 );
+			getCell( conseqBox ).spaceBottom( 0 );
 		}
 	}
 
@@ -149,7 +148,7 @@ public class IncidentDialog extends Window implements Disposable, EventListener 
 	}
 
 	public void addChoice( final PlotBranch branch ) {
-		if ( choiceCount < MAX_CHOICE_COUNT )
+		if ( choiceCount < maxChoiceCount )
 			choices[choiceCount] = branch;
 		choiceCount++;
 
@@ -158,27 +157,56 @@ public class IncidentDialog extends Window implements Disposable, EventListener 
 		buf.append( ". " );
 		buf.append( branch.getText() );
 
-		String spoilerText = branch.getSpoilerText( context );
-		if ( branch.isSpoilerVisible() && spoilerText != null ) {
-			buf.append( "  [ " );
-			buf.append( spoilerText );
-			buf.append( " ]" );
-		}
-
 		final PlotBranchLabel choice = new PlotBranchLabel( buf.toString(), normalStyle, hoverStyle );
 		choice.setUserObject( branch );
 
-		float w = getLabelWidth( choice, getBodyWidth() );
-		choiceTable.row();
-		choiceTable.add( choice ).top().left().width( w ).spaceBottom( sepChoices );
+		final ConsequenceBox cBox = new ConsequenceBox( skin );
+		boolean hasConseqs = false;
+		if ( branch.isSpoilerVisible() && branch.getIncidentRefId() != -1 ) {
+			IncidentModel incModel = context.getReferenceManager().getObject( branch.getIncidentRefId(), IncidentModel.class );
+			Integer[] conseqRefIds = incModel.consequenceRefIds();
+			if ( conseqRefIds.length > 0 ) {
+				cBox.setTouchable( Touchable.enabled );
+				cBox.setUserObject( branch );
+				for ( int refId : conseqRefIds ) {
+					Consequence conseq = context.getReferenceManager().getObject( refId, Consequence.class );
+					conseq.placeConsequenceActor( cBox );
+				}
+				hasConseqs = true;
+			}
+		}
 
-		// TODO: If the choice's incident has consequences, and the spoilerVisible flag is set to true,
-		// then draw the consequence box next to the choice label.
+		final int conseqPad = 10;
+		float availableWidth = getBodyWidth() - ( hasConseqs ? ( cBox.getMinWidth() + conseqPad ) : 0 );
+		float w = getLabelWidth( choice, availableWidth );
+		choiceTable.row();
+		choiceTable.add( choice ).left().width( w ).spaceBottom( sepChoices );
+
+		if ( hasConseqs ) {
+			choiceTable.add( cBox ).left().spaceBottom( sepChoices ).spaceLeft( conseqPad );
+		}
+
+		InputListener listener = new InputListener() {
+
+			public void enter( InputEvent event, float x, float y, int pointer, Actor fromActor ) {
+				choice.setStyle( hoverStyle );
+				cBox.setBorderTint( hoverStyle.fontColor );
+			}
+
+			public void exit( InputEvent event, float x, float y, int pointer, Actor toActor ) {
+				// Exit events are apparently also sent on mouseUp/Down...
+				if ( toActor != choice && toActor != cBox ) {
+					choice.setStyle( normalStyle );
+					cBox.setBorderTint( normalStyle.fontColor );
+				}
+			}
+		};
+		choice.addListener( listener );
+		cBox.addListener( listener );
 	}
 
 	public void addConsequence( Consequence conseq ) {
-		Label lblConseq = new Label( conseq.getSpoilerText(), badStyle );
-		conseqTable.add( lblConseq ).pad( 5 ).padLeft( 10 ).padRight( 10 );
+		conseq.placeConsequenceActor( conseqBox );
 	}
 
 	/*
@@ -220,28 +248,18 @@ public class IncidentDialog extends Window implements Disposable, EventListener 
 		for ( int r = 0; r < t.getRows(); ++r ) {
 			float maxH = 0;
 			for ( int c = 0; c < t.getColumns(); ++c ) {
-				Cell cell = cells.get( r * t.getColumns() + c );
-				// Some weird padding; could figure out where it's from, but adding it makes the height accurate
-				final float mysteryPadding = 5;
-				float pad = cell.getComputedPadTop() + cell.getComputedPadBottom() + mysteryPadding;
-				float ch = height( cell.getActor() ) + pad;
+				int i = r * t.getColumns() + c;
+				if ( i >= cells.size )
+					continue;
+				Cell cell = cells.get( i );
+				float pad = cell.getComputedPadTop() + cell.getComputedPadBottom();
+				float ch = cell.getMinHeight() + pad;
 				if ( ch > maxH )
 					maxH = ch;
 			}
 			result += maxH;
 		}
 		return result;
-	}
-
-	private float height( Actor a ) {
-		if ( a == null )
-			return 0;
-		else if ( a instanceof Label )
-			return getLabelHeight( (Label)a, getBodyWidth() );
-		else if ( a instanceof Table )
-			return tableHeight( (Table)a );
-		else
-			return a.getHeight();
 	}
 
 	/**
@@ -269,13 +287,15 @@ public class IncidentDialog extends Window implements Disposable, EventListener 
 			--choiceCount;
 			choices[choiceCount] = null;
 		}
-		conseqTable.clear();
+		conseqBox.clear();
 		// Hide the conseqTable to prevent it from flickering when the dialog is changing
-		conseqTable.setVisible( false );
+		conseqBox.setVisible( false );
 		choiceTable.clear();
 
 		fireDisposedEvent();
 		disposeListeners.clear();
+
+		System.gc();
 	}
 
 	@Override
@@ -312,10 +332,6 @@ public class IncidentDialog extends Window implements Disposable, EventListener 
 
 	private float getLabelWidth( Label l, float maxW ) {
 		return l.getStyle().font.getWrappedBounds( l.getText(), maxW ).width;
-	}
-
-	private float getLabelHeight( Label l, float maxW ) { // Yes, width. This is not a typo.
-		return l.getStyle().font.getWrappedBounds( l.getText(), maxW ).height;
 	}
 
 	private void choiceSelected( OverdriveContext context, PlotBranch branch, float x, float y ) {
@@ -366,7 +382,7 @@ public class IncidentDialog extends Window implements Disposable, EventListener 
 			if ( choiceNumber >= Keys.NUM_0 && choiceNumber <= Keys.NUM_9 ) {
 				choiceNumber -= Keys.NUM_0;
 				if ( choiceNumber == 0 )
-					choiceNumber = MAX_CHOICE_COUNT;
+					choiceNumber = maxChoiceCount;
 				if ( choiceNumber <= choiceCount )
 					choiceSelected( context, choices[choiceNumber - 1], getX(), getTop() );
 				return true;
@@ -381,9 +397,8 @@ public class IncidentDialog extends Window implements Disposable, EventListener 
 		public boolean touchDown( InputEvent e, float x, float y, int pointer, int button ) {
 			Actor target = e.getTarget();
 			dragging = false;
-			if ( target instanceof PlotBranchLabel && e.getButton() == Buttons.LEFT ) {
-				PlotBranchLabel choice = (PlotBranchLabel)target;
-				PlotBranch branch = (PlotBranch)choice.getUserObject();
+			if ( target.isDescendantOf( choiceTable ) && e.getButton() == Buttons.LEFT ) {
+				PlotBranch branch = (PlotBranch)target.getUserObject();
 				choiceSelected( context, branch, getX(), getTop() );
 				return true;
 			}

@@ -1,6 +1,7 @@
 package com.ftloverdrive.model.incident;
 
 import com.ftloverdrive.core.OverdriveContext;
+import com.ftloverdrive.ui.incident.ConsequenceBox;
 
 
 /**
@@ -31,7 +32,7 @@ public interface Consequence {
 	 * In the original game this was a parenthetical appended to choices
 	 * when hidden="false".
 	 */
-	public String getSpoilerText();
+	public void placeConsequenceActor( ConsequenceBox conseqBox );
 
 
 	public void execute( OverdriveContext context );

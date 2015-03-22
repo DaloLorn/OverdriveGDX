@@ -2,17 +2,14 @@ package com.ftloverdrive.ui.incident;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
-import com.badlogic.gdx.scenes.scene2d.Actor;
-import com.badlogic.gdx.scenes.scene2d.InputEvent;
-import com.badlogic.gdx.scenes.scene2d.InputListener;
-import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.utils.Align;
+import com.ftloverdrive.ui.ShaderLabel;
 
 
 /**
  * An actor representing a PlotBranch in an IncidentDialog.
  */
-public class PlotBranchLabel extends Label {
+public class PlotBranchLabel extends ShaderLabel {
 
 	private static final LabelStyle defaultLabelStyle = new LabelStyle( new BitmapFont(), new Color() );
 
@@ -24,19 +21,5 @@ public class PlotBranchLabel extends Label {
 		setWrap( true );
 
 		setStyle( textStyle );
-
-		addListener( new InputListener() {
-
-			public void enter( InputEvent event, float x, float y, int pointer, Actor fromActor ) {
-				if ( event.getTarget() == PlotBranchLabel.this )
-					setStyle( hoverStyle );
-			}
-
-			public void exit( InputEvent event, float x, float y, int pointer, Actor toActor ) {
-				// Exit events are apparently also sent on mouseUp/Down...
-				if ( event.getTarget() == PlotBranchLabel.this && toActor != PlotBranchLabel.this )
-					setStyle( textStyle );
-			}
-		} );
 	}
 }

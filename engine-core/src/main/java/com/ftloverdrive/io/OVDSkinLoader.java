@@ -44,12 +44,12 @@ public class OVDSkinLoader extends AsynchronousAssetLoader<OVDSkin, OVDSkinLoade
 			deps.add( new AssetDescriptor( parameter.textureAtlasPath, TextureAtlas.class ) );
 		}
 
-		// Scan the skin file for ImageSpec dependencies
+		// Scan the skin file for dependencies
 		Json json = new Json();
 		ObjectMap<String, JsonValue> map = json.fromJson( ObjectMap.class, file );
-		JsonValue specs = map.get( ImageSpec.class.getCanonicalName() );
-		if ( specs != null ) {
-			for ( JsonValue spec : specs ) {
+		JsonValue jv = map.get( ImageSpec.class.getCanonicalName() );
+		if ( jv != null ) {
+			for ( JsonValue spec : jv ) {
 				FileHandle atlasFile = new FileHandle( spec.getString( "atlasPath" ) );
 				AssetDescriptor descr = new AssetDescriptor( atlasFile, TextureAtlas.class );
 				if ( !deps.contains( descr, false ) )

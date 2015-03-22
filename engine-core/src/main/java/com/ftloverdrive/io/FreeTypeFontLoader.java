@@ -69,6 +69,10 @@ public class FreeTypeFontLoader extends AsynchronousAssetLoader<BitmapFont, Bitm
 
 		FreeTypeFontGenerator generator = new FreeTypeFontGenerator( file );
 		FreeTypeFontParameter param = new FreeTypeFontParameter();
+		// Additional params for distance field fonts:
+		// param.genMipMaps = true;
+		// param.minFilter = TextureFilter.Linear;
+		// param.magFilter = TextureFilter.Linear;
 		param.size = fontSize;
 		param.characters = FreeTypeFontGenerator.DEFAULT_CHARS;
 		param.flip = flip;

@@ -1,7 +1,5 @@
 package com.ftloverdrive.model.incident;
 
-import com.ftloverdrive.core.OverdriveContext;
-
 
 /**
  * What the original game referred to as an event choice.
@@ -16,13 +14,6 @@ public interface PlotBranch {
 
 	/** Returns the clickable text for this branch. */
 	public String getText();
-
-	/**
-	 * Returns spoiler text for what will happen.
-	 * Scans the nested Incident's Consequences and returns a concatenation
-	 * of all their spoilers... or null.
-	 */
-	public String getSpoilerText( OverdriveContext context );
 
 	/** Toggles desired visibility of the spoiler text. */
 	public void setSpoilerVisible( boolean b );

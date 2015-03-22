@@ -103,12 +103,18 @@ public class DeferredIncidentModel extends AbstractOVDModel implements IncidentM
 
 	@Override
 	public Integer[] consequenceRefIds() {
-		return consequenceRefIds.toArray();
+		Integer[] result = new Integer[consequenceRefIds.size];
+		for ( int i = 0; i < result.length; ++i )
+			result[i] = consequenceRefIds.get( i );
+		return result;
 	}
 
 	@Override
 	public Integer[] branchRefIds() {
-		return branchRefIds.toArray();
+		Integer[] result = new Integer[branchRefIds.size];
+		for ( int i = 0; i < result.length; ++i )
+			result[i] = branchRefIds.get( i );
+		return result;
 	}
 
 	@Override

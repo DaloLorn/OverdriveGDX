@@ -33,6 +33,7 @@
     choice-hover: { font: plot-font-bold, fontColor: yellow },
     choice-blue: { font: plot-font-bold, fontColor: blue },
 
+    conseq-neutral: { font: plot-font, fontColor: white },
     conseq-bad: { font: plot-font, fontColor: red },
     conseq-good: { font: plot-font, fontColor: green }
   },
@@ -49,7 +50,7 @@
     // Spacing between the consequence box and choices
     conseq-choice-separator: 35,
     // The vertical spacing between choices
-    choice-separator: 13,
+    choice-separator: 15,
     // Total width of the incident dialog window
     window-width: 600
   }
