@@ -5,6 +5,9 @@ import java.util.Collection;
 
 /**
  * Something that can navigate a ship's floorplan.
+ * 
+ * TODO: Remove setAmbulationPath(), change so that Ambulator extends OrderListener (?)
+ * and sets the next waypoint as a reaction to MoveOrderEvent, or something along those lines?
  */
 public interface Ambulator extends Coordinatable {
 
@@ -28,8 +31,9 @@ public interface Ambulator extends Coordinatable {
 	 * begin moving.
 	 */
 	public void setAmbulationGoal( ShipCoordinate coord );
+
 	public ShipCoordinate getAmbulationGoal();
-	
+
 	public void setAmbulationPath( Collection<ShipCoordinate> path );
 
 

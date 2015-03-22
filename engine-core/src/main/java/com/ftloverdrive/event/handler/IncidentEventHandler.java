@@ -1,6 +1,8 @@
 package com.ftloverdrive.event.handler;
 
 import com.badlogic.gdx.utils.Pools;
+import com.ftloverdrive.blueprint.incident.IncidentBlueprint;
+import com.ftloverdrive.blueprint.incident.PlotBranchBlueprint;
 import com.ftloverdrive.core.OverdriveContext;
 import com.ftloverdrive.event.OVDEvent;
 import com.ftloverdrive.event.OVDEventHandler;
@@ -9,6 +11,7 @@ import com.ftloverdrive.event.incident.DamageConsequenceCreationEvent;
 import com.ftloverdrive.event.incident.IncidentAddBranchEvent;
 import com.ftloverdrive.event.incident.IncidentAddConsequenceEvent;
 import com.ftloverdrive.event.incident.IncidentCreationEvent;
+import com.ftloverdrive.event.incident.IncidentSelectionEvent;
 import com.ftloverdrive.event.incident.IncidentTriggerEvent;
 import com.ftloverdrive.model.incident.DamageConsequence;
 import com.ftloverdrive.model.incident.IncidentModel;
@@ -27,6 +30,7 @@ public class IncidentEventHandler implements OVDEventHandler {
 				IncidentCreationEvent.class,
 				IncidentAddBranchEvent.class,
 				IncidentAddConsequenceEvent.class,
+				IncidentSelectionEvent.class,
 				IncidentTriggerEvent.class,
 
 				BranchCreationEvent.class,
@@ -72,6 +76,24 @@ public class IncidentEventHandler implements OVDEventHandler {
 			IncidentModel incModel = context.getReferenceManager().getObject( incRefId, IncidentModel.class );
 			incModel.addConsequence( event.getConsequenceRefId() );
 		}
+		else if ( e instanceof IncidentSelectionEvent ) {
+			IncidentSelectionEvent event = (IncidentSelectionEvent)e;
+
+			int incRefId = event.getIncidentRefId();
+			IncidentModel incModel = context.getReferenceManager().getObject( incRefId, IncidentModel.class );
+			IncidentBlueprint incBlueprint = (IncidentBlueprint)context.getBlueprintManager().getBlueprint( incModel.getIncidentId() );
+
+			for ( PlotBranchBlueprint branchBlueprint : incBlueprint.getPlotBranches() ) {
+				int branchRefId = branchBlueprint.construct( context );
+				IncidentAddBranchEvent branchE = Pools.get( IncidentAddBranchEvent.class ).obtain();
+				branchE.init( incRefId, branchRefId );
+				context.getScreenEventManager().postDelayedEvent( branchE );
+			}
+
+			IncidentTriggerEvent triggerE = Pools.get( IncidentTriggerEvent.class ).obtain();
+			triggerE.init( incRefId );
+			context.getScreenEventManager().postDelayedEvent( triggerE );
+		}
 		else if ( e instanceof IncidentTriggerEvent ) {
 			IncidentTriggerEvent event = (IncidentTriggerEvent)e;
 
@@ -85,7 +107,7 @@ public class IncidentEventHandler implements OVDEventHandler {
 
 			int bRefId = event.getBranchRefId();
 			PlotBranch branch = new PlotBranchModel();
-			branch.setIncidentId( event.getIncidentId() );
+			branch.setIncidentRefId( event.getIncidentRefId() );
 			branch.setText( event.getChoiceText() );
 			branch.setSpoilerVisible( event.isSpoilerVisible() );
 			context.getReferenceManager().addObject( branch, bRefId );
@@ -112,6 +134,9 @@ public class IncidentEventHandler implements OVDEventHandler {
 		}
 		else if ( e.getClass() == IncidentAddConsequenceEvent.class ) {
 			Pools.get( IncidentAddConsequenceEvent.class ).free( (IncidentAddConsequenceEvent)e );
+		}
+		else if ( e.getClass() == IncidentSelectionEvent.class ) {
+			Pools.get( IncidentSelectionEvent.class ).free( (IncidentSelectionEvent)e );
 		}
 		else if ( e.getClass() == IncidentTriggerEvent.class ) {
 			Pools.get( IncidentTriggerEvent.class ).free( (IncidentTriggerEvent)e );

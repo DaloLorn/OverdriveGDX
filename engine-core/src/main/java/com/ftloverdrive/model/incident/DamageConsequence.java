@@ -15,6 +15,10 @@ public class DamageConsequence extends AbstractOVDModel implements Consequence {
 		damageValue = value;
 	}
 
+	public String getSpoilerText() {
+		return damageValue + " damage to your hull";
+	}
+
 	@Override
 	public void execute( OverdriveContext context ) {
 		int gameRefId = context.getGameModelRefId();

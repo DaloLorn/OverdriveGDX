@@ -6,7 +6,7 @@ import com.ftloverdrive.event.AbstractOVDEvent;
 public class BranchCreationEvent extends AbstractOVDEvent {
 
 	protected int bRefId = -1;
-	protected String incId = null;
+	protected int incRefId = -1;
 	protected String text = null;
 	protected boolean spoiler = true;
 
@@ -20,9 +20,9 @@ public class BranchCreationEvent extends AbstractOVDEvent {
 	 * @param branchRefId
 	 *            a reserved reference id for the new branch
 	 */
-	public void init( int branchRefId, String incidentId, String choiceText, boolean spoilerVisible ) {
+	public void init( int branchRefId, int incidentRefId, String choiceText, boolean spoilerVisible ) {
 		bRefId = branchRefId;
-		incId = incidentId;
+		incRefId = incidentRefId;
 		text = choiceText;
 		spoiler = spoilerVisible;
 	}
@@ -31,8 +31,8 @@ public class BranchCreationEvent extends AbstractOVDEvent {
 		return bRefId;
 	}
 
-	public String getIncidentId() {
-		return incId;
+	public int getIncidentRefId() {
+		return incRefId;
 	}
 
 	public String getChoiceText() {

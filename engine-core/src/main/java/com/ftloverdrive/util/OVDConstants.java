@@ -4,8 +4,6 @@ package com.ftloverdrive.util;
 public class OVDConstants {
 
 
-	public static final String PLOT_FONT = "fonts/JustinFont12Bold.ttf?size=13";
-
 	/*
 	 * ========================================
 	 * Orientation / direction / facing.
@@ -106,6 +104,8 @@ public class OVDConstants {
 	 * ========================================
 	 * Atlas paths.
 	 */
+
+	public static final String PLOT_FONT = "fonts/JustinFont12Bold.ttf?size=13";
 
 	public static final String ROOT_ATLAS = "img/.atlas.atlas";
 	public static final String BUTTONS_FTL_ATLAS = "img/buttons/FTL/.atlas.atlas";

@@ -6,7 +6,6 @@ import java.util.List;
 import com.badlogic.gdx.utils.Pools;
 import com.ftloverdrive.blueprint.AbstractOVDBlueprint;
 import com.ftloverdrive.core.OverdriveContext;
-import com.ftloverdrive.event.incident.IncidentAddBranchEvent;
 import com.ftloverdrive.event.incident.IncidentAddConsequenceEvent;
 import com.ftloverdrive.event.incident.IncidentCreationEvent;
 
@@ -51,6 +50,10 @@ public class IncidentBlueprint extends AbstractOVDBlueprint {
 		branches.add( branch );
 	}
 
+	public PlotBranchBlueprint[] getPlotBranches() {
+		return branches.toArray( new PlotBranchBlueprint[0] );
+	}
+
 	@Override
 	public int construct( OverdriveContext context ) {
 		int incRefId = context.getNetManager().requestNewRefId();
@@ -65,14 +68,6 @@ public class IncidentBlueprint extends AbstractOVDBlueprint {
 			IncidentAddConsequenceEvent cseqE = Pools.get( IncidentAddConsequenceEvent.class ).obtain();
 			cseqE.init( incRefId, cseqRefId );
 			context.getScreenEventManager().postDelayedEvent( cseqE );
-		}
-
-		for ( PlotBranchBlueprint branch : branches ) {
-			int bRefId = branch.construct( context );
-
-			IncidentAddBranchEvent branchE = Pools.get( IncidentAddBranchEvent.class ).obtain();
-			branchE.init( incRefId, bRefId );
-			context.getScreenEventManager().postDelayedEvent( branchE );
 		}
 
 		return incRefId;

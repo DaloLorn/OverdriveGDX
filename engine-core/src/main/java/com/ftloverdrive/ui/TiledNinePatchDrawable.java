@@ -22,12 +22,19 @@ public class TiledNinePatchDrawable extends BaseDrawable {
 	private static final int MIDDLE_RIGHT = 3;
 	private static final int BOTTOM_CENTER = 4;
 
-	private TextureRegion[] corners;
-	private TiledDrawable[] bodies;
+	private TextureRegion[] corners = null;
+	private TiledDrawable[] bodies = null;
 
 
-	public TiledNinePatchDrawable( TextureRegion region, int left, int right, int top, int bottom ) {
+	protected TiledNinePatchDrawable() {
+	}
+
+	public TiledNinePatchDrawable( TextureRegion region, float left, float right, float top, float bottom ) {
 		setRegion( region, left, right, top, bottom );
+	}
+
+	public void setRegion( TextureRegion region, float left, float right, float top, float bottom ) {
+		setRegion( region, (int)left, (int)right, (int)top, (int)bottom );
 	}
 
 	public void setRegion( TextureRegion region, int left, int right, int top, int bottom ) {

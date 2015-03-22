@@ -24,6 +24,9 @@ public class DeferredIncidentModel extends AbstractOVDModel implements IncidentM
 	private String incText = null;
 
 
+	protected DeferredIncidentModel() {
+	}
+
 	public DeferredIncidentModel( String incidentId ) {
 		incId = incidentId;
 	}
@@ -45,8 +48,6 @@ public class DeferredIncidentModel extends AbstractOVDModel implements IncidentM
 
 	@Override
 	public void execute( OverdriveContext context ) {
-		// TODO: Trigger or enqueue to be triggered after the incident chain is complete?
-		// Or maybe "immediate" flag on consequences?
 		for ( int cseqRefId : consequenceRefIds ) {
 			Consequence consequence = context.getReferenceManager().getObject( cseqRefId, Consequence.class );
 			consequence.execute( context );
@@ -55,9 +56,26 @@ public class DeferredIncidentModel extends AbstractOVDModel implements IncidentM
 		OVDScreen screen = context.getScreen();
 		final Stage popupStage = screen.getStageManager().getStage( BaseScreen.POPUP_STAGE_ID );
 
-		IncidentDialog dialog = new IncidentDialog( context );
+		// If there already is an IncidentDialog present in the stage, use that.
+		// Otherwise create a new one.
+		IncidentDialog dialog = popupStage.getRoot().findActor( IncidentDialog.ACTOR_NAME );
+		if ( dialog == null )
+			dialog = new IncidentDialog( context );
+
 		dialog.setCaptureInput( true );
+		dialog.addDisposeListener( this );
 		dialog.setIncidentText( getText() );
+
+		if ( consequenceRefIds.size == 0 ) {
+			dialog.showConseequenceBox( false );
+		}
+		else {
+			dialog.showConseequenceBox( true );
+			for ( int conseqRefId : consequenceRefIds ) {
+				Consequence conseq = context.getReferenceManager().getObject( conseqRefId, Consequence.class );
+				dialog.addConsequence( conseq );
+			}
+		}
 
 		if ( branchRefIds.size == 0 ) {
 			// If the incident defines no choices, add the default "Continue..." choice.
@@ -70,15 +88,17 @@ public class DeferredIncidentModel extends AbstractOVDModel implements IncidentM
 			}
 		}
 
-		dialog.addFiller();
+		// Height depends on width and number of plot branches, so calculate it after everything's been added
+		dialog.setHeight( dialog.computePreferredHeight() );
 
-		dialog.setSize( dialog.computePreferredWidth( 500 ), dialog.computePreferredHeight() );
-		dialog.setPosition( ( screen.getScreenWidth() - dialog.getWidth() ) / 2, ( screen.getScreenHeight() - dialog.getHeight() ) / 2 );
+		if ( !popupStage.getActors().contains( dialog, true ) ) {
+			// setKeepWithinStage() only applies if added to the stage root. :/
+			popupStage.addActor( dialog );
+			popupStage.addListener( dialog );
+		}
 
-		// setKeepWithinStage() only applies if added to the stage root. :/
-		popupStage.addActor( dialog );
-		popupStage.addListener( dialog );
-		dialog.addDisposeListener( this );
+		// Position depends on size, so set it last
+		dialog.usePreferredPosition();
 	}
 
 	@Override

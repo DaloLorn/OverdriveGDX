@@ -1,6 +1,5 @@
 package com.ftloverdrive.io;
 
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -9,8 +8,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import com.badlogic.gdx.assets.loaders.FileHandleResolver;
-import com.badlogic.gdx.assets.loaders.resolvers.InternalFileHandleResolver;
-import com.badlogic.gdx.assets.loaders.resolvers.ExternalFileHandleResolver;
 import com.badlogic.gdx.files.FileHandle;
 
 

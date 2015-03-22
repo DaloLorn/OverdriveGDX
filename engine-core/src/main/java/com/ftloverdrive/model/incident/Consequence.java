@@ -31,7 +31,7 @@ public interface Consequence {
 	 * In the original game this was a parenthetical appended to choices
 	 * when hidden="false".
 	 */
-	// public String getSpoilerText();
+	public String getSpoilerText();
 
 
 	public void execute( OverdriveContext context );

@@ -1,14 +1,12 @@
 package com.ftloverdrive.model.incident;
 
-import com.ftloverdrive.blueprint.incident.ConsequenceBlueprint;
-import com.ftloverdrive.blueprint.incident.IncidentBlueprint;
 import com.ftloverdrive.core.OverdriveContext;
 import com.ftloverdrive.model.AbstractOVDModel;
 
 
 public class PlotBranchModel extends AbstractOVDModel implements PlotBranch {
 
-	private String incidentId = null;
+	private int incRefId = -1;
 	private String choiceText = null;
 	private boolean spoilerVisible = true;
 
@@ -17,12 +15,12 @@ public class PlotBranchModel extends AbstractOVDModel implements PlotBranch {
 		setText( "Continue..." );
 	}
 
-	public PlotBranchModel( String incidentId ) {
-		setIncidentId( incidentId );
+	public PlotBranchModel( int incidentRefId ) {
+		setIncidentRefId( incidentRefId );
 	}
 
-	public PlotBranchModel( String incidentId, String text ) {
-		setIncidentId( incidentId );
+	public PlotBranchModel( int incidentRefId, String text ) {
+		setIncidentRefId( incidentRefId );
 		setText( text );
 	}
 
@@ -37,17 +35,12 @@ public class PlotBranchModel extends AbstractOVDModel implements PlotBranch {
 
 	@Override
 	public String getSpoilerText( OverdriveContext context ) {
-		if ( incidentId == null ) {
+		if ( incRefId == -1 ) {
 			return null;
 		}
 		else {
-			StringBuilder buf = new StringBuilder();
-			IncidentBlueprint incidentBlueprint = (IncidentBlueprint)context.getBlueprintManager().getBlueprint( incidentId );
-			for ( ConsequenceBlueprint conseq : incidentBlueprint.getConsequences() ) {
-				buf.append( conseq.getSpoilerText() );
-			}
-
-			return buf.length() == 0 ? null : buf.toString();
+			// TODO return the linked incident's consequence box actor?
+			return null;
 		}
 	}
 
@@ -61,12 +54,12 @@ public class PlotBranchModel extends AbstractOVDModel implements PlotBranch {
 		return spoilerVisible;
 	}
 
-	public void setIncidentId( String id ) {
-		incidentId = id;
+	public void setIncidentRefId( int incidentRefId ) {
+		incRefId = incidentRefId;
 	}
 
 	@Override
-	public String getIncidentId() {
-		return incidentId;
+	public int getIncidentRefId() {
+		return incRefId;
 	}
 }

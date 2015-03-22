@@ -5,7 +5,6 @@ import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Group;
-import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Pools;
 import com.badlogic.gdx.utils.Scaling;
@@ -26,10 +25,9 @@ import com.ftloverdrive.event.handler.IncidentEventHandler;
 import com.ftloverdrive.event.handler.LocalEventHandler;
 import com.ftloverdrive.event.handler.ShipEventHandler;
 import com.ftloverdrive.event.handler.TickEventHandler;
-import com.ftloverdrive.event.incident.IncidentTriggerEvent;
+import com.ftloverdrive.event.incident.IncidentSelectionEvent;
 import com.ftloverdrive.event.ship.ShipPropertyEvent;
 import com.ftloverdrive.event.ship.ShipPropertyListener;
-import com.ftloverdrive.model.Damagable;
 import com.ftloverdrive.model.DefaultGameModel;
 import com.ftloverdrive.model.DefaultPlayerModel;
 import com.ftloverdrive.model.GameModel;
@@ -110,12 +108,12 @@ public class TestScreen extends BaseScreen {
 		// Group lowerLayer = (Group)stageRoot.findActor( layerName );
 		// stageRoot.addActorAfter( lowerLayer, newGroup );
 
-		context.getAssetManager().load( OVDConstants.INCIDENT_DIALOG_SKIN, Skin.class );
 		context.getAssetManager().load( OVDConstants.BKG_ATLAS, TextureAtlas.class );
 		context.getAssetManager().load( OVDConstants.ROOT_ATLAS, TextureAtlas.class );
 		context.getAssetManager().load( OVDConstants.MISC_ATLAS, TextureAtlas.class );
 		context.getAssetManager().load( OVDConstants.PEOPLE_ATLAS, TextureAtlas.class );
 		context.getAssetManager().load( OVDConstants.PLOT_FONT, BitmapFont.class );
+
 		context.getAssetManager().finishLoading();
 
 		bgAtlas = context.getAssetManager().get( OVDConstants.BKG_ATLAS, TextureAtlas.class );
@@ -214,6 +212,7 @@ public class TestScreen extends BaseScreen {
 		}, TickListener.class );
 
 		// Create a test ship.
+
 		int shipRefId = new TestShipBlueprint( null ).construct( context );
 
 		// Set it as the player's ship.
@@ -237,7 +236,8 @@ public class TestScreen extends BaseScreen {
 		IncidentBlueprint incBlueprint = new IncidentBlueprint( "TEST_INCIDENT_1" );
 		incBlueprint.setTextTemplate( loremIpsum );
 
-		PlotBranchBlueprint branchBlueprint = new PlotBranchBlueprint( "TEST_INCIDENT_2", "Go to event 2" );
+		PlotBranchBlueprint branchBlueprint = new PlotBranchBlueprint( "TEST_INCIDENT_2",
+				"Go to event 2. Also a branch with a very long selection text that hopefully will wrap correctly." );
 		incBlueprint.addPlotBranch( branchBlueprint );
 		incBlueprint.addPlotBranch( new PlotBranchBlueprint() );
 
@@ -247,7 +247,7 @@ public class TestScreen extends BaseScreen {
 		incBlueprint = new IncidentBlueprint( "TEST_INCIDENT_2" );
 		incBlueprint.setTextTemplate( "This is a looped event!" );
 
-		ConsequenceBlueprint cseqBlueprint = new DamageConsequenceBlueprint( 5 );
+		ConsequenceBlueprint cseqBlueprint = new DamageConsequenceBlueprint( 1, 5 );
 		incBlueprint.addConsequence( cseqBlueprint );
 
 		branchBlueprint = new PlotBranchBlueprint( "TEST_INCIDENT_1", "Go to event 1" );
@@ -255,9 +255,9 @@ public class TestScreen extends BaseScreen {
 
 		context.getBlueprintManager().storeBlueprint( "TEST_INCIDENT_2", incBlueprint, DeferredIncidentModel.class );
 
-		IncidentTriggerEvent incTriggerE = Pools.get( IncidentTriggerEvent.class ).obtain();
-		incTriggerE.init( incRefId );
-		context.getScreenEventManager().postDelayedEvent( incTriggerE );
+		IncidentSelectionEvent incSelectionE = Pools.get( IncidentSelectionEvent.class ).obtain();
+		incSelectionE.init( incRefId );
+		context.getScreenEventManager().postDelayedEvent( incSelectionE );
 	}
 
 	@Override

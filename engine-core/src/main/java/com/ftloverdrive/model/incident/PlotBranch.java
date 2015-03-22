@@ -17,7 +17,6 @@ public interface PlotBranch {
 	/** Returns the clickable text for this branch. */
 	public String getText();
 
-
 	/**
 	 * Returns spoiler text for what will happen.
 	 * Scans the nested Incident's Consequences and returns a concatenation
@@ -31,8 +30,8 @@ public interface PlotBranch {
 	/** Returns true if this branch *wants* its spoiler to be shown, false otherwise. */
 	public boolean isSpoilerVisible();
 
-	public void setIncidentId( String id );
+	public void setIncidentRefId( int incidentRefId );
 
-	/** Returns unique ID of an Incident to trigger if this branch is chosen, or null. */
-	public String getIncidentId();
+	/** Returns ref id of the Incident to trigger if this branch is chosen, or null. */
+	public int getIncidentRefId();
 }

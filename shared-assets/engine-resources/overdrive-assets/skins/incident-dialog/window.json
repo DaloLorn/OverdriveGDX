@@ -1,0 +1,56 @@
+{
+  com.badlogic.gdx.graphics.g2d.BitmapFont: {
+    plot-font-bold: { file: "fonts/JustinFont12Bold.ttf?size=14" },
+    plot-font:      { file: "fonts/JustinFont12.ttf?size=14" }
+  },
+
+  com.badlogic.gdx.graphics.Color: {
+    white:  { a: 1, r: 1,    g: 1,    b: 1 },
+    yellow: { a: 1, r: 0.95, g: 1,    b: 0.31 },
+    red:    { a: 1, r: 1,    g: 0.2,  b: 0.2 },
+    green:  { a: 1, r: 0.39, g: 1,    b: 0.39 },
+    blue:   { a: 1, r: 0,    g: 0.76, b: 1 }
+  },
+
+  com.ftloverdrive.io.ImageSpec: {
+    window-texture: { atlasPath: "img/.atlas.atlas", regionName: "window-base" }
+  },
+
+  com.ftloverdrive.ui.TiledNinePatchDrawable: {
+    window-patch: {
+      texture: window-texture,
+      top: 28, bot: 27, left: 28, right: 28
+    }
+  },
+
+  // Fields the game is hardcoded to look for.
+  // Values can be changed freely, but entry names must remain the same.
+
+  com.badlogic.gdx.scenes.scene2d.ui.Label$LabelStyle: {
+    incident-text: { font: plot-font-bold, fontColor: white },
+
+    choice-normal: incident-text,
+    choice-hover: { font: plot-font-bold, fontColor: yellow },
+    choice-blue: { font: plot-font-bold, fontColor: blue },
+
+    conseq-bad: { font: plot-font, fontColor: red },
+    conseq-good: { font: plot-font, fontColor: green }
+  },
+
+  com.badlogic.gdx.scenes.scene2d.ui.Window$WindowStyle: {
+    window-style: {
+      titleFont: plot-font, background: window-patch
+    }
+  },
+
+  java.lang.Integer: {
+    // Spacing between the incident text and consequence box
+    text-conseq-separator: 25,
+    // Spacing between the consequence box and choices
+    conseq-choice-separator: 35,
+    // The vertical spacing between choices
+    choice-separator: 13,
+    // Total width of the incident dialog window
+    window-width: 600
+  }
+}

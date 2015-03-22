@@ -4,24 +4,25 @@ import com.badlogic.gdx.utils.Pools;
 import com.ftloverdrive.core.OverdriveContext;
 import com.ftloverdrive.event.OVDEvent;
 import com.ftloverdrive.event.OVDEventHandler;
-import com.ftloverdrive.event.local.LocalActorBoundaryEvent;
-import com.ftloverdrive.event.local.LocalActorBoundaryListener;
 import com.ftloverdrive.event.local.LocalActorClickedEvent;
 import com.ftloverdrive.event.local.LocalActorClickedListener;
 
+
+/**
+ * @see {@link com.ftloverdrive.event.AbstractLocalEvent}
+ */
 public class LocalEventHandler implements OVDEventHandler {
+
 	private Class[] eventClasses;
 	private Class[] listenerClasses;
 
 
 	public LocalEventHandler() {
 		eventClasses = new Class[] {
-			LocalActorClickedEvent.class,
-			LocalActorBoundaryEvent.class
+				LocalActorClickedEvent.class
 		};
 		listenerClasses = new Class[] {
-			LocalActorClickedListener.class,
-			LocalActorBoundaryListener.class
+				LocalActorClickedListener.class
 		};
 	}
 
@@ -38,18 +39,10 @@ public class LocalEventHandler implements OVDEventHandler {
 	@Override
 	public void handle( OverdriveContext context, OVDEvent e, Object[] listeners ) {
 		if ( e instanceof LocalActorClickedEvent ) {
-			LocalActorClickedEvent event = (LocalActorClickedEvent) e;
-			for ( int i = listeners.length-2; i >= 0; i-=2 ) {
+			LocalActorClickedEvent event = (LocalActorClickedEvent)e;
+			for ( int i = listeners.length - 2; i >= 0; i -= 2 ) {
 				if ( listeners[i] == LocalActorClickedListener.class ) {
-					((LocalActorClickedListener)listeners[i+1]).actorClicked( context, event );
-				}
-			}
-		}
-		else if ( e instanceof LocalActorBoundaryEvent ) {
-			LocalActorBoundaryEvent event = (LocalActorBoundaryEvent) e;
-			for ( int i = listeners.length-2; i >= 0; i-=2 ) {
-				if ( listeners[i] == LocalActorBoundaryListener.class ) {
-					((LocalActorBoundaryListener)listeners[i+1]).actorBoundaryCrossed( context, event );
+					( (LocalActorClickedListener)listeners[i + 1] ).actorClicked( context, event );
 				}
 			}
 		}
@@ -57,7 +50,7 @@ public class LocalEventHandler implements OVDEventHandler {
 	}
 
 	@Override
-	public void disposeEvent(OVDEvent e) {
+	public void disposeEvent( OVDEvent e ) {
 		if ( e.getClass() == LocalActorClickedEvent.class ) {
 			Pools.get( LocalActorClickedEvent.class ).free( (LocalActorClickedEvent)e );
 		}

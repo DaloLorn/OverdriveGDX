@@ -45,8 +45,14 @@ public class PlotBranchBlueprint extends AbstractOVDBlueprint {
 	public int construct( OverdriveContext context ) {
 		int branchRefId = context.getNetManager().requestNewRefId();
 
+		int incRefId = -1;
+
+		// Default "Continue..." branches have no incidentId
+		if ( incidentId != null )
+			incRefId = context.getBlueprintManager().getBlueprint( incidentId ).construct( context );
+
 		BranchCreationEvent createE = Pools.get( BranchCreationEvent.class ).obtain();
-		createE.init( branchRefId, incidentId, choiceText, spoilerVisible );
+		createE.init( branchRefId, incRefId, choiceText, spoilerVisible );
 		context.getScreenEventManager().postDelayedEvent( createE );
 
 		return branchRefId;

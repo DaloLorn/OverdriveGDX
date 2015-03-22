@@ -22,6 +22,9 @@ public class AnimSpec extends ImageSpec {
 	protected float interval = -1;
 
 
+	protected AnimSpec() {
+	}
+
 	/**
 	 * Creates a new AnimSpec.
 	 * 

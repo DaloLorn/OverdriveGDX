@@ -12,6 +12,7 @@ import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator.FreeTypeBitmapFontData;
+import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator.FreeTypeFontParameter;
 import com.badlogic.gdx.utils.Array;
 
 
@@ -22,6 +23,7 @@ import com.badlogic.gdx.utils.Array;
  * The font size can be specified by appending to the fileName: "...?size=10".
  */
 public class FreeTypeFontLoader extends AsynchronousAssetLoader<BitmapFont, BitmapFontParameter> {
+
 	protected Pattern argsPtn;
 
 
@@ -53,12 +55,12 @@ public class FreeTypeFontLoader extends AsynchronousAssetLoader<BitmapFont, Bitm
 			scrubbedFileName = scrubbedFileName.substring( 0, qMark );
 
 			Matcher m = argsPtn.matcher( fileName );
-			m.region( qMark+1, fileName.length() );
+			m.region( qMark + 1, fileName.length() );
 			while ( m.lookingAt() ) {
 				if ( m.group( 1 ).equals( "size" ) ) {
 					fontSize = Integer.parseInt( m.group( 2 ) );
 				}
-				if ( m.group( 3 ).length() > 0 ) break;  // Hit the "#" separator.
+				if ( m.group( 3 ).length() > 0 ) break; // Hit the "#" separator.
 				m.region( m.end(), fileName.length() );
 			}
 		}
@@ -66,13 +68,17 @@ public class FreeTypeFontLoader extends AsynchronousAssetLoader<BitmapFont, Bitm
 		boolean flip = parameter != null ? parameter.flip : false;
 
 		FreeTypeFontGenerator generator = new FreeTypeFontGenerator( file );
+		FreeTypeFontParameter param = new FreeTypeFontParameter();
+		param.size = fontSize;
+		param.characters = FreeTypeFontGenerator.DEFAULT_CHARS;
+		param.flip = flip;
+		FreeTypeBitmapFontData data = generator.generateData( param );
 
-		FreeTypeBitmapFontData data = generator.generateData( fontSize, FreeTypeFontGenerator.DEFAULT_CHARS, flip );
 		generator.dispose();
 
 		return new BitmapFont( data, data.getTextureRegions(), true );
 	}
-	
+
 	@Override
 	public void loadAsync( AssetManager manager, String fileName, FileHandle file, BitmapFontParameter parameter ) {
 		// No-op.

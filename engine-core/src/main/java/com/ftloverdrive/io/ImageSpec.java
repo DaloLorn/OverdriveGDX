@@ -10,6 +10,9 @@ public class ImageSpec {
 	protected String regionName = null;
 
 
+	protected ImageSpec() {
+	}
+
 	public ImageSpec( String atlasPath, String regionName ) {
 		this.atlasPath = atlasPath;
 		this.regionName = regionName;

@@ -15,6 +15,8 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.utils.Logger;
 import com.ftloverdrive.blueprint.OVDBlueprintManager;
 import com.ftloverdrive.io.FreeTypeFontLoader;
+import com.ftloverdrive.io.OVDSkin;
+import com.ftloverdrive.io.OVDSkinLoader;
 import com.ftloverdrive.io.RelativeFileHandleResolver;
 import com.ftloverdrive.io.URIFileHandleResolver;
 import com.ftloverdrive.net.OVDNetManager;
@@ -97,6 +99,7 @@ public class OverdriveGame implements ApplicationListener {
 		assetManager = new AssetManager( fileHandleResolver );
 		assetManager.setLoader( BitmapFont.class, new FreeTypeFontLoader( fileHandleResolver ) );
 		assetManager.setLoader( ScriptResource.class, new ScriptLoader( fileHandleResolver ) );
+		assetManager.setLoader( OVDSkin.class, new OVDSkinLoader( assetManager, fileHandleResolver ) );
 
 		OverdriveContext context = new OverdriveContext();
 		context.init( this, null, -1 );
@@ -157,7 +160,7 @@ public class OverdriveGame implements ApplicationListener {
 	public OVDReferenceManager getReferenceManager() {
 		return refManager;
 	}
-	
+
 	/**
 	 * Returns a manager to link unique string identifiers with blueprints.
 	 */

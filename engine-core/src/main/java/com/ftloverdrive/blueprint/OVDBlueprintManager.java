@@ -33,7 +33,7 @@ public class OVDBlueprintManager {
 	public <T extends OVDModel> T createModel( String blueprintId, Object... args ) {
 		if ( idModelMap.containsKey( blueprintId ) ) {
 			try {
-				Class<? extends OVDModel> type = idModelMap.get( blueprintId );
+				Class type = idModelMap.get( blueprintId );
 				T result = null;
 				if ( args.length > 0 ) {
 					Class[] argTypes = new Class[args.length];
@@ -52,6 +52,9 @@ public class OVDBlueprintManager {
 			catch ( Exception e ) {
 				e.printStackTrace();
 			}
+		}
+		else {
+			// TODO: Throw an error
 		}
 
 		return null;
