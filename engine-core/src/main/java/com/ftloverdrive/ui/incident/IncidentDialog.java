@@ -119,8 +119,6 @@ public class IncidentDialog extends Window implements Disposable, EventListener 
 
 		addListener( new IncidentDialogInputListener() );
 		setWidth( computePreferredWidth( skin.get( "window-width", Integer.class ) ) );
-
-		ConsequenceBox test = new ConsequenceBox( skin );
 	}
 
 	public void showConseequenceBox( boolean show ) {
@@ -164,7 +162,7 @@ public class IncidentDialog extends Window implements Disposable, EventListener 
 		boolean hasConseqs = false;
 		if ( branch.isSpoilerVisible() && branch.getIncidentRefId() != -1 ) {
 			IncidentModel incModel = context.getReferenceManager().getObject( branch.getIncidentRefId(), IncidentModel.class );
-			Integer[] conseqRefIds = incModel.consequenceRefIds();
+			int[] conseqRefIds = incModel.consequenceRefIds();
 			if ( conseqRefIds.length > 0 ) {
 				cBox.setTouchable( Touchable.enabled );
 				cBox.setUserObject( branch );

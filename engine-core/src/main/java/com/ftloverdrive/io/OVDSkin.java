@@ -133,7 +133,6 @@ public class OVDSkin extends Skin {
 
 			public FileHandle read( Json json, JsonValue jsonData, Class type ) {
 				FileHandle fh = resolve( skinFile, json.readValue( "path", String.class, jsonData ) );
-				System.out.println( fh );
 				return fh;
 			}
 		} );
@@ -150,5 +149,6 @@ public class OVDSkin extends Skin {
 
 	public void dispose() {
 		super.dispose();
+		// TODO: Need to perform any additional disposing?
 	}
 }

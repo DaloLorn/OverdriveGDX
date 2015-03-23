@@ -9,7 +9,6 @@ import com.ftloverdrive.event.engine.ModelDestructionEvent;
 import com.ftloverdrive.model.AbstractOVDModel;
 import com.ftloverdrive.ui.incident.IncidentDialog;
 import com.ftloverdrive.ui.screen.BaseScreen;
-import com.ftloverdrive.ui.screen.OVDScreen;
 
 
 /**
@@ -53,8 +52,7 @@ public class DeferredIncidentModel extends AbstractOVDModel implements IncidentM
 			consequence.execute( context );
 		}
 
-		OVDScreen screen = context.getScreen();
-		final Stage popupStage = screen.getStageManager().getStage( BaseScreen.POPUP_STAGE_ID );
+		final Stage popupStage = context.getScreen().getStageManager().getStage( BaseScreen.POPUP_STAGE_ID );
 
 		// If there already is an IncidentDialog present in the stage, use that.
 		// Otherwise create a new one.
@@ -102,16 +100,16 @@ public class DeferredIncidentModel extends AbstractOVDModel implements IncidentM
 	}
 
 	@Override
-	public Integer[] consequenceRefIds() {
-		Integer[] result = new Integer[consequenceRefIds.size];
+	public int[] consequenceRefIds() {
+		int[] result = new int[consequenceRefIds.size];
 		for ( int i = 0; i < result.length; ++i )
 			result[i] = consequenceRefIds.get( i );
 		return result;
 	}
 
 	@Override
-	public Integer[] branchRefIds() {
-		Integer[] result = new Integer[branchRefIds.size];
+	public int[] branchRefIds() {
+		int[] result = new int[branchRefIds.size];
 		for ( int i = 0; i < result.length; ++i )
 			result[i] = branchRefIds.get( i );
 		return result;

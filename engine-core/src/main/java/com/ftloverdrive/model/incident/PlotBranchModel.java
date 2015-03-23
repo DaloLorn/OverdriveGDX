@@ -11,20 +11,13 @@ public class PlotBranchModel extends AbstractOVDModel implements PlotBranch {
 
 
 	public PlotBranchModel() {
-		setText( "Continue..." );
+		choiceText = "Continue...";
 	}
 
-	public PlotBranchModel( int incidentRefId ) {
-		setIncidentRefId( incidentRefId );
-	}
-
-	public PlotBranchModel( int incidentRefId, String text ) {
-		setIncidentRefId( incidentRefId );
-		setText( text );
-	}
-
-	public void setText( String text ) {
+	public PlotBranchModel( int incidentRefId, String text, boolean showSpoiler ) {
+		incRefId = incidentRefId;
 		choiceText = text;
+		spoilerVisible = showSpoiler;
 	}
 
 	@Override
@@ -33,17 +26,8 @@ public class PlotBranchModel extends AbstractOVDModel implements PlotBranch {
 	}
 
 	@Override
-	public void setSpoilerVisible( boolean b ) {
-		spoilerVisible = b;
-	}
-
-	@Override
 	public boolean isSpoilerVisible() {
 		return spoilerVisible;
-	}
-
-	public void setIncidentRefId( int incidentRefId ) {
-		incRefId = incidentRefId;
 	}
 
 	@Override

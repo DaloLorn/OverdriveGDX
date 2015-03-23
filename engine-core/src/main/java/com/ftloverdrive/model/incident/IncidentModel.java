@@ -41,12 +41,12 @@ public interface IncidentModel extends OVDModel {
 	public void setText( String text );
 
 	/** Returns a list of Consequences, all of which trigger at the start of this Incident. */
-	public Integer[] consequenceRefIds();
+	public int[] consequenceRefIds();
 
 	public void addConsequence( int cseqRefId );
 
 	/** Returns choices which may lead to further Incidents. */
-	public Integer[] branchRefIds();
+	public int[] branchRefIds();
 
 	public void addPlotBranch( int branchRefId );
 }

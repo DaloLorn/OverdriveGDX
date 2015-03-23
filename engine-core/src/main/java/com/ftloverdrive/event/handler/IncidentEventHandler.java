@@ -106,10 +106,7 @@ public class IncidentEventHandler implements OVDEventHandler {
 			BranchCreationEvent event = (BranchCreationEvent)e;
 
 			int bRefId = event.getBranchRefId();
-			PlotBranch branch = new PlotBranchModel();
-			branch.setIncidentRefId( event.getIncidentRefId() );
-			branch.setText( event.getChoiceText() );
-			branch.setSpoilerVisible( event.isSpoilerVisible() );
+			PlotBranch branch = new PlotBranchModel( event.getIncidentRefId(), event.getChoiceText(), event.isSpoilerVisible() );
 			context.getReferenceManager().addObject( branch, bRefId );
 		}
 

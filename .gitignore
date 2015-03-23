@@ -1,4 +1,5 @@
 target/
+build.bat
 
 *.class
 *.tmp
