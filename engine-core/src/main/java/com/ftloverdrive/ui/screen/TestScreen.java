@@ -32,7 +32,6 @@ import com.ftloverdrive.model.DefaultGameModel;
 import com.ftloverdrive.model.DefaultPlayerModel;
 import com.ftloverdrive.model.GameModel;
 import com.ftloverdrive.model.PlayerModel;
-import com.ftloverdrive.model.incident.RequirementResource;
 import com.ftloverdrive.model.ship.ShipModel;
 import com.ftloverdrive.net.NetTest;
 import com.ftloverdrive.ui.ShatteredImage;
@@ -259,8 +258,8 @@ public class TestScreen extends BaseScreen {
 		incBlueprint.setTextTemplate( "This is a looped event!" );
 
 		incBlueprint.addConsequence( new ConsequenceResourceBlueprint( OVDConstants.SCRAP, 15, 30 ) );
-		incBlueprint.addConsequence( new ConsequenceResourceBlueprint( OVDConstants.DRONES, 0, 6 ) );
-		incBlueprint.addConsequence( new ConsequenceResourceBlueprint( OVDConstants.MISSILES, 0, 6 ) );
+		incBlueprint.addConsequence( new ConsequenceResourceBlueprint( OVDConstants.DRONES, 0, 1 ) );
+		incBlueprint.addConsequence( new ConsequenceResourceBlueprint( OVDConstants.MISSILES, 0, 1 ) );
 		incBlueprint.addConsequence( new ConsequenceResourceBlueprint( OVDConstants.FUEL, 0, 3 ) );
 		incBlueprint.addConsequence( new ConsequenceDamageBlueprint( 1, 5 ) );
 

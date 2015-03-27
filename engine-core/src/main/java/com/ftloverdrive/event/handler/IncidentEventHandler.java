@@ -59,32 +59,31 @@ public class IncidentEventHandler implements OVDEventHandler {
 	@Override
 	public void handle( OverdriveContext context, OVDEvent e, Object[] listeners ) {
 		if ( e instanceof IncidentCreationEvent ) {
-			IncidentCreationEvent event = (IncidentCreationEvent)e;
+			IncidentCreationEvent ev = (IncidentCreationEvent)e;
 
-			String incUID = event.getIncidentUniqueId();
-			IncidentModel incModel = new DeferredIncidentModel( incUID );
-			incModel.setText( event.getIncidentText() );
-			int incRefId = event.getIncidentRefId();
+			IncidentModel incModel = new DeferredIncidentModel( ev.getIncidentId() );
+			incModel.setText( ev.getIncidentText() );
+			int incRefId = ev.getIncidentRefId();
 			context.getReferenceManager().addObject( incModel, incRefId );
 		}
 		else if ( e instanceof IncidentAddBranchEvent ) {
-			IncidentAddBranchEvent event = (IncidentAddBranchEvent)e;
+			IncidentAddBranchEvent ev = (IncidentAddBranchEvent)e;
 
-			int incRefId = event.getIncidentRefId();
+			int incRefId = ev.getIncidentRefId();
 			IncidentModel incModel = context.getReferenceManager().getObject( incRefId, IncidentModel.class );
-			incModel.addPlotBranch( event.getBranchRefId() );
+			incModel.addPlotBranch( ev.getBranchRefId() );
 		}
 		else if ( e instanceof IncidentAddConsequenceEvent ) {
-			IncidentAddConsequenceEvent event = (IncidentAddConsequenceEvent)e;
+			IncidentAddConsequenceEvent ev = (IncidentAddConsequenceEvent)e;
 
-			int incRefId = event.getIncidentRefId();
+			int incRefId = ev.getIncidentRefId();
 			IncidentModel incModel = context.getReferenceManager().getObject( incRefId, IncidentModel.class );
-			incModel.addConsequence( event.getConsequenceRefId() );
+			incModel.addConsequence( ev.getConsequenceRefId() );
 		}
 		else if ( e instanceof IncidentSelectionEvent ) {
-			IncidentSelectionEvent event = (IncidentSelectionEvent)e;
+			IncidentSelectionEvent ev = (IncidentSelectionEvent)e;
 
-			int incRefId = event.getIncidentRefId();
+			int incRefId = ev.getIncidentRefId();
 			IncidentModel incModel = context.getReferenceManager().getObject( incRefId, IncidentModel.class );
 			IncidentBlueprint incBlueprint = (IncidentBlueprint)context.getBlueprintManager().getBlueprint( incModel.getIncidentId() );
 
@@ -100,9 +99,9 @@ public class IncidentEventHandler implements OVDEventHandler {
 			context.getScreenEventManager().postDelayedEvent( triggerE );
 		}
 		else if ( e instanceof IncidentTriggerEvent ) {
-			IncidentTriggerEvent event = (IncidentTriggerEvent)e;
+			IncidentTriggerEvent ev = (IncidentTriggerEvent)e;
 
-			int incRefId = event.getIncidentRefId();
+			int incRefId = ev.getIncidentRefId();
 			IncidentModel incModel = context.getReferenceManager().getObject( incRefId, IncidentModel.class );
 			incModel.execute( context );
 		}
@@ -143,7 +142,7 @@ public class IncidentEventHandler implements OVDEventHandler {
 			ConsequenceResourceCreationEvent ev = (ConsequenceResourceCreationEvent)e;
 
 			int cRefId = ev.getConsequenceRefId();
-			ConsequenceResource consequence = new ConsequenceResource( ev.getResource(), ev.getAmount(), ev.getRequires() );
+			ConsequenceResource consequence = new ConsequenceResource( context, ev.getResource(), ev.getAmount(), ev.getRequires() );
 			context.getReferenceManager().addObject( consequence, cRefId );
 		}
 	}

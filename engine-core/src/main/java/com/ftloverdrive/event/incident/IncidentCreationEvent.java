@@ -6,7 +6,7 @@ import com.ftloverdrive.event.AbstractOVDEvent;
 public class IncidentCreationEvent extends AbstractOVDEvent {
 
 	protected int incRefId = -1;
-	protected String incUniqueId = null;
+	protected String incId = null;
 	protected String incText = null;
 
 
@@ -18,14 +18,14 @@ public class IncidentCreationEvent extends AbstractOVDEvent {
 	 * 
 	 * @param incidentRefId
 	 *            a reserved reference id for the new incident
-	 * @param incidentUniqueId
-	 *            unique identifier of the new incident
+	 * @param incidentId
+	 *            blueprint name of the IncidentBlueprint to use
 	 * @param incidentText
 	 *            text to be displayed
 	 */
-	public void init( int incidentRefId, String incidentUniqueId, String incidentText ) {
+	public void init( int incidentRefId, String incidentId, String incidentText ) {
 		incRefId = incidentRefId;
-		incUniqueId = incidentUniqueId;
+		incId = incidentId;
 		incText = incidentText;
 	}
 
@@ -33,8 +33,8 @@ public class IncidentCreationEvent extends AbstractOVDEvent {
 		return incRefId;
 	}
 
-	public String getIncidentUniqueId() {
-		return incUniqueId;
+	public String getIncidentId() {
+		return incId;
 	}
 
 	public String getIncidentText() {
@@ -44,7 +44,7 @@ public class IncidentCreationEvent extends AbstractOVDEvent {
 	@Override
 	public void reset() {
 		incRefId = -1;
-		incUniqueId = null;
+		incId = null;
 		incText = null;
 	}
 }

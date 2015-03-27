@@ -4,6 +4,7 @@ import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.scenes.scene2d.ui.Cell;
 import com.badlogic.gdx.scenes.scene2d.ui.HorizontalGroup;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
+import com.badlogic.gdx.utils.Disposable;
 import com.ftloverdrive.core.OverdriveContext;
 import com.ftloverdrive.model.AbstractOVDModel;
 import com.ftloverdrive.model.PlayerModel;
@@ -12,14 +13,17 @@ import com.ftloverdrive.ui.incident.ConsequenceBox;
 import com.ftloverdrive.util.OVDConstants;
 
 
-public class ConsequenceResource extends AbstractOVDModel implements Consequence {
+public class ConsequenceResource extends AbstractOVDModel implements Consequence, Disposable {
+
+	private OverdriveContext context;
 
 	private String resourceId = null;
 	private int amount = 0;
 	private boolean requires = true;
 
 
-	public ConsequenceResource( String resourceId, int value, boolean requires ) {
+	public ConsequenceResource( OverdriveContext context, String resourceId, int value, boolean requires ) {
+		this.context = context;
 		this.resourceId = resourceId;
 		amount = value;
 		this.requires = requires;
@@ -54,8 +58,10 @@ public class ConsequenceResource extends AbstractOVDModel implements Consequence
 				last = cl;
 			}
 		}
-		first.expandX().right().padLeft( 10 );
-		last.expandX().left().padRight( 10 );
+		if ( first != last ) {
+			first.expandX().right().padLeft( 10 );
+			last.expandX().left().padRight( 10 );
+		}
 	}
 
 	@Override
@@ -85,5 +91,10 @@ public class ConsequenceResource extends AbstractOVDModel implements Consequence
 	public void addRequirements( PlotBranch branch ) {
 		if ( requires )
 			branch.addRequirement( new RequirementResource( resourceId, -amount ) );
+	}
+
+	@Override
+	public void dispose() {
+		context.getAssetManager().unload( OVDConstants.RESOURCE_ATLAS );
 	}
 }
