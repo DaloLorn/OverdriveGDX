@@ -45,14 +45,13 @@ public class ConsequenceResource extends AbstractOVDModel implements Consequence
 		float h = Math.max( rIcon.getHeight(), lblConseq.getMinHeight() );
 		Cell c = box.add( grp ).size( rIcon.getWidth() + lblConseq.getMinWidth(), h );
 
-		Cell first = c, last = c;
+		Cell first = null, last = c;
 		for ( Cell cl : box.getCells() ) {
 			if ( cl.getRow() == c.getRow() ) {
 				cl.expand( 0, 0 );
-				if ( cl.getColumn() == 0 )
+				if ( first == null )
 					first = cl;
-				else if ( cl.getColumn() == box.getColumns() )
-					last = cl;
+				last = cl;
 			}
 		}
 		first.expandX().right().padLeft( 10 );
