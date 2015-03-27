@@ -53,7 +53,7 @@ public class OVDConstants {
 	public static final String MISSILES = "Missiles";
 
 	/** Ship property. */
-	public static final String DRONE_PARTS = "DroneParts";
+	public static final String DRONES = "Drones";
 
 	/** Ship property. */
 	public static final String WEAPON_SLOTS = "WeaponSlots";
@@ -122,6 +122,7 @@ public class OVDConstants {
 	public static final String WEAPONS_ATLAS = "img/weapons/.atlas.atlas";
 	public static final String BKG_ATLAS = "img/stars/.atlas.atlas";
 	public static final String MENU_ATLAS = "img/main_menus/.atlas.atlas";
+	public static final String RESOURCE_ATLAS = "img/ui_icons/.atlas.atlas";
 
 	public static final String FLOORPLAN_ATLAS = "internal://overdrive-assets/images/floorplan.atlas";
 	public static final String CUSTOM_HANGAR_ATLAS = "internal://overdrive-assets/images/hangar-ui/hangar.atlas";

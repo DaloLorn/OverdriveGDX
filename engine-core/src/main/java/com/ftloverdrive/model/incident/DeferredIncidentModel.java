@@ -75,16 +75,14 @@ public class DeferredIncidentModel extends AbstractOVDModel implements IncidentM
 			}
 		}
 
-		if ( branchRefIds.size == 0 ) {
-			// If the incident defines no choices, add the default "Continue..." choice.
-			dialog.addChoice( new PlotBranchModel() );
+		for ( int branchRefId : branchRefIds ) {
+			PlotBranch branch = context.getReferenceManager().getObject( branchRefId, PlotBranch.class );
+			dialog.addChoice( branch );
 		}
-		else {
-			for ( int branchRefId : branchRefIds ) {
-				PlotBranch branch = context.getReferenceManager().getObject( branchRefId, PlotBranch.class );
-				dialog.addChoice( branch );
-			}
-		}
+		// If the incident defines no branches, or none of the added branches are available / visible, then
+		// add the default "Continue..." choice.
+		if ( dialog.countAvailableChoices() == 0 )
+			dialog.addChoice( new DefaultPlotBranch() );
 
 		// Height depends on width and number of plot branches, so calculate it after everything's been added
 		dialog.setHeight( dialog.computePreferredHeight() );

@@ -53,7 +53,7 @@ public class AbstractShipModel extends AbstractOVDModel implements ShipModel, Da
 		shipProperties.setInt( OVDConstants.SCRAP, 0 );
 		shipProperties.setInt( OVDConstants.FUEL, 0 );
 		shipProperties.setInt( OVDConstants.MISSILES, 0 );
-		shipProperties.setInt( OVDConstants.DRONE_PARTS, 0 );
+		shipProperties.setInt( OVDConstants.DRONES, 0 );
 		shipProperties.setInt( OVDConstants.WEAPON_SLOTS, 0 );
 		shipProperties.setInt( OVDConstants.DRONE_SLOTS, 0 );
 		shipProperties.setInt( OVDConstants.AUGMENT_SLOTS, 0 );

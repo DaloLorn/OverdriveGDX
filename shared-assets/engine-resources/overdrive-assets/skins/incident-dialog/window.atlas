@@ -3,10 +3,38 @@ window.png
 format: RGBA8888
 filter: Nearest,Nearest
 repeat: none
-consequence-box
+consequence-border-normal
   rotate: false
   xy: 0, 0
   size: 5, 5
   orig: 5, 5
+  offset: 0, 0
+  index: -1
+consequence-border-hover
+  rotate: false
+  xy: 5, 0
+  size: 5, 5
+  orig: 5, 5
+  offset: 0, 0
+  index: -1
+consequence-border-blue
+  rotate: false
+  xy: 0, 5
+  size: 5, 5
+  orig: 5, 5
+  offset: 0, 0
+  index: -1
+consequence-border-disabled
+  rotate: false
+  xy: 5, 5
+  size: 5, 5
+  orig: 5, 5
+  offset: 0, 0
+  index: -1
+consequence-bg
+  rotate: false
+  xy: 10, 0
+  size: 1, 1
+  orig: 1, 1
   offset: 0, 0
   index: -1

@@ -12,6 +12,7 @@ import com.ftloverdrive.event.ship.ShipCrewCreationEvent;
 import com.ftloverdrive.event.ship.ShipDoorCreationEvent;
 import com.ftloverdrive.event.ship.ShipLayoutCrewPlacementEvent;
 import com.ftloverdrive.event.ship.ShipLayoutDoorAddEvent;
+import com.ftloverdrive.event.ship.ShipLayoutListener;
 import com.ftloverdrive.event.ship.ShipLayoutRoomAddEvent;
 import com.ftloverdrive.event.ship.ShipPropertyEvent;
 import com.ftloverdrive.event.ship.ShipPropertyListener;
@@ -51,6 +52,7 @@ public class ShipEventHandler implements OVDEventHandler {
 		};
 		listenerClasses = new Class[] {
 				ShipPropertyListener.class,
+				ShipLayoutListener.class,
 				OrderListener.class
 		};
 	}
@@ -66,14 +68,15 @@ public class ShipEventHandler implements OVDEventHandler {
 		return listenerClasses;
 	}
 
-
 	@Override
 	public void handle( OverdriveContext context, OVDEvent e, Object[] listeners ) {
 		if ( e instanceof ShipCreationEvent ) {
 			ShipCreationEvent event = (ShipCreationEvent)e;
 
 			int shipRefId = event.getShipRefId();
-			ShipModel shipModel = new TestShipModel();
+			ShipModel shipModel = context.getBlueprintManager().createModel( event.getShipBlueprintId(), event.getConstructorArgs() );
+			if ( shipModel == null )
+				shipModel = new TestShipModel();
 
 			context.getReferenceManager().addObject( shipModel, shipRefId );
 		}
@@ -96,9 +99,8 @@ public class ShipEventHandler implements OVDEventHandler {
 			}
 
 			for ( int i = listeners.length - 2; i >= 0; i -= 2 ) {
-				if ( listeners[i] == ShipPropertyListener.class ) {
+				if ( listeners[i] == ShipPropertyListener.class )
 					( (ShipPropertyListener)listeners[i + 1] ).shipPropertyChanged( context, event );
-				}
 			}
 		}
 
@@ -129,6 +131,11 @@ public class ShipEventHandler implements OVDEventHandler {
 			ShipCoordinate[] roomCoords = event.getRoomCoords();
 
 			shipModel.getLayout().addRoom( roomRefId, roomCoords );
+
+			for ( int i = listeners.length - 2; i >= 0; i -= 2 ) {
+				if ( listeners[i] == ShipLayoutListener.class )
+					( (ShipLayoutListener)listeners[i + 1] ).shipLayoutRoomAdded( context, event );
+			}
 		}
 
 		else if ( e instanceof ShipDoorCreationEvent ) {
@@ -146,6 +153,11 @@ public class ShipEventHandler implements OVDEventHandler {
 			int doorRefId = event.getDoorRefId();
 
 			shipModel.getLayout().addDoor( doorRefId, event.getDoorCoords() );
+
+			for ( int i = listeners.length - 2; i >= 0; i -= 2 ) {
+				if ( listeners[i] == ShipLayoutListener.class )
+					( (ShipLayoutListener)listeners[i + 1] ).shipLayoutDoorAdded( context, event );
+			}
 		}
 
 		else if ( e instanceof ShipCrewCreationEvent ) {

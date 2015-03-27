@@ -18,4 +18,9 @@ public interface PlotBranch {
 
 	/** Returns ref id of the Incident to trigger if this branch is chosen, or null. */
 	public int getIncidentRefId();
+
+	/** Returns the requirements that have to be satisfied in order to make this branch clickable */
+	public PlotBranchRequirement[] getRequirements();
+
+	public void addRequirement( PlotBranchRequirement req );
 }

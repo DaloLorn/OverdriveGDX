@@ -22,7 +22,7 @@ public class OVDEventManager {
 	private Deque<OVDEvent> inQueue = new LinkedBlockingDeque<OVDEvent>();
 	OVDEventListenerList outListenerList = new OVDEventListenerList();
 	OVDEventListenerList inListenerList = new OVDEventListenerList();
-	Map<Class,OVDEventHandler> handlerMap = new HashMap<Class,OVDEventHandler>();
+	Map<Class, OVDEventHandler> handlerMap = new HashMap<Class, OVDEventHandler>();
 
 	private final int tickRate = 1000;  // Milliseconds per tick of game-time.
 	private int spareTime = 0;          // Remembers leftover milliseconds between ticks.
@@ -41,23 +41,29 @@ public class OVDEventManager {
 	 */
 	public void processEvents( OverdriveContext context ) {
 		OVDEvent event;
-		while ( (event = inQueue.poll()) != null ) {
+		while ( ( event = inQueue.poll() ) != null ) {
 			OVDEventHandler h = handlerMap.get( event.getClass() );
 			if ( h != null ) {
 				h.handle( context, event, inListenerList.getListenerList() );
 				h.disposeEvent( event );
 			}
 			else {
-				System.out.println( "Unhandled event: "+ event );
+				System.out.println( "Unhandled event: " + event );
 			}
 		}
-		while ( (event = outQueue.poll()) != null ) {
+		while ( ( event = outQueue.poll() ) != null ) {
 			// TODO: A registry of handlers to dispatch various event types.
 			// Otherwise this will just be a hardcoded if/else instance check.
 
 			if ( !event.isCancelled() ) {
-				// Pretend it went to the server and back.
-				postDelayedInboundEvent( event );
+				if ( event instanceof AbstractLocalEvent ) {
+					// Local events are not sent to the server.
+					postDelayedInboundEvent( event );
+				}
+				else {
+					// Pretend it went to the server and back.
+					postDelayedInboundEvent( event );
+				}
 			}
 		}
 	}
@@ -75,9 +81,6 @@ public class OVDEventManager {
 	 * Adds an event to the end of the outbound queue. (thread-safe)
 	 */
 	public void postDelayedEvent( OVDEvent e ) {
-		if ( e instanceof AbstractLocalEvent ) {
-			throw new IllegalArgumentException( "Attempted to post a local event to outbound queue." );
-		}
 		outQueue.addLast( e );
 	}
 
@@ -85,9 +88,6 @@ public class OVDEventManager {
 	 * Adds an event to the start of the outbound queue. (thread-safe)
 	 */
 	public void postPreemptiveEvent( OVDEvent e ) {
-		if ( e instanceof AbstractLocalEvent ) {
-			throw new IllegalArgumentException( "Attempted to post a local event to outbound queue." );
-		}
 		outQueue.addFirst( e );
 	}
 
@@ -98,7 +98,7 @@ public class OVDEventManager {
 	 * As enough time accumulates, TickEvents may be generated.
 	 */
 	public void secondsElapsed( float t ) {
-		spareTime += (int)(t * 1000);  // Add as milliseconds.
+		spareTime += (int)( t * 1000 ); // Add as milliseconds.
 		elapsedTicks = spareTime / tickRate;
 		if ( elapsedTicks > 0 ) {
 			spareTime = spareTime % tickRate;
@@ -122,8 +122,10 @@ public class OVDEventManager {
 	/**
 	 * Adds a listener for incoming events.
 	 *
-	 * @param l  a listener to be notified
-	 * @param listenerClass  a class a handler expects that the listener can be cast as
+	 * @param l
+	 *            a listener to be notified
+	 * @param listenerClass
+	 *            a class a handler expects that the listener can be cast as
 	 */
 	public <T extends OVDEventListener> void addEventListener( T l, Class<T> listenerClass ) {
 		inListenerList.add( listenerClass, l );

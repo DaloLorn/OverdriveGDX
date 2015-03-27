@@ -6,8 +6,11 @@ import com.ftloverdrive.event.AbstractOVDEvent;
 
 
 public class ShipCreationEvent extends AbstractOVDEvent implements Poolable {
+
 	protected int shipRefId = -1;
-	protected String shipType = null;
+	protected String shipBlueprintId = null;
+	// TODO: This would mean sending an array of objects over net, probably not very smart...?
+	protected Object[] constructorArgs = null;
 
 
 	public ShipCreationEvent() {
@@ -19,27 +22,33 @@ public class ShipCreationEvent extends AbstractOVDEvent implements Poolable {
 	 * TODO: Decide on a convention for shipType values.
 	 * Have blueprints create the model without events?
 	 *
-	 * @param shipRefId  a reserved reference id for the new ship
-	 * @param shipType  a string identifying what ship to make
+	 * @param shipRefId
+	 *            a reserved reference id for the new ship
+	 * @param shipBlueprintId
+	 *            a string identifying what ship to make
 	 */
-	public void init( int shipRefId, String shipType ) {
+	public void init( int shipRefId, String shipBlueprintId, Object... constructorArgs ) {
 		this.shipRefId = shipRefId;
-		this.shipType = shipType;
+		this.shipBlueprintId = shipBlueprintId;
+		this.constructorArgs = constructorArgs;
 	}
-
 
 	public int getShipRefId() {
 		return shipRefId;
 	}
 
-	public String getShipType() {
-		return shipType;
+	public String getShipBlueprintId() {
+		return shipBlueprintId;
 	}
 
+	public Object[] getConstructorArgs() {
+		return constructorArgs;
+	}
 
 	@Override
 	public void reset() {
 		shipRefId = -1;
-		shipType = null;
+		shipBlueprintId = null;
+		constructorArgs = null;
 	}
 }

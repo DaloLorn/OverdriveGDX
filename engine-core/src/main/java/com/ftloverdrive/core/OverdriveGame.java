@@ -49,9 +49,6 @@ public class OverdriveGame implements ApplicationListener {
 	private Screen currentScreen = null;
 
 
-	// private com.ftloverdrive.net.NetworkTest networkTest; // TODO: Remove me.
-
-
 	@Override
 	public void create() {
 		Gdx.app.setLogLevel( Application.LOG_DEBUG );
@@ -106,9 +103,6 @@ public class OverdriveGame implements ApplicationListener {
 		screenManager = new OVDScreenManager( context );
 
 		screenManager.showScreen( screenManager.getInitScreenKey() );
-
-		// networkTest = new com.ftloverdrive.net.NetworkTest();
-		// networkTest.init();
 	}
 
 
@@ -192,7 +186,6 @@ public class OverdriveGame implements ApplicationListener {
 		return currentScreen;
 	}
 
-
 	@Override
 	public void resize( int width, int height ) {
 		log.info( String.format( "Screen resized: %dx%d", width, height ) );
@@ -219,6 +212,5 @@ public class OverdriveGame implements ApplicationListener {
 		if ( currentScreen != null ) currentScreen.dispose();
 		screenManager.dispose();
 		assetManager.dispose();
-		// networkTest.shutdown();
 	}
 }

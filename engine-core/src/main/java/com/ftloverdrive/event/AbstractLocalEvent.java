@@ -1,18 +1,14 @@
 package com.ftloverdrive.event;
 
 /**
- * A marker class to distinguish between local and non-local events,
- * for exception throwing to detect erronoeusly posted events.
+ * A marker class to distinguish between local and non-local events.
  * 
- * Local events are handled only by the local client.
- * 
- * Basically only useful for wrapped input events that are
- * handled via the event manager in order to expose them to
- * listeners, which in turn can enqueue non-local events that
- * the server can scrutinize.
- * 
- * Should be posted using OVDEventManager.postDelayedInboundEvent(),
- * since we don't want to inform the server of local events.
+ * Local events are events that are not supposed to be sent to the
+ * server, and are handled fully by the local client -- for instance
+ * because we don't want to suffer the overhead involved in waiting
+ * for the server's confirmation for an action that has no bearing on
+ * the other player (eg. an input wrapper event, or an event telling
+ * an actor to play an animation)
  */
 public abstract class AbstractLocalEvent extends AbstractOVDEvent {
 }

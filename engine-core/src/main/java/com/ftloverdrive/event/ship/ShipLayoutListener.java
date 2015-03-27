@@ -8,4 +8,6 @@ import com.ftloverdrive.event.ship.ShipLayoutRoomAddEvent;
 public interface ShipLayoutListener extends OVDEventListener {
 
 	public void shipLayoutRoomAdded( OverdriveContext context, ShipLayoutRoomAddEvent e );
+
+	public void shipLayoutDoorAdded( OverdriveContext context, ShipLayoutDoorAddEvent e );
 }

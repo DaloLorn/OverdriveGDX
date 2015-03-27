@@ -8,8 +8,8 @@ import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Pools;
 import com.badlogic.gdx.utils.Scaling;
-import com.ftloverdrive.blueprint.incident.ConsequenceBlueprint;
-import com.ftloverdrive.blueprint.incident.DamageConsequenceBlueprint;
+import com.ftloverdrive.blueprint.incident.ConsequenceDamageBlueprint;
+import com.ftloverdrive.blueprint.incident.ConsequenceResourceBlueprint;
 import com.ftloverdrive.blueprint.incident.IncidentBlueprint;
 import com.ftloverdrive.blueprint.incident.PlotBranchBlueprint;
 import com.ftloverdrive.blueprint.ship.TestShipBlueprint;
@@ -32,8 +32,9 @@ import com.ftloverdrive.model.DefaultGameModel;
 import com.ftloverdrive.model.DefaultPlayerModel;
 import com.ftloverdrive.model.GameModel;
 import com.ftloverdrive.model.PlayerModel;
-import com.ftloverdrive.model.incident.DeferredIncidentModel;
+import com.ftloverdrive.model.incident.RequirementResource;
 import com.ftloverdrive.model.ship.ShipModel;
+import com.ftloverdrive.net.NetTest;
 import com.ftloverdrive.ui.ShatteredImage;
 import com.ftloverdrive.ui.hud.PlayerShipDoorHighlighter;
 import com.ftloverdrive.ui.hud.PlayerShipHullMonitor;
@@ -223,6 +224,14 @@ public class TestScreen extends BaseScreen {
 		incidentWindowDemo();
 
 		resize( getScreenWidth(), getScreenHeight() );
+
+		try {
+			NetTest test = new NetTest();
+			test.shutdown();
+		}
+		catch ( Exception e ) {
+			e.printStackTrace();
+		}
 	}
 
 	private void incidentWindowDemo() {
@@ -239,21 +248,33 @@ public class TestScreen extends BaseScreen {
 		PlotBranchBlueprint branchBlueprint = new PlotBranchBlueprint( "TEST_INCIDENT_2",
 				"Go to event 2. Also a branch with a very long selection text that hopefully will wrap correctly." );
 		incBlueprint.addPlotBranch( branchBlueprint );
+		branchBlueprint = new PlotBranchBlueprint( "TEST_INCIDENT_3", "Need moar scrap!" );
+		incBlueprint.addPlotBranch( branchBlueprint );
 		incBlueprint.addPlotBranch( new PlotBranchBlueprint() );
 
-		context.getBlueprintManager().storeBlueprint( "TEST_INCIDENT_1", incBlueprint, DeferredIncidentModel.class );
+		context.getBlueprintManager().storeBlueprint( "TEST_INCIDENT_1", incBlueprint );
 		int incRefId = incBlueprint.construct( context );
 
 		incBlueprint = new IncidentBlueprint( "TEST_INCIDENT_2" );
 		incBlueprint.setTextTemplate( "This is a looped event!" );
 
-		ConsequenceBlueprint cseqBlueprint = new DamageConsequenceBlueprint( 1, 5 );
-		incBlueprint.addConsequence( cseqBlueprint );
+		incBlueprint.addConsequence( new ConsequenceResourceBlueprint( OVDConstants.SCRAP, 15, 30 ) );
+		incBlueprint.addConsequence( new ConsequenceResourceBlueprint( OVDConstants.DRONES, 0, 6 ) );
+		incBlueprint.addConsequence( new ConsequenceResourceBlueprint( OVDConstants.MISSILES, 0, 6 ) );
+		incBlueprint.addConsequence( new ConsequenceResourceBlueprint( OVDConstants.FUEL, 0, 3 ) );
+		incBlueprint.addConsequence( new ConsequenceDamageBlueprint( 1, 5 ) );
 
 		branchBlueprint = new PlotBranchBlueprint( "TEST_INCIDENT_1", "Go to event 1" );
 		incBlueprint.addPlotBranch( branchBlueprint );
 
-		context.getBlueprintManager().storeBlueprint( "TEST_INCIDENT_2", incBlueprint, DeferredIncidentModel.class );
+		context.getBlueprintManager().storeBlueprint( "TEST_INCIDENT_2", incBlueprint );
+
+		incBlueprint = new IncidentBlueprint( "TEST_INCIDENT_3" );
+		incBlueprint.setTextTemplate( "Requirement test" );
+		incBlueprint.addConsequence( new ConsequenceResourceBlueprint( OVDConstants.SCRAP, -60, -50 ) );
+		incBlueprint.addConsequence( new ConsequenceResourceBlueprint( OVDConstants.FUEL, 1, 3 ) );
+		incBlueprint.addPlotBranch( branchBlueprint );
+		context.getBlueprintManager().storeBlueprint( "TEST_INCIDENT_3", incBlueprint );
 
 		IncidentSelectionEvent incSelectionE = Pools.get( IncidentSelectionEvent.class ).obtain();
 		incSelectionE.init( incRefId );

@@ -3,20 +3,20 @@ package com.ftloverdrive.event.incident;
 import com.ftloverdrive.event.AbstractOVDEvent;
 
 
-public class DamageConsequenceCreationEvent extends AbstractOVDEvent {
+public class ConsequenceDamageCreationEvent extends AbstractOVDEvent {
 
 	protected int cseqRefId = -1;
 	protected int damage = -1;
 
 
-	public DamageConsequenceCreationEvent() {
+	public ConsequenceDamageCreationEvent() {
 	}
 
 	/**
 	 * Pseudo-constructor.
 	 * 
 	 * @param consequenceRefId
-	 *            a reserved reference id for the new branch
+	 *            a reserved reference id for the new consequence
 	 * @param damage
 	 *            amount of damage to deal
 	 */

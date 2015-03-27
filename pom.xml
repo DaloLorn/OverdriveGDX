@@ -25,7 +25,19 @@
 			<id>gdx-nightlies</id>
 			<url>https://oss.sonatype.org/content/repositories/snapshots/</url>
 		</repository>
+		<repository>
+            <id>clojars</id>
+            <url>http://clojars.org/repo/</url>
+		</repository>
 	</repositories>
+
+    <dependencies>
+        <dependency>
+            <groupId>kryonet</groupId>
+            <artifactId>kryonet</artifactId>
+            <version>2.21</version>
+        </dependency>
+    </dependencies>
 
 	<build>
 		<plugins>

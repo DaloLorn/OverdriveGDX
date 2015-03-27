@@ -15,6 +15,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Cell;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.badlogic.gdx.scenes.scene2d.ui.VerticalGroup;
 import com.badlogic.gdx.scenes.scene2d.ui.Window;
 import com.badlogic.gdx.scenes.scene2d.utils.Align;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
@@ -26,11 +27,19 @@ import com.ftloverdrive.event.engine.DisposeListener;
 import com.ftloverdrive.event.incident.IncidentSelectionEvent;
 import com.ftloverdrive.io.OVDSkin;
 import com.ftloverdrive.model.incident.Consequence;
+import com.ftloverdrive.model.incident.DefaultBranchCriteria;
 import com.ftloverdrive.model.incident.IncidentModel;
 import com.ftloverdrive.model.incident.PlotBranch;
+import com.ftloverdrive.model.incident.PlotBranchCriteria;
+import com.ftloverdrive.model.incident.PlotBranchCriteria.CriteriaResult;
 import com.ftloverdrive.ui.ShaderLabel;
 
 
+/**
+ * Window used to display Incidents.
+ * 
+ * It ain't pretty, but UI code rarely is.
+ */
 public class IncidentDialog extends Window implements Disposable, EventListener {
 
 	private static final WindowStyle defaultWindowStyle = new WindowStyle( new BitmapFont(), new Color(), null );
@@ -43,31 +52,39 @@ public class IncidentDialog extends Window implements Disposable, EventListener 
 	protected static float lastX = -1;
 	protected static float lastTopY = -1;
 
+	// Separates choices from each other
 	protected int sepChoices = 0;
+	// Separates the incident text from consequence box
 	protected int sepTextConseq = 0;
+	// Separates the consequence box from choices table
 	protected int sepConseqChoice = 0;
 
 	// Size of a single repeating tile of the background
 	protected float frameBodyWidth = 0;
 	protected float frameBodyHeight = 0;
 
-	protected Array<DisposeListener> disposeListeners = new Array<DisposeListener>( false, 1 );
-
 	protected OverdriveContext context;
 	protected OVDSkin skin;
 
-	protected LabelStyle normalStyle;
-	protected LabelStyle hoverStyle;
+	protected LabelStyle stlNormal;
+	protected LabelStyle stlHover;
+	protected LabelStyle stlBlue;
+	protected LabelStyle stlDisabled;
 
 	protected ShaderLabel lblIncText;
-	protected Table choiceTable;
+	protected VerticalGroup vgChoices;
 	protected ConsequenceBox conseqBox;
+
+	protected PlotBranchCriteria branchCriteria;
 
 	// Only 10 keys on the numeric keyboard, so we can only support 10 hotkeyed plot branches
 	private int choiceCount = 0;
 	private PlotBranch[] choices = new PlotBranch[maxChoiceCount];
+	private int availableChoiceCount = 0;
 
+	private Array<DisposeListener> disposeListeners = new Array<DisposeListener>( false, 1 );
 	private boolean captureInput = false;
+	private boolean dragging = false;
 
 
 	public IncidentDialog( OverdriveContext srcContext ) {
@@ -80,13 +97,17 @@ public class IncidentDialog extends Window implements Disposable, EventListener 
 		setMovable( true );
 		setName( ACTOR_NAME );
 
+		branchCriteria = new DefaultBranchCriteria();
+
 		context.getAssetManager().load( SKIN_PATH, OVDSkin.class );
 		context.getAssetManager().finishLoading();
 		skin = context.getAssetManager().get( SKIN_PATH, OVDSkin.class );
 
 		LabelStyle incStyle = skin.get( "incident-text", LabelStyle.class );
-		normalStyle = skin.get( "choice-normal", LabelStyle.class );
-		hoverStyle = skin.get( "choice-hover", LabelStyle.class );
+		stlNormal = skin.get( "choice-normal", LabelStyle.class );
+		stlHover = skin.get( "choice-hover", LabelStyle.class );
+		stlBlue = skin.get( "choice-blue", LabelStyle.class );
+		stlDisabled = skin.get( "choice-disabled", LabelStyle.class );
 
 		// DistanceFieldFontShader fontShader = new DistanceFieldFontShader( 1.0f / 8.0f );
 
@@ -109,13 +130,15 @@ public class IncidentDialog extends Window implements Disposable, EventListener 
 		add( lblIncText );
 
 		conseqBox = new ConsequenceBox( skin );
+		conseqBox.align( Align.center );
 		row().center().spaceBottom( sepConseqChoice );
 		add( conseqBox );
 
-		choiceTable = new Table();
-		choiceTable.align( Align.left );
+		vgChoices = new VerticalGroup();
+		vgChoices.align( Align.left );
+		vgChoices.space( sepChoices );
 		row().expandX().fillX().left();
-		add( choiceTable );
+		add( vgChoices );
 
 		addListener( new IncidentDialogInputListener() );
 		setWidth( computePreferredWidth( skin.get( "window-width", Integer.class ) ) );
@@ -134,6 +157,16 @@ public class IncidentDialog extends Window implements Disposable, EventListener 
 	}
 
 	/**
+	 * Sets the PlotBranchCriteria that will be used to determine the appearance and
+	 * availability of choices.
+	 */
+	public void setPlotBranchCriteria( PlotBranchCriteria criteria ) {
+		if ( criteria == null )
+			throw new IllegalArgumentException( "Argument is null." );
+		branchCriteria = criteria;
+	}
+
+	/**
 	 * If set to true, this window will capture all input until it is dismissed.
 	 */
 	public void setCaptureInput( boolean block ) {
@@ -146,65 +179,116 @@ public class IncidentDialog extends Window implements Disposable, EventListener 
 	}
 
 	public void addChoice( final PlotBranch branch ) {
+		// Determine what kind of plot branch this is, so we can set its appearance appropriately
+		CriteriaResult criterion = branchCriteria.classify( context, branch );
+		// Branches that get classified as blue don't show up as such if they don't show spoilers
+		if ( criterion == CriteriaResult.BLUE && !branch.isSpoilerVisible() )
+			criterion = CriteriaResult.NORMAL;
+		else if ( criterion == CriteriaResult.INVISIBLE_UNAVAILABLE )
+			return;
+
+		final LabelStyle stlDefault;
+		if ( criterion == CriteriaResult.BLUE ) {
+			stlDefault = stlBlue;
+			availableChoiceCount++;
+		}
+		else if ( criterion == CriteriaResult.NORMAL ) {
+			stlDefault = stlNormal;
+			availableChoiceCount++;
+		}
+		else
+			stlDefault = stlDisabled;
+
+		// Keep track of branches
 		if ( choiceCount < maxChoiceCount )
 			choices[choiceCount] = branch;
 		choiceCount++;
 
-		StringBuilder buf = new StringBuilder();
-		buf.append( choiceCount );
-		buf.append( ". " );
-		buf.append( branch.getText() );
-
-		final PlotBranchLabel choice = new PlotBranchLabel( buf.toString(), normalStyle, hoverStyle );
+		// Create the label representing the plot branch
+		String choiceText = choiceCount + ". " + branch.getText();
+		final ShaderLabel choice = new ShaderLabel( choiceText, stlDefault );
+		choice.setAlignment( Align.top | Align.left, Align.center | Align.left );
+		choice.setWrap( true );
 		choice.setUserObject( branch );
 
+		// Create the box containing consequences of this branch's incident
 		final ConsequenceBox cBox = new ConsequenceBox( skin );
-		boolean hasConseqs = false;
+		boolean showBranchConseqBox = false;
 		if ( branch.isSpoilerVisible() && branch.getIncidentRefId() != -1 ) {
 			IncidentModel incModel = context.getReferenceManager().getObject( branch.getIncidentRefId(), IncidentModel.class );
-			int[] conseqRefIds = incModel.consequenceRefIds();
-			if ( conseqRefIds.length > 0 ) {
+			for ( int refId : incModel.consequenceRefIds() ) {
+				Consequence conseq = context.getReferenceManager().getObject( refId, Consequence.class );
+				if ( conseq.isSpoilable() ) {
+					conseq.placeConsequenceActor( context, cBox );
+					showBranchConseqBox = true;
+				}
+			}
+			if ( showBranchConseqBox ) {
 				cBox.setTouchable( Touchable.enabled );
 				cBox.setUserObject( branch );
-				for ( int refId : conseqRefIds ) {
-					Consequence conseq = context.getReferenceManager().getObject( refId, Consequence.class );
-					conseq.placeConsequenceActor( cBox );
-				}
-				hasConseqs = true;
+				if ( criterion == CriteriaResult.VISIBLE_UNAVAILABLE )
+					cBox.setStyleDisabled();
+				else if ( criterion == CriteriaResult.BLUE )
+					cBox.setStyleBlue();
 			}
 		}
 
+		// Position everything
 		final int conseqPad = 10;
-		float availableWidth = getBodyWidth() - ( hasConseqs ? ( cBox.getMinWidth() + conseqPad ) : 0 );
+		float availableWidth = getWidth() - getPadLeft() - getPadRight();
+		if ( showBranchConseqBox )
+			availableWidth += -cBox.getMinWidth() - conseqPad;
 		float w = getLabelWidth( choice, availableWidth );
-		choiceTable.row();
-		choiceTable.add( choice ).left().width( w ).spaceBottom( sepChoices );
 
-		if ( hasConseqs ) {
-			choiceTable.add( cBox ).left().spaceBottom( sepChoices ).spaceLeft( conseqPad );
-		}
+		final Table tbChoice = new Table();
+		tbChoice.setTouchable( Touchable.enabled );
+		tbChoice.setUserObject( branch );
+
+		tbChoice.add( choice ).left().width( w );
+		if ( showBranchConseqBox )
+			tbChoice.add( cBox ).left().spaceLeft( conseqPad );
+
+		vgChoices.addActor( tbChoice );
 
 		InputListener listener = new InputListener() {
 
 			public void enter( InputEvent event, float x, float y, int pointer, Actor fromActor ) {
-				choice.setStyle( hoverStyle );
-				cBox.setBorderTint( hoverStyle.fontColor );
+				if ( !dragging ) {
+					choice.setStyle( stlHover );
+					cBox.setStyleHover();
+				}
 			}
 
 			public void exit( InputEvent event, float x, float y, int pointer, Actor toActor ) {
-				// Exit events are apparently also sent on mouseUp/Down...
-				if ( toActor != choice && toActor != cBox ) {
-					choice.setStyle( normalStyle );
-					cBox.setBorderTint( normalStyle.fontColor );
+				// Exit/enter events are also sent on touchUp/Down...
+				if ( !dragging && toActor != tbChoice && toActor != choice && toActor != cBox ) {
+					choice.setStyle( stlDefault );
+					if ( stlDefault == stlNormal )
+						cBox.setStyleNormal();
+					else if ( stlDefault == stlBlue )
+						cBox.setStyleBlue();
+				}
+			}
+
+			@Override
+			public void touchUp( InputEvent event, float x, float y, int pointer, int button ) {
+				if ( !dragging ) {
+					choice.setStyle( stlHover );
+					cBox.setStyleHover();
 				}
 			}
 		};
-		choice.addListener( listener );
-		cBox.addListener( listener );
+
+		if ( criterion != CriteriaResult.VISIBLE_UNAVAILABLE )
+			tbChoice.addListener( listener );
+	}
+
+	public int countAvailableChoices() {
+		return availableChoiceCount;
 	}
 
 	public void addConsequence( Consequence conseq ) {
-		conseq.placeConsequenceActor( conseqBox );
+		conseq.placeConsequenceActor( context, conseqBox );
 	}
 
 	/*
@@ -218,7 +302,7 @@ public class IncidentDialog extends Window implements Disposable, EventListener 
 	 * The value returned is always greater than or equal to the one passed.
 	 */
 	public float computePreferredWidth( int w ) {
-		layout();
+		validate();
 		float bw = w - ( getPadLeft() + getPadRight() );
 		if ( bw % frameBodyWidth != 0 )
 			w += frameBodyWidth - bw % frameBodyWidth;
@@ -232,28 +316,29 @@ public class IncidentDialog extends Window implements Disposable, EventListener 
 	 * background image is tiled correctly.
 	 */
 	public float computePreferredHeight() {
-		layout();
+		validate();
 		float h = tableHeight( this );
 		if ( h % frameBodyHeight != 0 )
 			h += frameBodyHeight - h % frameBodyHeight;
 		h += getPadTop() + getPadBottom();
+		h += ( choiceCount - 1 ) * sepChoices;
 		return h;
 	}
 
 	private float tableHeight( Table t ) {
 		float result = 0;
 		Array<Cell> cells = t.getCells();
-		for ( int r = 0; r < t.getRows(); ++r ) {
+		for ( int row = 0; row < t.getRows(); ++row ) {
 			float maxH = 0;
-			for ( int c = 0; c < t.getColumns(); ++c ) {
-				int i = r * t.getColumns() + c;
+			for ( int col = 0; col < t.getColumns(); ++col ) {
+				int i = row * t.getColumns() + col;
 				if ( i >= cells.size )
 					continue;
-				Cell cell = cells.get( i );
-				float pad = cell.getComputedPadTop() + cell.getComputedPadBottom();
-				float ch = cell.getMinHeight() + pad;
-				if ( ch > maxH )
-					maxH = ch;
+				Cell c = cells.get( i );
+				float pad = c.getComputedPadTop() + c.getComputedPadBottom();
+				float cHeight = c.getMinHeight() + pad;
+				if ( cHeight > maxH )
+					maxH = cHeight;
 			}
 			result += maxH;
 		}
@@ -281,14 +366,17 @@ public class IncidentDialog extends Window implements Disposable, EventListener 
 	 * A "soft dispose", resets the dialog so that it can be reused by another incident.
 	 */
 	private void reset0() {
+		if ( choiceCount > maxChoiceCount )
+			choiceCount = maxChoiceCount;
 		for ( ; choiceCount > 0; ) {
 			--choiceCount;
 			choices[choiceCount] = null;
 		}
+		availableChoiceCount = 0;
 		conseqBox.clear();
 		// Hide the conseqTable to prevent it from flickering when the dialog is changing
 		conseqBox.setVisible( false );
-		choiceTable.clear();
+		vgChoices.clear();
 
 		fireDisposedEvent();
 		disposeListeners.clear();
@@ -305,6 +393,7 @@ public class IncidentDialog extends Window implements Disposable, EventListener 
 		stage.removeListener( this );
 
 		Pools.get( OverdriveContext.class ).free( context );
+		System.gc();
 	}
 
 	private void fireDisposedEvent() {
@@ -324,15 +413,15 @@ public class IncidentDialog extends Window implements Disposable, EventListener 
 	 * ==========================================================================
 	 */
 
-	private float getBodyWidth() {
-		return getWidth() - getPadLeft() - getPadRight();
-	}
-
 	private float getLabelWidth( Label l, float maxW ) {
 		return l.getStyle().font.getWrappedBounds( l.getText(), maxW ).width;
 	}
 
 	private void choiceSelected( OverdriveContext context, PlotBranch branch, float x, float y ) {
+		CriteriaResult criterion = branchCriteria.classify( context, branch );
+		if ( criterion == CriteriaResult.VISIBLE_UNAVAILABLE )
+			return;
+
 		int incRefId = branch.getIncidentRefId();
 		if ( incRefId == -1 ) {
 			// TODO: Send notification that incident ended, to unpause the game?
@@ -360,6 +449,8 @@ public class IncidentDialog extends Window implements Disposable, EventListener 
 
 	@Override
 	public boolean handle( Event event ) {
+		if ( event.isHandled() )
+			return true;
 		boolean handled = getListeners().get( 0 ).handle( event );
 		if ( isVisible() && event instanceof InputEvent )
 			handled = captureInput;
@@ -369,7 +460,6 @@ public class IncidentDialog extends Window implements Disposable, EventListener 
 
 	private class IncidentDialogInputListener extends InputListener {
 
-		boolean dragging = false;
 		float startX = -1, startY = -1;
 
 
@@ -392,10 +482,28 @@ public class IncidentDialog extends Window implements Disposable, EventListener 
 		}
 
 		@Override
+		public void touchUp( InputEvent event, float x, float y, int pointer, int button ) {
+			dragging = false;
+
+			Actor a = hit( x, y, true );
+			if ( a != null && a.getParent().isDescendantOf( vgChoices ) ) {
+				if ( a instanceof Label || a instanceof ConsequenceBox )
+					a = a.getParent();
+				// Choices' listener is not informed of these events, since they're sent through
+				// the dialog. Need to inform them manually.
+				for ( EventListener listener : a.getListeners() )
+					listener.handle( event );
+			}
+
+			if ( !captureInput )
+				super.touchUp( event, x, y, pointer, button );
+		}
+
+		@Override
 		public boolean touchDown( InputEvent e, float x, float y, int pointer, int button ) {
 			Actor target = e.getTarget();
 			dragging = false;
-			if ( target.isDescendantOf( choiceTable ) && e.getButton() == Buttons.LEFT ) {
+			if ( target.isDescendantOf( vgChoices ) && e.getButton() == Buttons.LEFT ) {
 				PlotBranch branch = (PlotBranch)target.getUserObject();
 				choiceSelected( context, branch, getX(), getTop() );
 				return true;

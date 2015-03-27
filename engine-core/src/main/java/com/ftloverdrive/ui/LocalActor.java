@@ -35,7 +35,7 @@ public abstract class LocalActor extends Actor implements EventListener {
 			if ( e.getType() == InputEvent.Type.touchDown ) {
 				LocalActorClickedEvent le = Pools.get( LocalActorClickedEvent.class ).obtain();
 				le.init( e );
-				context.getScreenEventManager().postDelayedInboundEvent( le );
+				context.getScreenEventManager().postDelayedEvent( le );
 			}
 		}
 		return false;

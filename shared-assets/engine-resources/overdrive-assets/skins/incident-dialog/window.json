@@ -5,11 +5,12 @@
   },
 
   com.badlogic.gdx.graphics.Color: {
-    white:  { a: 1, r: 1,    g: 1,    b: 1 },
-    yellow: { a: 1, r: 0.95, g: 1,    b: 0.31 },
-    red:    { a: 1, r: 1,    g: 0.2,  b: 0.2 },
-    green:  { a: 1, r: 0.39, g: 1,    b: 0.39 },
-    blue:   { a: 1, r: 0,    g: 0.76, b: 1 }
+    white:  { a: 1, r: 1,    g: 1,    b: 1     },
+    yellow: { a: 1, r: 0.95, g: 1,    b: 0.31  },
+    red:    { a: 1, r: 1,    g: 0.2,  b: 0.2   },
+    green:  { a: 1, r: 0.39, g: 1,    b: 0.39  },
+    blue:   { a: 1, r: 0,    g: 0.76, b: 1     },
+    gray:   { a: 1, r: 0.59, g: 0.59, b: 0.59  }
   },
 
   com.ftloverdrive.io.ImageSpec: {
@@ -32,8 +33,9 @@
     choice-normal: incident-text,
     choice-hover: { font: plot-font-bold, fontColor: yellow },
     choice-blue: { font: plot-font-bold, fontColor: blue },
+    choice-disabled: { font: plot-font-bold, fontColor: gray },
 
-    conseq-neutral: { font: plot-font, fontColor: white },
+    conseq-normal: { font: plot-font, fontColor: white },
     conseq-bad: { font: plot-font, fontColor: red },
     conseq-good: { font: plot-font, fontColor: green }
   },

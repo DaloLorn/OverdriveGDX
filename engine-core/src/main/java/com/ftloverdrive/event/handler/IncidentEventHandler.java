@@ -7,16 +7,20 @@ import com.ftloverdrive.core.OverdriveContext;
 import com.ftloverdrive.event.OVDEvent;
 import com.ftloverdrive.event.OVDEventHandler;
 import com.ftloverdrive.event.incident.BranchCreationEvent;
-import com.ftloverdrive.event.incident.DamageConsequenceCreationEvent;
+import com.ftloverdrive.event.incident.ConsequenceDamageCreationEvent;
+import com.ftloverdrive.event.incident.ConsequenceResourceCreationEvent;
 import com.ftloverdrive.event.incident.IncidentAddBranchEvent;
 import com.ftloverdrive.event.incident.IncidentAddConsequenceEvent;
 import com.ftloverdrive.event.incident.IncidentCreationEvent;
 import com.ftloverdrive.event.incident.IncidentSelectionEvent;
 import com.ftloverdrive.event.incident.IncidentTriggerEvent;
-import com.ftloverdrive.model.incident.DamageConsequence;
+import com.ftloverdrive.model.incident.Consequence;
+import com.ftloverdrive.model.incident.ConsequenceDamage;
+import com.ftloverdrive.model.incident.ConsequenceResource;
+import com.ftloverdrive.model.incident.DefaultPlotBranch;
+import com.ftloverdrive.model.incident.DeferredIncidentModel;
 import com.ftloverdrive.model.incident.IncidentModel;
 import com.ftloverdrive.model.incident.PlotBranch;
-import com.ftloverdrive.model.incident.PlotBranchModel;
 
 
 public class IncidentEventHandler implements OVDEventHandler {
@@ -35,7 +39,8 @@ public class IncidentEventHandler implements OVDEventHandler {
 
 				BranchCreationEvent.class,
 
-				DamageConsequenceCreationEvent.class
+				ConsequenceDamageCreationEvent.class,
+				ConsequenceResourceCreationEvent.class
 		};
 		listenerClasses = new Class[] {
 				};
@@ -57,7 +62,7 @@ public class IncidentEventHandler implements OVDEventHandler {
 			IncidentCreationEvent event = (IncidentCreationEvent)e;
 
 			String incUID = event.getIncidentUniqueId();
-			IncidentModel incModel = context.getBlueprintManager().createModel( incUID, incUID );
+			IncidentModel incModel = new DeferredIncidentModel( incUID );
 			incModel.setText( event.getIncidentText() );
 			int incRefId = event.getIncidentRefId();
 			context.getReferenceManager().addObject( incModel, incRefId );
@@ -103,20 +108,42 @@ public class IncidentEventHandler implements OVDEventHandler {
 		}
 
 		else if ( e instanceof BranchCreationEvent ) {
-			BranchCreationEvent event = (BranchCreationEvent)e;
+			BranchCreationEvent ev = (BranchCreationEvent)e;
 
-			int bRefId = event.getBranchRefId();
-			PlotBranch branch = new PlotBranchModel( event.getIncidentRefId(), event.getChoiceText(), event.isSpoilerVisible() );
+			int bRefId = ev.getBranchRefId();
+			PlotBranch branch = new DefaultPlotBranch( ev.getIncidentRefId(), ev.getChoiceText(),
+					ev.isSpoilerVisible(), ev.getRequirements() );
 			context.getReferenceManager().addObject( branch, bRefId );
+
+			int incRefId = ev.getIncidentRefId();
+			if ( incRefId != -1 ) {
+				IncidentModel incModel = context.getReferenceManager().getObject( incRefId, IncidentModel.class );
+				for ( int cseqRefId : incModel.consequenceRefIds() ) {
+					Consequence conseq = context.getReferenceManager().getObject( cseqRefId, Consequence.class );
+					conseq.addRequirements( branch );
+				}
+			}
 		}
 
 		// TODO: each type of consequence has a separate creation event -- ugly.
 		// Think of a better way of doing this (tricky / need more info)
-		else if ( e instanceof DamageConsequenceCreationEvent ) {
-			DamageConsequenceCreationEvent event = (DamageConsequenceCreationEvent)e;
 
-			int cRefId = event.getConsequenceRefId();
-			DamageConsequence consequence = new DamageConsequence( event.getDamage() );
+		// Could just use the data directly from the incident blueprint, look at it
+		// and retrieve a list of consequence blueprints that have been added to it
+		// and use them as though they were models. But this assumes both clients
+		// have the exact same set of blueprints
+		else if ( e instanceof ConsequenceDamageCreationEvent ) {
+			ConsequenceDamageCreationEvent ev = (ConsequenceDamageCreationEvent)e;
+
+			int cRefId = ev.getConsequenceRefId();
+			ConsequenceDamage consequence = new ConsequenceDamage( ev.getDamage() );
+			context.getReferenceManager().addObject( consequence, cRefId );
+		}
+		else if ( e instanceof ConsequenceResourceCreationEvent ) {
+			ConsequenceResourceCreationEvent ev = (ConsequenceResourceCreationEvent)e;
+
+			int cRefId = ev.getConsequenceRefId();
+			ConsequenceResource consequence = new ConsequenceResource( ev.getResource(), ev.getAmount(), ev.getRequires() );
 			context.getReferenceManager().addObject( consequence, cRefId );
 		}
 	}
@@ -143,8 +170,11 @@ public class IncidentEventHandler implements OVDEventHandler {
 			Pools.get( BranchCreationEvent.class ).free( (BranchCreationEvent)e );
 		}
 
-		else if ( e.getClass() == DamageConsequenceCreationEvent.class ) {
-			Pools.get( DamageConsequenceCreationEvent.class ).free( (DamageConsequenceCreationEvent)e );
+		else if ( e.getClass() == ConsequenceDamageCreationEvent.class ) {
+			Pools.get( ConsequenceDamageCreationEvent.class ).free( (ConsequenceDamageCreationEvent)e );
+		}
+		else if ( e.getClass() == ConsequenceResourceCreationEvent.class ) {
+			Pools.get( ConsequenceResourceCreationEvent.class ).free( (ConsequenceResourceCreationEvent)e );
 		}
 	}
 }
