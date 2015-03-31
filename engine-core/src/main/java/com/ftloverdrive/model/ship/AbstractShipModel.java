@@ -6,12 +6,11 @@ import com.ftloverdrive.core.OverdriveContext;
 import com.ftloverdrive.event.ship.ShipPropertyEvent;
 import com.ftloverdrive.io.ImageSpec;
 import com.ftloverdrive.model.AbstractOVDModel;
-import com.ftloverdrive.model.Damagable;
 import com.ftloverdrive.model.NamedProperties;
 import com.ftloverdrive.util.OVDConstants;
 
 
-public class AbstractShipModel extends AbstractOVDModel implements ShipModel, Damagable {
+public class AbstractShipModel extends AbstractOVDModel implements ShipModel {
 
 	protected NamedProperties shipProperties = new NamedProperties();
 
@@ -57,9 +56,10 @@ public class AbstractShipModel extends AbstractOVDModel implements ShipModel, Da
 		shipProperties.setInt( OVDConstants.WEAPON_SLOTS, 0 );
 		shipProperties.setInt( OVDConstants.DRONE_SLOTS, 0 );
 		shipProperties.setInt( OVDConstants.AUGMENT_SLOTS, 0 );
-		shipProperties.setInt( OVDConstants.CREW_SLOTS, 1 );
+		shipProperties.setInt( OVDConstants.CREW_SLOTS, 8 );
+		shipProperties.setString( OVDConstants.BLUEPRINT_NAME, "DEFAULT" );
 		shipLayout = new ShipLayout();
-		crewArray = new Array<Integer>( true, 8 );
+		crewArray = new Array<Integer>( true, shipProperties.getInt( OVDConstants.CREW_SLOTS ) );
 	}
 
 

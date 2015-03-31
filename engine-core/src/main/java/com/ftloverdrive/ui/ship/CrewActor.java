@@ -194,7 +194,8 @@ public class CrewActor extends AmbulActor
 				}
 			}
 			else {
-				// If the crew is not currently aboard the ship (ie. is boarding), then there's no way they can get there
+				// If the crew is not currently aboard the ship (ie. is boarding), then there's no way they can get there,
+				// so just ignore the order.
 			}
 		}
 	}

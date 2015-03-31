@@ -2,7 +2,6 @@ package com.ftloverdrive.ui.screen;
 
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
-import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.utils.Array;
@@ -32,12 +31,13 @@ import com.ftloverdrive.model.DefaultGameModel;
 import com.ftloverdrive.model.DefaultPlayerModel;
 import com.ftloverdrive.model.GameModel;
 import com.ftloverdrive.model.PlayerModel;
+import com.ftloverdrive.model.incident.RequirementShip;
 import com.ftloverdrive.model.ship.ShipModel;
 import com.ftloverdrive.net.NetTest;
 import com.ftloverdrive.ui.ShatteredImage;
+import com.ftloverdrive.ui.hud.PlayerScrapMonitor;
 import com.ftloverdrive.ui.hud.PlayerShipDoorHighlighter;
 import com.ftloverdrive.ui.hud.PlayerShipHullMonitor;
-import com.ftloverdrive.ui.ship.CrewActor;
 import com.ftloverdrive.ui.ship.ShipActor;
 import com.ftloverdrive.util.OVDConstants;
 
@@ -45,16 +45,11 @@ import com.ftloverdrive.util.OVDConstants;
 public class TestScreen extends BaseScreen {
 
 	private TextureAtlas bgAtlas;
-	private TextureAtlas rootAtlas;
-	private TextureAtlas miscAtlas;
-
-	private Matrix4 projMatrix;
 
 	private PlayerShipHullMonitor playerShipHullMonitor;
+	private PlayerScrapMonitor playerScrapMonitor;
 	private PlayerShipDoorHighlighter doorHighlighter;
 	private ShipActor shipActor;
-
-	private CrewActor selectedActor = null;
 
 
 	public TestScreen( OverdriveContext srcContext ) {
@@ -137,6 +132,11 @@ public class TestScreen extends BaseScreen {
 		playerShipHullMonitor.setPosition( 0, hudStage.getHeight() - playerShipHullMonitor.getHeight() );
 		hudStage.addActor( playerShipHullMonitor );
 
+		playerScrapMonitor = new PlayerScrapMonitor( context );
+		playerScrapMonitor.setPosition( playerShipHullMonitor.getWidth(),
+				hudStage.getHeight() - playerScrapMonitor.getHeight() );
+		hudStage.addActor( playerScrapMonitor );
+
 		doorHighlighter = new PlayerShipDoorHighlighter( context );
 		doorHighlighter.setVisible( false );
 		hudStage.addActor( doorHighlighter );
@@ -180,6 +180,9 @@ public class TestScreen extends BaseScreen {
 
 		eventManager.addEventListener( playerShipHullMonitor, GamePlayerShipChangeListener.class );
 		eventManager.addEventListener( playerShipHullMonitor, ShipPropertyListener.class );
+
+		eventManager.addEventListener( playerScrapMonitor, GamePlayerShipChangeListener.class );
+		eventManager.addEventListener( playerScrapMonitor, ShipPropertyListener.class );
 
 		eventManager.addEventListener( shipActor, GamePlayerShipChangeListener.class );
 		eventManager.addEventListener( shipActor, ShipPropertyListener.class );
@@ -234,9 +237,7 @@ public class TestScreen extends BaseScreen {
 	}
 
 	private void incidentWindowDemo() {
-		String loremIpsum = "Lorem ipsum dolor sit amet, consectetur adipisicing elit, " +
-				"sed do eiusmod tempor incididunt ut labore et dolore magna aliqua." +
-				"\n\nThis window is draggable.\n\n" +
+		String loremIpsum = "This window is draggable.\n\n" +
 				"This window intercepts all user input while it is visible. " +
 				"Click on the choice below (or press corresponding number key) to dismiss the window.";
 
@@ -247,7 +248,8 @@ public class TestScreen extends BaseScreen {
 		PlotBranchBlueprint branchBlueprint = new PlotBranchBlueprint( "TEST_INCIDENT_2",
 				"Go to event 2. Also a branch with a very long selection text that hopefully will wrap correctly." );
 		incBlueprint.addPlotBranch( branchBlueprint );
-		branchBlueprint = new PlotBranchBlueprint( "TEST_INCIDENT_3", "Need moar scrap!" );
+		branchBlueprint = new PlotBranchBlueprint( "TEST_INCIDENT_3", "(Test Ship) Need moar scrap!" );
+		branchBlueprint.addRequirement( new RequirementShip( "DEFAULT" ) );
 		incBlueprint.addPlotBranch( branchBlueprint );
 		incBlueprint.addPlotBranch( new PlotBranchBlueprint() );
 
@@ -270,7 +272,7 @@ public class TestScreen extends BaseScreen {
 
 		incBlueprint = new IncidentBlueprint( "TEST_INCIDENT_3" );
 		incBlueprint.setTextTemplate( "Requirement test" );
-		incBlueprint.addConsequence( new ConsequenceResourceBlueprint( OVDConstants.SCRAP, -60, -50 ) );
+		incBlueprint.addConsequence( new ConsequenceResourceBlueprint( OVDConstants.SCRAP, -50, -60 ) );
 		incBlueprint.addConsequence( new ConsequenceResourceBlueprint( OVDConstants.FUEL, 1, 3 ) );
 		incBlueprint.addPlotBranch( branchBlueprint );
 		context.getBlueprintManager().storeBlueprint( "TEST_INCIDENT_3", incBlueprint );
@@ -294,6 +296,8 @@ public class TestScreen extends BaseScreen {
 
 		// HUD
 		playerShipHullMonitor.setPosition( 0, hudStage.getHeight() - playerShipHullMonitor.getHeight() );
+		playerScrapMonitor.setPosition( playerShipHullMonitor.getWidth(),
+				hudStage.getHeight() - playerScrapMonitor.getHeight() );
 		// Main
 		shipActor.setPosition( 350, mainStage.getHeight() - shipActor.getHeight() - 170 );
 
@@ -325,6 +329,7 @@ public class TestScreen extends BaseScreen {
 	public void dispose() {
 		hudStage.dispose();
 		playerShipHullMonitor.dispose();
+		playerScrapMonitor.dispose();
 		shipActor.dispose();
 		context.getAssetManager().unload( OVDConstants.BKG_ATLAS );
 		context.getAssetManager().unload( OVDConstants.ROOT_ATLAS );

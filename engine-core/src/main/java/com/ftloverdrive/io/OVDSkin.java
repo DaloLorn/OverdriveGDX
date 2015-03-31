@@ -15,12 +15,14 @@ import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.Json.ReadOnlySerializer;
 import com.badlogic.gdx.utils.JsonValue;
 import com.badlogic.gdx.utils.SerializationException;
+import com.ftloverdrive.ui.DistanceFieldShader;
 import com.ftloverdrive.ui.TiledNinePatchDrawable;
 
 
 /**
  * A customized Skin that can load fonts from any path that the game itself can load.
- * Also capable of loading truetype fonts, and TiledNinePatchDrawables.
+ * Also capable of loading truetype fonts, and TiledNinePatchDrawables. Doesn't require
+ * an .atlas file with the same name as the skin.
  * 
  * Stores a reference to the AssetManager as a field. Not very elegant, or even
  * architecturally sound, but allows the skin to get a hold of a TextureAtlas, if it is
@@ -134,6 +136,23 @@ public class OVDSkin extends Skin {
 			public FileHandle read( Json json, JsonValue jsonData, Class type ) {
 				FileHandle fh = resolve( skinFile, json.readValue( "path", String.class, jsonData ) );
 				return fh;
+			}
+		} );
+
+		json.setSerializer( DistanceFieldShader.class, new ReadOnlySerializer<DistanceFieldShader>() {
+
+			public DistanceFieldShader read( Json json, JsonValue jsonData, Class type ) {
+				float smoothing = json.readValue( "smoothing", Float.class, jsonData );
+				String key = DistanceFieldShader.class.getName() + "?" + smoothing;
+				DistanceFieldShader shader = null;
+				if ( skin.has( key, DistanceFieldShader.class ) ) {
+					shader = skin.get( key, DistanceFieldShader.class );
+				}
+				else {
+					shader = new DistanceFieldShader( smoothing );
+					skin.add( key, shader, DistanceFieldShader.class );
+				}
+				return shader;
 			}
 		} );
 

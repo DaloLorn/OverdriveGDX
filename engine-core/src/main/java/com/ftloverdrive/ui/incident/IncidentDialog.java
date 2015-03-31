@@ -13,7 +13,6 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.scenes.scene2d.ui.Cell;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
-import com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.VerticalGroup;
 import com.badlogic.gdx.scenes.scene2d.ui.Window;
@@ -33,6 +32,7 @@ import com.ftloverdrive.model.incident.PlotBranch;
 import com.ftloverdrive.model.incident.PlotBranchCriteria;
 import com.ftloverdrive.model.incident.PlotBranchCriteria.CriteriaResult;
 import com.ftloverdrive.ui.ShaderLabel;
+import com.ftloverdrive.ui.ShaderLabel.ShaderLabelStyle;
 
 
 /**
@@ -52,12 +52,14 @@ public class IncidentDialog extends Window implements Disposable, EventListener 
 	protected static float lastX = -1;
 	protected static float lastTopY = -1;
 
-	// Separates choices from each other
+	// Separates branches from each other
 	protected int sepChoices = 0;
 	// Separates the incident text from consequence box
 	protected int sepTextConseq = 0;
-	// Separates the consequence box from choices table
-	protected int sepConseqChoice = 0;
+	// Separates the consequence box from branches table
+	protected int sepConseqBranches = 0;
+	// Separates a branch's spoiler box from the branch label
+	protected int sepBranchSpoiler = 0;
 
 	// Size of a single repeating tile of the background
 	protected float frameBodyWidth = 0;
@@ -66,10 +68,10 @@ public class IncidentDialog extends Window implements Disposable, EventListener 
 	protected OverdriveContext context;
 	protected OVDSkin skin;
 
-	protected LabelStyle stlNormal;
-	protected LabelStyle stlHover;
-	protected LabelStyle stlBlue;
-	protected LabelStyle stlDisabled;
+	protected ShaderLabelStyle stlNormal;
+	protected ShaderLabelStyle stlHover;
+	protected ShaderLabelStyle stlBlue;
+	protected ShaderLabelStyle stlDisabled;
 
 	protected ShaderLabel lblIncText;
 	protected VerticalGroup vgChoices;
@@ -103,17 +105,18 @@ public class IncidentDialog extends Window implements Disposable, EventListener 
 		context.getAssetManager().finishLoading();
 		skin = context.getAssetManager().get( SKIN_PATH, OVDSkin.class );
 
-		LabelStyle incStyle = skin.get( "incident-text", LabelStyle.class );
-		stlNormal = skin.get( "choice-normal", LabelStyle.class );
-		stlHover = skin.get( "choice-hover", LabelStyle.class );
-		stlBlue = skin.get( "choice-blue", LabelStyle.class );
-		stlDisabled = skin.get( "choice-disabled", LabelStyle.class );
+		ShaderLabelStyle incStyle = skin.get( "incident-text", ShaderLabelStyle.class );
+		stlNormal = skin.get( "choice-normal", ShaderLabelStyle.class );
+		stlHover = skin.get( "choice-hover", ShaderLabelStyle.class );
+		stlBlue = skin.get( "choice-blue", ShaderLabelStyle.class );
+		stlDisabled = skin.get( "choice-disabled", ShaderLabelStyle.class );
 
 		// DistanceFieldFontShader fontShader = new DistanceFieldFontShader( 1.0f / 8.0f );
 
 		sepChoices = skin.get( "choice-separator", Integer.class );
 		sepTextConseq = skin.get( "text-conseq-separator", Integer.class );
-		sepConseqChoice = skin.get( "conseq-choice-separator", Integer.class );
+		sepConseqBranches = skin.get( "conseq-choice-separator", Integer.class );
+		sepBranchSpoiler = skin.get( "branch-spoiler-separator", Integer.class );
 
 		WindowStyle wndStyle = skin.get( "window-style", WindowStyle.class );
 		setStyle( wndStyle );
@@ -131,7 +134,7 @@ public class IncidentDialog extends Window implements Disposable, EventListener 
 
 		conseqBox = new ConsequenceBox( skin );
 		conseqBox.align( Align.center );
-		row().center().spaceBottom( sepConseqChoice );
+		row().center().spaceBottom( sepConseqBranches );
 		add( conseqBox );
 
 		vgChoices = new VerticalGroup();
@@ -148,10 +151,10 @@ public class IncidentDialog extends Window implements Disposable, EventListener 
 		conseqBox.setVisible( show );
 		if ( show ) {
 			getCell( lblIncText ).spaceBottom( sepTextConseq );
-			getCell( conseqBox ).spaceBottom( sepConseqChoice );
+			getCell( conseqBox ).spaceBottom( sepConseqBranches );
 		}
 		else {
-			getCell( lblIncText ).spaceBottom( sepConseqChoice );
+			getCell( lblIncText ).spaceBottom( sepConseqBranches );
 			getCell( conseqBox ).spaceBottom( 0 );
 		}
 	}
@@ -161,8 +164,6 @@ public class IncidentDialog extends Window implements Disposable, EventListener 
 	 * availability of choices.
 	 */
 	public void setPlotBranchCriteria( PlotBranchCriteria criteria ) {
-		if ( criteria == null )
-			throw new IllegalArgumentException( "Argument is null." );
 		branchCriteria = criteria;
 	}
 
@@ -182,12 +183,13 @@ public class IncidentDialog extends Window implements Disposable, EventListener 
 		// Determine what kind of plot branch this is, so we can set its appearance appropriately
 		CriteriaResult criterion = branchCriteria.classify( context, branch );
 		// Branches that get classified as blue don't show up as such if they don't show spoilers
+		// TODO: Add a separate boolean for this?
 		if ( criterion == CriteriaResult.BLUE && !branch.isSpoilerVisible() )
 			criterion = CriteriaResult.NORMAL;
 		else if ( criterion == CriteriaResult.INVISIBLE_UNAVAILABLE )
 			return;
 
-		final LabelStyle stlDefault;
+		final ShaderLabelStyle stlDefault;
 		if ( criterion == CriteriaResult.BLUE ) {
 			stlDefault = stlBlue;
 			availableChoiceCount++;
@@ -234,10 +236,9 @@ public class IncidentDialog extends Window implements Disposable, EventListener 
 		}
 
 		// Position everything
-		final int conseqPad = 10;
 		float availableWidth = getWidth() - getPadLeft() - getPadRight();
 		if ( showBranchConseqBox )
-			availableWidth += -cBox.getMinWidth() - conseqPad;
+			availableWidth += -cBox.getMinWidth() - sepBranchSpoiler;
 		float w = getLabelWidth( choice, availableWidth );
 
 		final Table tbChoice = new Table();
@@ -246,7 +247,7 @@ public class IncidentDialog extends Window implements Disposable, EventListener 
 
 		tbChoice.add( choice ).left().width( w );
 		if ( showBranchConseqBox )
-			tbChoice.add( cBox ).left().spaceLeft( conseqPad );
+			tbChoice.add( cBox ).left().spaceLeft( sepBranchSpoiler );
 
 		vgChoices.addActor( tbChoice );
 
@@ -318,10 +319,10 @@ public class IncidentDialog extends Window implements Disposable, EventListener 
 	public float computePreferredHeight() {
 		validate();
 		float h = tableHeight( this );
+		h += ( availableChoiceCount - 1 ) * sepChoices;
 		if ( h % frameBodyHeight != 0 )
 			h += frameBodyHeight - h % frameBodyHeight;
 		h += getPadTop() + getPadBottom();
-		h += ( choiceCount - 1 ) * sepChoices;
 		return h;
 	}
 

@@ -45,6 +45,14 @@ public class ShaderLabel extends Label {
 
 	public static class ShaderLabelStyle extends LabelStyle {
 
-		public String shader;
+		public DistanceFieldShader shader;
+		
+		public ShaderLabelStyle() {
+		}
+		
+		public ShaderLabelStyle(ShaderLabelStyle style) {
+			super(style);
+			shader = style.shader;
+		}
 	}
 }

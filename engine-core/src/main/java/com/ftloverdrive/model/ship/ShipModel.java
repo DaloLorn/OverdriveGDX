@@ -1,11 +1,12 @@
 package com.ftloverdrive.model.ship;
 
 import com.ftloverdrive.io.ImageSpec;
+import com.ftloverdrive.model.Damagable;
 import com.ftloverdrive.model.NamedProperties;
 import com.ftloverdrive.model.OVDModel;
 
 
-public interface ShipModel extends OVDModel {
+public interface ShipModel extends OVDModel, Damagable {
 
 	public NamedProperties getProperties();
 

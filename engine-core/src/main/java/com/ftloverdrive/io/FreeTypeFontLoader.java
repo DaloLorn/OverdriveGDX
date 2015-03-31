@@ -9,6 +9,7 @@ import com.badlogic.gdx.assets.loaders.AsynchronousAssetLoader;
 import com.badlogic.gdx.assets.loaders.BitmapFontLoader.BitmapFontParameter;
 import com.badlogic.gdx.assets.loaders.FileHandleResolver;
 import com.badlogic.gdx.files.FileHandle;
+import com.badlogic.gdx.graphics.Texture.TextureFilter;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator.FreeTypeBitmapFontData;
@@ -68,11 +69,12 @@ public class FreeTypeFontLoader extends AsynchronousAssetLoader<BitmapFont, Bitm
 		boolean flip = parameter != null ? parameter.flip : false;
 
 		FreeTypeFontGenerator generator = new FreeTypeFontGenerator( file );
+		generator.scaleForPixelHeight( (int)Math.ceil( fontSize ) );
 		FreeTypeFontParameter param = new FreeTypeFontParameter();
 		// Additional params for distance field fonts:
 		// param.genMipMaps = true;
-		// param.minFilter = TextureFilter.Linear;
-		// param.magFilter = TextureFilter.Linear;
+		param.minFilter = TextureFilter.Nearest;
+		param.magFilter = TextureFilter.MipMapLinearNearest;
 		param.size = fontSize;
 		param.characters = FreeTypeFontGenerator.DEFAULT_CHARS;
 		param.flip = flip;

@@ -24,20 +24,25 @@
     }
   },
 
+  com.ftloverdrive.ui.DistanceFieldShader: {
+    thin: { smoothing: 0.5f },
+    bold: { smoothing: 0.3f }
+  },
+
   // Fields the game is hardcoded to look for.
   // Values can be changed freely, but entry names must remain the same.
 
-  com.badlogic.gdx.scenes.scene2d.ui.Label$LabelStyle: {
-    incident-text: { font: plot-font-bold, fontColor: white },
+  com.ftloverdrive.ui.ShaderLabel$ShaderLabelStyle: {
+    incident-text: { font: plot-font-bold, fontColor: white, shader: bold },
 
     choice-normal: incident-text,
-    choice-hover: { font: plot-font-bold, fontColor: yellow },
-    choice-blue: { font: plot-font-bold, fontColor: blue },
-    choice-disabled: { font: plot-font-bold, fontColor: gray },
+    choice-hover: { font: plot-font-bold, fontColor: yellow, shader: bold },
+    choice-blue: { font: plot-font-bold, fontColor: blue, shader: bold },
+    choice-disabled: { font: plot-font-bold, fontColor: gray, shader: bold },
 
-    conseq-normal: { font: plot-font, fontColor: white },
-    conseq-bad: { font: plot-font, fontColor: red },
-    conseq-good: { font: plot-font, fontColor: green }
+    conseq-normal: { font: plot-font, fontColor: white, shader: thin },
+    conseq-bad: { font: plot-font, fontColor: red, shader: thin },
+    conseq-good: { font: plot-font, fontColor: green, shader: thin }
   },
 
   com.badlogic.gdx.scenes.scene2d.ui.Window$WindowStyle: {
@@ -53,6 +58,8 @@
     conseq-choice-separator: 35,
     // The vertical spacing between choices
     choice-separator: 15,
+    // Separates a branch's spoiler box from the branch label
+    branch-spoiler-separator: 10,
     // Total width of the incident dialog window
     window-width: 600
   }

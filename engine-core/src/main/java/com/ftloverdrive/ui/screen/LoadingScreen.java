@@ -112,7 +112,7 @@ public class LoadingScreen implements Disposable, OVDScreen {
 		context.getAssetManager().load( OVDConstants.MENU_ATLAS, TextureAtlas.class );
 		//context.getAssetManager().load( OVDConstants.WEAPONS_ATLAS, TextureAtlas.class );
 
-		// XXX: Commented out script loading, moving stuff from scripts to hard-code directly
+		// XXX: Re-enable once scripts are actually needed for something
 		/*
 		// Preload scripts.
 		FileHandle scriptsFolder = context.getFileHandleResolver().resolve("overdrive-assets/scripts");
@@ -204,9 +204,8 @@ public class LoadingScreen implements Disposable, OVDScreen {
 
 		// Incrementally load assets until completely done.
 		if ( context.getAssetManager().update() ) {
-			//if ( Gdx.input.isTouched() ) {
+			//if ( Gdx.input.isTouched() )
 				context.getScreenManager().continueToNextScreen();
-			//}
 		}
 
 		// Interpolate the percentage to make it more smooth.

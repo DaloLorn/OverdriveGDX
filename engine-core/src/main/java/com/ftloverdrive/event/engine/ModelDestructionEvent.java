@@ -4,7 +4,9 @@ import com.ftloverdrive.event.AbstractOVDEvent;
 
 
 /**
- * Signal event telling the game to release the Model associated with the ref id.
+ * A signal event telling the game to release the Model associated with the ref id.
+ * If the model also implements the Disposable interface, then the dispose() method
+ * will be called.
  */
 public class ModelDestructionEvent extends AbstractOVDEvent {
 

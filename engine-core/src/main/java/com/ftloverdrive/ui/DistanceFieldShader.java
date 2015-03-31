@@ -10,7 +10,7 @@ import com.badlogic.gdx.graphics.glutils.ShaderProgram;
  * @author http://badlogicgames.com/forum/viewtopic.php?f=11&t=9881#p44705
  *
  */
-public class DistanceFieldFontShader extends ShaderProgram {
+public class DistanceFieldShader extends ShaderProgram {
 
 	private static final String vertex;
 	private static final String fragment;
@@ -58,7 +58,10 @@ public class DistanceFieldFontShader extends ShaderProgram {
 	}
 
 
-	public DistanceFieldFontShader( float smoothingFactor ) {
+	public DistanceFieldShader( float smoothingFactor ) {
 		super( vertex, String.format( fragment, smoothingFactor ) );
+		if ( !isCompiled() ) {
+			throw new RuntimeException( "Failed to compile shader:\n" + getLog() );
+		}
 	}
 }

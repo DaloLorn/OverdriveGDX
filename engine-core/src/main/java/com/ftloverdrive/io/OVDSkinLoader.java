@@ -37,8 +37,9 @@ public class OVDSkinLoader extends AsynchronousAssetLoader<OVDSkin, OVDSkinLoade
 		Array<AssetDescriptor> deps = new Array();
 		if ( parameter == null ) {
 			FileHandle atlasFile = new FileHandle( file.pathWithoutExtension() + ".atlas" );
-			if ( atlasFile.exists() )
+			if ( atlasFile.exists() ) {
 				deps.add( new AssetDescriptor( atlasFile, TextureAtlas.class ) );
+			}
 		}
 		else if ( parameter.textureAtlasPath != null ) {
 			deps.add( new AssetDescriptor( parameter.textureAtlasPath, TextureAtlas.class ) );
@@ -76,12 +77,18 @@ public class OVDSkinLoader extends AsynchronousAssetLoader<OVDSkin, OVDSkinLoade
 			textureAtlasPath = parameter.textureAtlasPath;
 			resources = parameter.resources;
 		}
-		TextureAtlas atlas = manager.get( textureAtlasPath, TextureAtlas.class );
-		OVDSkin skin = new OVDSkin( atlas, manager, resolver );
+
+		OVDSkin skin;
+		if ( manager.isLoaded( textureAtlasPath, TextureAtlas.class ) ) {
+			TextureAtlas atlas = manager.get( textureAtlasPath, TextureAtlas.class );
+			skin = new OVDSkin( atlas, manager, resolver );
+		}
+		else
+			skin = new OVDSkin( manager, resolver );
+
 		if ( resources != null ) {
-			for ( Entry<String, Object> entry : resources.entries() ) {
+			for ( Entry<String, Object> entry : resources.entries() )
 				skin.add( entry.key, entry.value );
-			}
 		}
 		skin.load( file );
 		return skin;

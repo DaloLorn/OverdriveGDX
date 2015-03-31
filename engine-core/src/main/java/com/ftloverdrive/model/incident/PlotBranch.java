@@ -3,10 +3,6 @@ package com.ftloverdrive.model.incident;
 
 /**
  * What the original game referred to as an event choice.
- *
- * TODO: A PlotBranchCriteria class to decide whether this branch is a
- * normal choice, a blue option, or unavailable (if the Overdrive context
- * doesn't meet arbitrary reqs).
  */
 public interface PlotBranch {
 
@@ -22,5 +18,9 @@ public interface PlotBranch {
 	/** Returns the requirements that have to be satisfied in order to make this branch clickable */
 	public PlotBranchRequirement[] getRequirements();
 
+	/**
+	 * Adds a new requirement to this branch. Needed mostly for Consequences that can optionally
+	 * add requirements, eg. negative ResourceConsequence
+	 */
 	public void addRequirement( PlotBranchRequirement req );
 }

@@ -12,6 +12,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.scenes.scene2d.utils.NinePatchDrawable;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.ftloverdrive.io.OVDSkin;
+import com.ftloverdrive.ui.ShaderLabel.ShaderLabelStyle;
 
 
 /**
@@ -20,9 +21,9 @@ import com.ftloverdrive.io.OVDSkin;
  */
 public class ConsequenceBox extends Table {
 
-	private final LabelStyle stlGood;
-	private final LabelStyle stlBad;
-	private final LabelStyle stlNormal;
+	private final ShaderLabelStyle stlGood;
+	private final ShaderLabelStyle stlBad;
+	private final ShaderLabelStyle stlNormal;
 
 	private final Color cNormal;
 	private final Color cHover;
@@ -39,16 +40,16 @@ public class ConsequenceBox extends Table {
 
 
 	public ConsequenceBox( OVDSkin skin ) {
-		stlGood = new LabelStyle( skin.get( "conseq-good", LabelStyle.class ) );
-		stlNormal = new LabelStyle( skin.get( "conseq-normal", LabelStyle.class ) );
-		stlBad = new LabelStyle( skin.get( "conseq-bad", LabelStyle.class ) );
+		stlGood = new ShaderLabelStyle( skin.get( "conseq-good", ShaderLabelStyle.class ) );
+		stlNormal = new ShaderLabelStyle( skin.get( "conseq-normal", ShaderLabelStyle.class ) );
+		stlBad = new ShaderLabelStyle( skin.get( "conseq-bad", ShaderLabelStyle.class ) );
 
 		cNormal = stlNormal.fontColor;
 		cGood = stlGood.fontColor;
 		cBad = stlBad.fontColor;
-		cHover = skin.get( "choice-hover", LabelStyle.class ).fontColor;
-		cBlue = skin.get( "choice-blue", LabelStyle.class ).fontColor;
-		cDisabled = skin.get( "choice-disabled", LabelStyle.class ).fontColor;
+		cHover = skin.get( "choice-hover", ShaderLabelStyle.class ).fontColor;
+		cBlue = skin.get( "choice-blue", ShaderLabelStyle.class ).fontColor;
+		cDisabled = skin.get( "choice-disabled", ShaderLabelStyle.class ).fontColor;
 
 		// libGDX makes it prohibitively hard to draw a simple rectangle -- need to use textures instead...
 		TextureRegion region = skin.getAtlas().findRegion( "consequence-border-normal" );

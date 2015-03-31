@@ -93,7 +93,7 @@ public class DeferredIncidentModel extends AbstractOVDModel implements IncidentM
 			popupStage.addListener( dialog );
 		}
 
-		// Position depends on size, so set it last
+		// Position depends on size and stage, so set it last
 		dialog.usePreferredPosition();
 	}
 

@@ -19,17 +19,15 @@ import com.ftloverdrive.model.OVDModel;
  * This allows to only create the necessary incidents, which makes event loops possible.
  * Of course, we could only create a single incident -- the one currently being displayed -- but
  * then we would be unable to show the outcomes of random Consequences (ie. random hull damage)
- * in plot branch spoiler texts.
+ * in plot branch spoilers.
  */
 public interface IncidentModel extends OVDModel {
 
-	/** Returns a unique identifier for this Incident. */
+	/** Returns the identifier of this Incident's blueprint. */
 	public String getIncidentId();
 
-
-	/** Triggers Consequences and notifies the UI to represent this model, with a Window. */
+	/** Triggers Consequences and notifies the UI to represent this model, with an IncidentDialog. */
 	public void execute( OverdriveContext context );
-
 
 	/**
 	 * Returns text to show when triggered, or null.

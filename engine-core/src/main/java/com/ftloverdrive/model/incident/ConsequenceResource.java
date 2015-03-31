@@ -5,9 +5,11 @@ import com.badlogic.gdx.scenes.scene2d.ui.Cell;
 import com.badlogic.gdx.scenes.scene2d.ui.HorizontalGroup;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.utils.Disposable;
+import com.badlogic.gdx.utils.Pools;
 import com.ftloverdrive.core.OverdriveContext;
+import com.ftloverdrive.event.ship.ShipPropertyEvent;
 import com.ftloverdrive.model.AbstractOVDModel;
-import com.ftloverdrive.model.PlayerModel;
+import com.ftloverdrive.model.GameModel;
 import com.ftloverdrive.ui.ShaderLabel;
 import com.ftloverdrive.ui.incident.ConsequenceBox;
 import com.ftloverdrive.util.OVDConstants;
@@ -49,19 +51,23 @@ public class ConsequenceResource extends AbstractOVDModel implements Consequence
 		float h = Math.max( rIcon.getHeight(), lblConseq.getMinHeight() );
 		Cell c = box.add( grp ).size( rIcon.getWidth() + lblConseq.getMinWidth(), h );
 
+		// Find the first and last cell in this row to expand them. This centers all cells in the row.
 		Cell first = null, last = c;
 		for ( Cell cl : box.getCells() ) {
 			if ( cl.getRow() == c.getRow() ) {
-				cl.expand( 0, 0 );
+				cl.expand( 0, 0 ).pad( 0 ); // Reset to defaults
 				if ( first == null )
 					first = cl;
 				last = cl;
 			}
 		}
+		// If first == last, then we only have one cell, and it is already centered - don't expand it.
 		if ( first != last ) {
-			first.expandX().right().padLeft( 10 );
-			last.expandX().left().padRight( 10 );
+			first.expandX().right();
+			last.expandX().left();
 		}
+		first.padLeft( 5 );
+		last.padRight( 10 );
 	}
 
 	@Override
@@ -74,17 +80,18 @@ public class ConsequenceResource extends AbstractOVDModel implements Consequence
 		if ( amount == 0 )
 			return;
 
-		// int gameRefId = context.getGameModelRefId();
-		// GameModel game = context.getReferenceManager().getObject( gameRefId, GameModel.class );
-		// int shipRefId = game.getPlayerShip( context.getNetManager().getLocalPlayerRefId() );
-
 		// TODO Consequences need a target player ref id
-		int playerRefId = context.getNetManager().getLocalPlayerRefId();
-		PlayerModel playerModel = context.getReferenceManager().getObject( playerRefId, PlayerModel.class );
-		int playerScrap = playerModel.getProperties().getInt( OVDConstants.SCRAP );
-		playerModel.getProperties().setInt( OVDConstants.SCRAP, playerScrap + amount );
+
 		// TODO: Resources in player model or ship model? Consider ship as in-game avatar of the player,
 		// and the player model only holds data immediately pertaining to the player (name, etc)??
+
+		int gameRefId = context.getGameModelRefId();
+		GameModel game = context.getReferenceManager().getObject( gameRefId, GameModel.class );
+		int shipRefId = game.getPlayerShip( context.getNetManager().getLocalPlayerRefId() );
+
+		ShipPropertyEvent event = Pools.get( ShipPropertyEvent.class ).obtain();
+		event.init( shipRefId, ShipPropertyEvent.INT_TYPE, ShipPropertyEvent.INCREMENT_ACTION, resourceId, amount );
+		context.getScreenEventManager().postDelayedEvent( event );
 	}
 
 	@Override

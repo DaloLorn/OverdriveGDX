@@ -1,8 +1,9 @@
 package com.ftloverdrive.model.incident;
 
 import com.ftloverdrive.core.OverdriveContext;
-import com.ftloverdrive.model.PlayerModel;
+import com.ftloverdrive.model.GameModel;
 import com.ftloverdrive.model.incident.PlotBranchCriteria.CriteriaResult;
+import com.ftloverdrive.model.ship.ShipModel;
 
 
 public class RequirementResource implements PlotBranchRequirement {
@@ -25,11 +26,13 @@ public class RequirementResource implements PlotBranchRequirement {
 
 	@Override
 	public CriteriaResult evaluate( OverdriveContext context ) {
-		int playerRefId = context.getNetManager().getLocalPlayerRefId();
-		PlayerModel playerModel = context.getReferenceManager().getObject( playerRefId, PlayerModel.class );
-		int playerScrap = playerModel.getProperties().getInt( resourceId );
+		int gameRefId = context.getGameModelRefId();
+		GameModel game = context.getReferenceManager().getObject( gameRefId, GameModel.class );
+		int shipRefId = game.getPlayerShip( context.getNetManager().getLocalPlayerRefId() );
+		ShipModel ship = context.getReferenceManager().getObject( shipRefId, ShipModel.class );
 
-		if ( playerScrap < quantity )
+		int scrap = ship.getProperties().getInt( resourceId );
+		if ( scrap < quantity )
 			return CriteriaResult.VISIBLE_UNAVAILABLE;
 		else
 			return CriteriaResult.NORMAL;

@@ -76,7 +76,7 @@ public class ShipEventHandler implements OVDEventHandler {
 			int shipRefId = event.getShipRefId();
 			ShipModel shipModel = context.getBlueprintManager().createModel( event.getShipBlueprintId(), event.getConstructorArgs() );
 			if ( shipModel == null )
-				shipModel = new TestShipModel();
+				shipModel = new TestShipModel(); // TODO: Change to default ship model
 
 			context.getReferenceManager().addObject( shipModel, shipRefId );
 		}

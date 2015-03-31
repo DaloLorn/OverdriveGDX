@@ -29,22 +29,23 @@ public interface Consequence {
 	/**
 	 * Places the actor representing this consequence in the ConsequenceBox passed in argument.
 	 *
-	 * In the original game this was a consequence box displayed next to choices when hidden="false".
+	 * In the original game, this was a consequence box displayed next to choices when hidden="false".
 	 */
 	public void placeConsequenceActor( OverdriveContext context, ConsequenceBox conseqBox );
 
 	/**
-	 * Allows the Consequence to optionally add requirements to the Plot Branch, eg. to add a
-	 * scrap requirement to prevent the player from purchasing something via an incident.
+	 * Allows the Consequence to optionally add requirements to the PlotBranch, eg. to add a
+	 * scrap requirement to prevent the player from purchasing something via an incident
+	 * without having the means to do so.
 	 * 
 	 * @param branch
-	 *            the branch that triggers the incident to which this consequence belongs
+	 *            the branch to which the requirements will be added
 	 */
 	public void addRequirements( PlotBranch branch );
 
 	/**
-	 * If true, then this consequence's actor should show up in the spoiler consequence box
-	 * displayed next to choices when hidden="false".
+	 * If true, then this consequence's spoiler actors should show up in the spoiler consequence box
+	 * displayed next to plot branch when hidden="false".
 	 */
 	public boolean isSpoilable();
 

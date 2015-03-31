@@ -19,12 +19,10 @@ import com.ftloverdrive.util.OVDConstants;
 
 public class TestShipBlueprint extends ShipBlueprint {
 
-	private static final String SHIP_ID = "SHIP_ID";
-
 	public TestShipBlueprint( ShipBlueprint prototype ) {
 		super( prototype );
 
-		propertyMap.put( SHIP_ID, "Test" );
+		propertyMap.put( OVDConstants.BLUEPRINT_NAME, getClass().getSimpleName() );
 	}
 
 	@Override
@@ -32,8 +30,10 @@ public class TestShipBlueprint extends ShipBlueprint {
 		int shipRefId = context.getNetManager().requestNewRefId();
 
 		ShipCreationEvent shipCreateEvent = Pools.get( ShipCreationEvent.class ).obtain();
-		shipCreateEvent.init( shipRefId, getClass().getSimpleName() );
+		shipCreateEvent.init( shipRefId, getProperty( OVDConstants.BLUEPRINT_NAME, String.class ) );
 		context.getScreenEventManager().postDelayedEvent( shipCreateEvent );
+		
+		// TODO: Events to copy properties from the blueprint to the model.
 
 		int roomRefId = -1;
 		ShipCoordinate[] roomCoords = null;

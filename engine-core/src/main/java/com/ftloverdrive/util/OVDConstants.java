@@ -3,6 +3,8 @@ package com.ftloverdrive.util;
 
 public class OVDConstants {
 
+	/** Common property. */
+	public static final String BLUEPRINT_NAME = "BlueprintName";
 
 	/*
 	 * ========================================
