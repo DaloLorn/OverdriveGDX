@@ -1,0 +1,24 @@
+{
+  com.ftloverdrive.io.ImageSpec: {
+    shield-bg-tex-on:  { atlasPath: "img/statusUI/.atlas.atlas", regionName: "top-shields4-on" },
+    shield-bg-tex-off: { atlasPath: "img/statusUI/.atlas.atlas", regionName: "top-shields4-off" },
+    shield-tex-empty:  { atlasPath: "img/statusUI/.atlas.atlas", regionName: "top-shieldsquare1-off" },
+    shield-tex-full:   { atlasPath: "img/statusUI/.atlas.atlas", regionName: "top-shieldsquare1-on" }
+  },
+
+  // Fields the game is hardcoded to look for.
+  // Values can be changed freely, but entry names must remain the same.
+
+  com.badlogic.gdx.graphics.g2d.Sprite: {
+    shield-bg-on:  { texture: shield-bg-tex-on },
+    shield-bg-off: { texture: shield-bg-tex-off },
+    shield-empty:  { texture: shield-tex-empty },
+    shield-full:   { texture: shield-tex-full }
+  },
+
+  java.lang.Integer: {
+    shield-offset-x: 12,
+    shield-offset-y: 10,
+    shield-spacing-x: 23
+  }
+}

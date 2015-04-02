@@ -7,6 +7,7 @@ import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.assets.loaders.FileHandleResolver;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
@@ -79,11 +80,12 @@ public class OVDSkin extends Skin {
 
 				FileHandle fontFile = resolve( skinFile, path );
 
+				// TODO: Return existing handle if resource already loaded?
 				// if ( manager.isLoaded( path, BitmapFont.class ) )
 				// return manager.get( path, BitmapFont.class );
 
 				String scrubbedPath = scrub( path );
-				if ( scrubbedPath.endsWith( ".ttf" ) ) {
+				if ( scrubbedPath.endsWith( ".ttf" ) ) { // TODO: Also .otf ?
 					FreeTypeFontLoader fontLoader = new FreeTypeFontLoader( resolver );
 					BitmapFont font = fontLoader.loadSync( manager, path, fontFile, null );
 					skin.add( path, font );
@@ -156,6 +158,27 @@ public class OVDSkin extends Skin {
 			}
 		} );
 
+		json.setSerializer( Sprite.class, new ReadOnlySerializer<Sprite>() {
+
+			public Sprite read( Json json, JsonValue jsonData, Class type ) {
+				String specName = json.readValue( "texture", String.class, jsonData );
+				ImageSpec spec = skin.get( specName, ImageSpec.class );
+				TextureAtlas atlas = manager.get( spec.atlasPath, TextureAtlas.class );
+
+				String key = jsonData.name;
+				Sprite result = null;
+				if ( skin.has( key, Sprite.class ) ) {
+					result = skin.getSprite( key );
+				}
+				else {
+					result = new Sprite( atlas.findRegion( spec.regionName ) );
+					skin.add( key, result, Sprite.class );
+				}
+
+				return result;
+			}
+		} );
+
 		return json;
 	}
 
@@ -164,6 +187,18 @@ public class OVDSkin extends Skin {
 		if ( drawable != null ) return drawable;
 
 		return super.getDrawable( name );
+	}
+
+	public int getInt( String name ) {
+		return super.get( name, Integer.class );
+	}
+
+	public float getFloat( String name ) {
+		return super.get( name, Float.class );
+	}
+
+	public boolean getBool( String name ) {
+		return super.get( name, Boolean.class );
 	}
 
 	public void dispose() {

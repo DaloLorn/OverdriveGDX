@@ -47,6 +47,8 @@ public class AbstractShipModel extends AbstractOVDModel implements ShipModel {
 		super();
 		shipProperties.setInt( OVDConstants.HULL_MAX, 0 );
 		shipProperties.setInt( OVDConstants.HULL, 0 );
+		shipProperties.setInt( OVDConstants.SHIELD_MAX, 0 );
+		shipProperties.setInt( OVDConstants.SHIELD, 0 );
 		shipProperties.setInt( OVDConstants.POWER_MAX, 0 );
 		shipProperties.setInt( OVDConstants.POWER, 0 );
 		shipProperties.setInt( OVDConstants.SCRAP, 0 );
@@ -58,6 +60,7 @@ public class AbstractShipModel extends AbstractOVDModel implements ShipModel {
 		shipProperties.setInt( OVDConstants.AUGMENT_SLOTS, 0 );
 		shipProperties.setInt( OVDConstants.CREW_SLOTS, 8 );
 		shipProperties.setString( OVDConstants.BLUEPRINT_NAME, "DEFAULT" );
+
 		shipLayout = new ShipLayout();
 		crewArray = new Array<Integer>( true, shipProperties.getInt( OVDConstants.CREW_SLOTS ) );
 	}
@@ -247,13 +250,22 @@ public class AbstractShipModel extends AbstractOVDModel implements ShipModel {
 		return true;
 	}
 
-
 	@Override
 	public void damage( OverdriveContext context, int value ) {
 		int selfRefId = context.getReferenceManager().getId( this );
 
-		ShipPropertyEvent event = Pools.get( ShipPropertyEvent.class ).obtain();
-		event.init( selfRefId, ShipPropertyEvent.INT_TYPE, ShipPropertyEvent.INCREMENT_ACTION, OVDConstants.HULL, -value );
-		context.getScreenEventManager().postDelayedEvent( event );
+		// TODO: Handle shield piercing & ion damage here, and others...
+		// TODO: Implement DamageHandlers that handle damage, so that Models can just reference them?
+
+		if ( getProperties().getInt( OVDConstants.SHIELD ) > 0 ) {
+			ShipPropertyEvent event = Pools.get( ShipPropertyEvent.class ).obtain();
+			event.init( selfRefId, ShipPropertyEvent.INT_TYPE, ShipPropertyEvent.INCREMENT_ACTION, OVDConstants.SHIELD, -1 );
+			context.getScreenEventManager().postDelayedEvent( event );
+		}
+		else {
+			ShipPropertyEvent event = Pools.get( ShipPropertyEvent.class ).obtain();
+			event.init( selfRefId, ShipPropertyEvent.INT_TYPE, ShipPropertyEvent.INCREMENT_ACTION, OVDConstants.HULL, -value );
+			context.getScreenEventManager().postDelayedEvent( event );
+		}
 	}
 }

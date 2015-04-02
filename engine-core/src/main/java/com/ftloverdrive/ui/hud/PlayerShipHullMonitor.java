@@ -1,9 +1,9 @@
 package com.ftloverdrive.ui.hud;
 
 import com.badlogic.gdx.assets.AssetManager;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.Sprite;
-import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.utils.Disposable;
 import com.ftloverdrive.core.OverdriveContext;
@@ -11,55 +11,71 @@ import com.ftloverdrive.event.game.GamePlayerShipChangeEvent;
 import com.ftloverdrive.event.game.GamePlayerShipChangeListener;
 import com.ftloverdrive.event.ship.ShipPropertyEvent;
 import com.ftloverdrive.event.ship.ShipPropertyListener;
+import com.ftloverdrive.io.OVDSkin;
 import com.ftloverdrive.model.ship.ShipModel;
 import com.ftloverdrive.util.OVDConstants;
 
 
 public class PlayerShipHullMonitor extends Actor implements Disposable, GamePlayerShipChangeListener, ShipPropertyListener {
 
+	public static final String SKIN_PATH = "overdrive-assets/skins/player-hud/hull-hud.json";
+
 	protected AssetManager assetManager;
+	protected int shipModelRefId = -1;
+
 	protected Sprite bgSprite;
 	protected Sprite barSprite;
+	protected int offsetX = 0;
+	protected int offsetY = 0;
+	protected Color cHigh;
+	protected Color cMedium;
+	protected Color cLow;
+
+	protected Color cCurrent;
 	protected float barClipWidth = 0;
-	protected int shipModelRefId = -1;
 
 
 	public PlayerShipHullMonitor( OverdriveContext context ) {
 		super();
 		assetManager = context.getAssetManager();
 
-		assetManager.load( OVDConstants.STATUSUI_ATLAS, TextureAtlas.class );
+		assetManager.load( SKIN_PATH, OVDSkin.class );
 		assetManager.finishLoading();
-		TextureAtlas statusUIAtlas = assetManager.get( OVDConstants.STATUSUI_ATLAS, TextureAtlas.class );
 
-		bgSprite = statusUIAtlas.createSprite( "top-hull" );
-		this.setWidth( bgSprite.getWidth() );
-		this.setHeight( bgSprite.getHeight() );
+		OVDSkin skin = assetManager.get( SKIN_PATH, OVDSkin.class );
 
-		barSprite = statusUIAtlas.createSprite( "top-hull-bar-mask" );
+		bgSprite = skin.getSprite( "hull-bg" );
+		barSprite = skin.getSprite( "hull-bar-mask" );
+
+		offsetX = skin.getInt( "bar-offset-x" );
+		offsetY = skin.getInt( "bar-offset-y" );
+
+		cHigh = skin.getColor( "bar-color-high" );
+		cMedium = skin.getColor( "bar-color-med" );
+		cLow = skin.getColor( "bar-color-low" );
+
+		setWidth( bgSprite.getWidth() );
+		setHeight( bgSprite.getHeight() );
+
+		cCurrent = cHigh;
 	}
-
 
 	@Override
 	public void draw( Batch batch, float parentAlpha ) {
 		super.draw( batch, parentAlpha );
 
-		//Color color = getColor();
-		//batch.setColor( color.r, color.g, color.b, color.a * parentAlpha );
-
-		bgSprite.setPosition( this.getX(), this.getY() );
+		bgSprite.setPosition( getX(), getY() );
 		bgSprite.draw( batch, parentAlpha );
 
 		batch.flush();
-		if ( clipBegin( this.getX()+11, this.getY(), barClipWidth, bgSprite.getHeight() ) ) {
-			barSprite.setPosition( this.getX()+11, this.getY() + bgSprite.getHeight()/2 - barSprite.getHeight()/2 );
-			barSprite.setColor( 0.47f, 1f, 0.47f, 1f );
+		if ( clipBegin( getX() + offsetX, getY() + offsetY, barClipWidth, bgSprite.getHeight() ) ) {
+			barSprite.setPosition( getX() + offsetX, getY() + bgSprite.getHeight() / 2 - barSprite.getHeight() / 2 + offsetY );
+			barSprite.setColor( cCurrent );
 			barSprite.draw( batch, parentAlpha );
 			batch.flush();
 			clipEnd();
 		}
 	}
-
 
 	public void setShipModel( OverdriveContext context, int shipModelRefId ) {
 		this.shipModelRefId = shipModelRefId;
@@ -87,7 +103,6 @@ public class PlayerShipHullMonitor extends Actor implements Disposable, GamePlay
 		}
 	}
 
-
 	/**
 	 * Updates the bar to match the player ship's Hull/HullMax.
 	 */
@@ -100,17 +115,25 @@ public class PlayerShipHullMonitor extends Actor implements Disposable, GamePlay
 			int hullAmt = shipModel.getProperties().getInt( OVDConstants.HULL );
 			int hullMax = shipModel.getProperties().getInt( OVDConstants.HULL_MAX );
 			if ( hullMax != 0 ) {
-				barClipWidth = Math.min( ((float)hullAmt / hullMax) * barSprite.getWidth(), barSprite.getWidth() );
-			} else {
+				barClipWidth = Math.min( ( (float)hullAmt / hullMax ) * barSprite.getWidth(), barSprite.getWidth() );
+
+				float p = ( (float)hullAmt ) / hullMax;
+				System.out.println( p );
+				if ( p > 0.66f )
+					cCurrent = cHigh;
+				else if ( p > 0.33f )
+					cCurrent = cMedium;
+				else
+					cCurrent = cLow;
+			}
+			else {
 				barClipWidth = 0;
 			}
 		}
 	}
 
-
-	// Actors don't normally have a dispose().
 	@Override
 	public void dispose() {
-		assetManager.unload( OVDConstants.STATUSUI_ATLAS );
+		assetManager.unload( SKIN_PATH );
 	}
 }

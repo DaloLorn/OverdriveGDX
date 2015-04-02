@@ -3,8 +3,8 @@ package com.ftloverdrive.ui.hud;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.Sprite;
-import com.badlogic.gdx.scenes.scene2d.Group;
-import com.badlogic.gdx.scenes.scene2d.utils.Align;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas;
+import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.utils.Disposable;
 import com.ftloverdrive.core.OverdriveContext;
 import com.ftloverdrive.event.game.GamePlayerShipChangeEvent;
@@ -13,26 +13,29 @@ import com.ftloverdrive.event.ship.ShipPropertyEvent;
 import com.ftloverdrive.event.ship.ShipPropertyListener;
 import com.ftloverdrive.io.OVDSkin;
 import com.ftloverdrive.model.ship.ShipModel;
-import com.ftloverdrive.ui.ShaderLabel;
-import com.ftloverdrive.ui.ShaderLabel.ShaderLabelStyle;
 import com.ftloverdrive.util.OVDConstants;
 
 
-public class PlayerScrapMonitor extends Group implements Disposable, GamePlayerShipChangeListener, ShipPropertyListener {
+public class PlayerShipShieldMonitor extends Actor implements Disposable, GamePlayerShipChangeListener, ShipPropertyListener {
 
-	public static final String SKIN_PATH = "overdrive-assets/skins/player-hud/scrap-hud.json";
+	public static final String SKIN_PATH = "overdrive-assets/skins/player-hud/shield-hud.json";
 
 	protected AssetManager assetManager;
 	protected int shipModelRefId = -1;
 
-	protected Sprite normalSprite;
-	protected Sprite redSprite;
+	protected int shieldMax = 0;
+	protected int shieldFull = 0;
 
 	protected Sprite bgSprite;
-	protected ShaderLabel lblScrap;
+	protected Sprite shieldEmptySprite;
+	protected Sprite shieldFullSprite;
+
+	protected int offsetX = 0;
+	protected int offsetY = 0;
+	protected int spacingX = 0;
 
 
-	public PlayerScrapMonitor( OverdriveContext context ) {
+	public PlayerShipShieldMonitor( OverdriveContext context ) {
 		super();
 		assetManager = context.getAssetManager();
 
@@ -41,29 +44,39 @@ public class PlayerScrapMonitor extends Group implements Disposable, GamePlayerS
 
 		OVDSkin skin = assetManager.get( SKIN_PATH, OVDSkin.class );
 
-		normalSprite = skin.getSprite( "scrap-bg-normal" );
-		redSprite = skin.getSprite( "scrap-bg-red" );
+		bgSprite = skin.getSprite( "shield-bg-on" );
+		shieldEmptySprite = skin.getSprite( "shield-empty" );
+		shieldFullSprite = skin.getSprite( "shield-full" );
 
-		int textOffsetX = skin.getInt( "scrap-text-offset-x" );
-		int textOffsetY = skin.getInt( "scrap-text-offset-y" );
+		offsetX = skin.getInt( "shield-offset-x" );
+		offsetY = skin.getInt( "shield-offset-y" );
+		spacingX = skin.getInt( "shield-spacing-x" );
 
-		ShaderLabelStyle stlScrap = skin.get( "scrap-text-style", ShaderLabelStyle.class );
-		lblScrap = new ShaderLabel( "####", stlScrap );
-		lblScrap.setAlignment( Align.center );
-		lblScrap.setPosition( textOffsetX, textOffsetY, Align.center );
-		addActor( lblScrap );
-
-		setWidth( normalSprite.getWidth() );
-		setHeight( normalSprite.getHeight() );
-		bgSprite = redSprite;
+		setWidth( bgSprite.getWidth() );
+		setHeight( bgSprite.getHeight() );
 	}
 
 	@Override
 	public void draw( Batch batch, float parentAlpha ) {
-		bgSprite.setPosition( this.getX(), this.getY() );
-		bgSprite.draw( batch, parentAlpha );
 		super.draw( batch, parentAlpha );
+
+		bgSprite.setPosition( getX(), getY() );
+		bgSprite.draw( batch, parentAlpha );
+
+		for ( int shieldIndex = 0; shieldIndex < shieldMax; ++shieldIndex ) {
+			if ( shieldIndex < shieldFull ) {
+				shieldFullSprite.setPosition( getX() + offsetX + shieldIndex * spacingX,
+						getY() + offsetY );
+				shieldFullSprite.draw( batch, parentAlpha );
+			}
+			else {
+				shieldEmptySprite.setPosition( getX() + offsetX + shieldIndex * spacingX,
+						getY() + offsetY );
+				shieldEmptySprite.draw( batch, parentAlpha );
+			}
+		}
 	}
+
 
 	public void setShipModel( OverdriveContext context, int shipModelRefId ) {
 		this.shipModelRefId = shipModelRefId;
@@ -84,21 +97,24 @@ public class PlayerScrapMonitor extends Group implements Disposable, GamePlayerS
 		if ( e.getShipRefId() != shipModelRefId ) return;
 
 		if ( e.getPropertyType() == ShipPropertyEvent.INT_TYPE ) {
-			if ( OVDConstants.SCRAP.equals( e.getPropertyKey() ) ) {
+			if ( OVDConstants.SHIELD.equals( e.getPropertyKey() ) || OVDConstants.SHIELD_MAX.equals( e.getPropertyKey() ) ) {
 				updateShipInfo( context );
 			}
 		}
 	}
 
+	/**
+	 * Updates the bar to match the player ship's Shield/ShieldMax.
+	 */
 	private void updateShipInfo( OverdriveContext context ) {
 		if ( shipModelRefId == -1 ) {
-			bgSprite = redSprite;
+			shieldMax = 0;
+			shieldFull = 0;
 		}
 		else {
 			ShipModel shipModel = context.getReferenceManager().getObject( shipModelRefId, ShipModel.class );
-			int scrapAmount = shipModel.getProperties().getInt( OVDConstants.SCRAP );
-			bgSprite = scrapAmount > 0 ? normalSprite : redSprite;
-			lblScrap.setText( "" + scrapAmount );
+			shieldFull = shipModel.getProperties().getInt( OVDConstants.SHIELD );
+			shieldMax = shipModel.getProperties().getInt( OVDConstants.SHIELD_MAX );
 		}
 	}
 

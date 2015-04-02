@@ -1,0 +1,29 @@
+{
+  com.ftloverdrive.io.ImageSpec: {
+    bg-texture:   { atlasPath: "img/statusUI/.atlas.atlas", regionName: "top-hull" },
+    mask-texture: { atlasPath: "img/statusUI/.atlas.atlas", regionName: "top-hull-bar-mask" }
+  },
+
+  // Fields the game is hardcoded to look for.
+  // Values can be changed freely, but entry names must remain the same.
+  
+  com.badlogic.gdx.graphics.Color: {
+    green:  { a: 1, r: 0.47, g: 1,    b: 0.47 },
+    yellow: { a: 1, r: 1,    g: 1,    b: 0.47 },
+    red:    { a: 1, r: 1,    g: 0.4,  b: 0.4  },
+
+    bar-color-high: green,
+    bar-color-med:  yellow,
+    bar-color-low:  red
+  },
+
+  com.badlogic.gdx.graphics.g2d.Sprite: {
+    hull-bg:  { texture: bg-texture },
+    hull-bar-mask: { texture: mask-texture }
+  },
+
+  java.lang.Integer: {
+    bar-offset-x: 11,
+    bar-offset-y: 0
+  }
+}

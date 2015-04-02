@@ -26,5 +26,6 @@ public class TestShipModel extends AbstractShipModel {
 		this.setFloorImageSpec( new ImageSpec( OVDConstants.SHIP_ATLAS, "kestral-floor" ) );
 
 		this.getProperties().setInt( OVDConstants.HULL_MAX, 30 );
+		this.getProperties().setInt( OVDConstants.SHIELD_MAX, 4 );
 	}
 }

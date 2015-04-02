@@ -38,6 +38,7 @@ import com.ftloverdrive.ui.ShatteredImage;
 import com.ftloverdrive.ui.hud.PlayerScrapMonitor;
 import com.ftloverdrive.ui.hud.PlayerShipDoorHighlighter;
 import com.ftloverdrive.ui.hud.PlayerShipHullMonitor;
+import com.ftloverdrive.ui.hud.PlayerShipShieldMonitor;
 import com.ftloverdrive.ui.ship.ShipActor;
 import com.ftloverdrive.util.OVDConstants;
 
@@ -47,6 +48,7 @@ public class TestScreen extends BaseScreen {
 	private TextureAtlas bgAtlas;
 
 	private PlayerShipHullMonitor playerShipHullMonitor;
+	private PlayerShipShieldMonitor playerShipShieldMonitor;
 	private PlayerScrapMonitor playerScrapMonitor;
 	private PlayerShipDoorHighlighter doorHighlighter;
 	private ShipActor shipActor;
@@ -106,6 +108,8 @@ public class TestScreen extends BaseScreen {
 		context.getAssetManager().load( OVDConstants.BKG_ATLAS, TextureAtlas.class );
 		context.getAssetManager().load( OVDConstants.ROOT_ATLAS, TextureAtlas.class );
 		context.getAssetManager().load( OVDConstants.MISC_ATLAS, TextureAtlas.class );
+		context.getAssetManager().load( OVDConstants.STATUSUI_ATLAS, TextureAtlas.class );
+		context.getAssetManager().load( OVDConstants.EFFECTS_ATLAS, TextureAtlas.class );
 		context.getAssetManager().load( OVDConstants.PEOPLE_ATLAS, TextureAtlas.class );
 		context.getAssetManager().load( OVDConstants.PLOT_FONT, BitmapFont.class );
 
@@ -131,6 +135,11 @@ public class TestScreen extends BaseScreen {
 		playerShipHullMonitor = new PlayerShipHullMonitor( context );
 		playerShipHullMonitor.setPosition( 0, hudStage.getHeight() - playerShipHullMonitor.getHeight() );
 		hudStage.addActor( playerShipHullMonitor );
+
+		playerShipShieldMonitor = new PlayerShipShieldMonitor( context );
+		playerShipShieldMonitor.setPosition( 0,
+				hudStage.getHeight() - playerShipHullMonitor.getHeight() - playerShipShieldMonitor.getHeight() );
+		hudStage.addActor( playerShipShieldMonitor );
 
 		playerScrapMonitor = new PlayerScrapMonitor( context );
 		playerScrapMonitor.setPosition( playerShipHullMonitor.getWidth(),
@@ -180,6 +189,8 @@ public class TestScreen extends BaseScreen {
 
 		eventManager.addEventListener( playerShipHullMonitor, GamePlayerShipChangeListener.class );
 		eventManager.addEventListener( playerShipHullMonitor, ShipPropertyListener.class );
+		eventManager.addEventListener( playerShipShieldMonitor, GamePlayerShipChangeListener.class );
+		eventManager.addEventListener( playerShipShieldMonitor, ShipPropertyListener.class );
 
 		eventManager.addEventListener( playerScrapMonitor, GamePlayerShipChangeListener.class );
 		eventManager.addEventListener( playerScrapMonitor, ShipPropertyListener.class );
@@ -203,6 +214,14 @@ public class TestScreen extends BaseScreen {
 					if ( hull < hullMax ) {
 						ShipPropertyEvent event = Pools.get( ShipPropertyEvent.class ).obtain();
 						event.init( shipRefId, ShipPropertyEvent.INT_TYPE, ShipPropertyEvent.INCREMENT_ACTION, OVDConstants.HULL, 1 );
+						context.getScreenEventManager().postDelayedEvent( event );
+					}
+
+					int shield = shipModel.getProperties().getInt( OVDConstants.SHIELD );
+					int shieldMax = shipModel.getProperties().getInt( OVDConstants.SHIELD_MAX );
+					if ( shield < shieldMax ) {
+						ShipPropertyEvent event = Pools.get( ShipPropertyEvent.class ).obtain();
+						event.init( shipRefId, ShipPropertyEvent.INT_TYPE, ShipPropertyEvent.INCREMENT_ACTION, OVDConstants.SHIELD, 1 );
 						context.getScreenEventManager().postDelayedEvent( event );
 					}
 				}
@@ -298,6 +317,8 @@ public class TestScreen extends BaseScreen {
 		playerShipHullMonitor.setPosition( 0, hudStage.getHeight() - playerShipHullMonitor.getHeight() );
 		playerScrapMonitor.setPosition( playerShipHullMonitor.getWidth(),
 				hudStage.getHeight() - playerScrapMonitor.getHeight() );
+		playerShipShieldMonitor.setPosition( 0,
+				hudStage.getHeight() - playerShipHullMonitor.getHeight() - playerShipShieldMonitor.getHeight() );
 		// Main
 		shipActor.setPosition( 350, mainStage.getHeight() - shipActor.getHeight() - 170 );
 

@@ -43,9 +43,9 @@ import com.ftloverdrive.ui.ShaderLabel.ShaderLabelStyle;
 public class IncidentDialog extends Window implements Disposable, EventListener {
 
 	private static final WindowStyle defaultWindowStyle = new WindowStyle( new BitmapFont(), new Color(), null );
-	private static final int maxChoiceCount = 10;
+	private static final int maxHHotkeyChoiceCount = 10;
 
-	public static final String SKIN_PATH = "internal://overdrive-assets/skins/incident-dialog/window.json";
+	public static final String SKIN_PATH = "overdrive-assets/skins/incident-dialog/window.json";
 	public static final String ACTOR_NAME = "IncidentDialog";
 
 	// The window's last location.
@@ -80,9 +80,9 @@ public class IncidentDialog extends Window implements Disposable, EventListener 
 	protected PlotBranchCriteria branchCriteria;
 
 	// Only 10 keys on the numeric keyboard, so we can only support 10 hotkeyed plot branches
-	private int choiceCount = 0;
-	private PlotBranch[] choices = new PlotBranch[maxChoiceCount];
-	private int availableChoiceCount = 0;
+	private int choiceCount = 0; // Total choice count
+	private int availableChoiceCount = 0; // Available (non-grayed out and visible) choice count
+	private PlotBranch[] hotkeyChoices = new PlotBranch[maxHHotkeyChoiceCount];
 
 	private Array<DisposeListener> disposeListeners = new Array<DisposeListener>( false, 1 );
 	private boolean captureInput = false;
@@ -111,12 +111,10 @@ public class IncidentDialog extends Window implements Disposable, EventListener 
 		stlBlue = skin.get( "choice-blue", ShaderLabelStyle.class );
 		stlDisabled = skin.get( "choice-disabled", ShaderLabelStyle.class );
 
-		// DistanceFieldFontShader fontShader = new DistanceFieldFontShader( 1.0f / 8.0f );
-
-		sepChoices = skin.get( "choice-separator", Integer.class );
-		sepTextConseq = skin.get( "text-conseq-separator", Integer.class );
-		sepConseqBranches = skin.get( "conseq-choice-separator", Integer.class );
-		sepBranchSpoiler = skin.get( "branch-spoiler-separator", Integer.class );
+		sepChoices = skin.getInt( "choice-separator" );
+		sepTextConseq = skin.getInt( "text-conseq-separator" );
+		sepConseqBranches = skin.getInt( "conseq-choice-separator" );
+		sepBranchSpoiler = skin.getInt( "branch-spoiler-separator" );
 
 		WindowStyle wndStyle = skin.get( "window-style", WindowStyle.class );
 		setStyle( wndStyle );
@@ -128,7 +126,6 @@ public class IncidentDialog extends Window implements Disposable, EventListener 
 		lblIncText = new ShaderLabel( "", incStyle );
 		lblIncText.setAlignment( Align.top | Align.left, Align.center | Align.left );
 		lblIncText.setWrap( true );
-		// lblIncText.setShader( fontShader );
 		row().top().expandX().fillX().spaceBottom( sepTextConseq );
 		add( lblIncText );
 
@@ -144,7 +141,7 @@ public class IncidentDialog extends Window implements Disposable, EventListener 
 		add( vgChoices );
 
 		addListener( new IncidentDialogInputListener() );
-		setWidth( computePreferredWidth( skin.get( "window-width", Integer.class ) ) );
+		setWidth( computePreferredWidth( skin.getInt( "window-width" ) ) );
 	}
 
 	public void showConseequenceBox( boolean show ) {
@@ -202,8 +199,8 @@ public class IncidentDialog extends Window implements Disposable, EventListener 
 			stlDefault = stlDisabled;
 
 		// Keep track of branches
-		if ( choiceCount < maxChoiceCount )
-			choices[choiceCount] = branch;
+		if ( choiceCount < maxHHotkeyChoiceCount )
+			hotkeyChoices[choiceCount] = branch;
 		choiceCount++;
 
 		// Create the label representing the plot branch
@@ -367,11 +364,11 @@ public class IncidentDialog extends Window implements Disposable, EventListener 
 	 * A "soft dispose", resets the dialog so that it can be reused by another incident.
 	 */
 	private void reset0() {
-		if ( choiceCount > maxChoiceCount )
-			choiceCount = maxChoiceCount;
+		if ( choiceCount > maxHHotkeyChoiceCount )
+			choiceCount = maxHHotkeyChoiceCount;
 		for ( ; choiceCount > 0; ) {
 			--choiceCount;
-			choices[choiceCount] = null;
+			hotkeyChoices[choiceCount] = null;
 		}
 		availableChoiceCount = 0;
 		conseqBox.clear();
@@ -471,9 +468,9 @@ public class IncidentDialog extends Window implements Disposable, EventListener 
 			if ( choiceNumber >= Keys.NUM_0 && choiceNumber <= Keys.NUM_9 ) {
 				choiceNumber -= Keys.NUM_0;
 				if ( choiceNumber == 0 )
-					choiceNumber = maxChoiceCount;
+					choiceNumber = maxHHotkeyChoiceCount;
 				if ( choiceNumber <= choiceCount )
-					choiceSelected( context, choices[choiceNumber - 1], getX(), getTop() );
+					choiceSelected( context, hotkeyChoices[choiceNumber - 1], getX(), getTop() );
 				return true;
 			}
 
@@ -487,7 +484,7 @@ public class IncidentDialog extends Window implements Disposable, EventListener 
 			dragging = false;
 
 			Actor a = hit( x, y, true );
-			if ( a != null && a.getParent().isDescendantOf( vgChoices ) ) {
+			if ( a != null && a.getParent() != null && a.getParent().isDescendantOf( vgChoices ) ) {
 				if ( a instanceof Label || a instanceof ConsequenceBox )
 					a = a.getParent();
 				// Choices' listener is not informed of these events, since they're sent through

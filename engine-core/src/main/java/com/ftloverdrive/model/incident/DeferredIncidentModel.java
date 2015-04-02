@@ -12,7 +12,7 @@ import com.ftloverdrive.ui.screen.BaseScreen;
 
 
 /**
- * What the original game referred to as an event.
+ * IncidentModel that gets constructed as it is needed.
  */
 public class DeferredIncidentModel extends AbstractOVDModel implements IncidentModel, DisposeListener {
 

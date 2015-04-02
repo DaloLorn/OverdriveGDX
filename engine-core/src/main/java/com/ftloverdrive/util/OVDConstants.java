@@ -23,13 +23,6 @@ public class OVDConstants {
 	/** A constant indicating western orientation, ie. facing leftwards. */
 	public static final int ORIENT_WEST = 3;
 
-	/*
-	 * ========================================
-	 * Player properties.
-	 */
-
-	/** Player property. */
-	public static final String SCRAP = "Scrap";
 
 	/*
 	 * ========================================
@@ -43,10 +36,19 @@ public class OVDConstants {
 	public static final String HULL = "Hull";
 
 	/** Ship property. */
+	public static final String SHIELD_MAX = "ShieldMax";
+
+	/** Ship property. */
+	public static final String SHIELD = "Shield";
+
+	/** Ship property. */
 	public static final String POWER_MAX = "PowerMax";
 
 	/** Ship property. */
 	public static final String POWER = "Power";
+
+	/** Ship property. */
+	public static final String SCRAP = "Scrap";
 
 	/** Ship property. */
 	public static final String FUEL = "Fuel";
@@ -83,6 +85,7 @@ public class OVDConstants {
 	 * 2 - gray sprite
 	 * 3 - gray sprite with marks
 	 * 4 - gray sprite with more marks
+	 * ...more levels as needed?
 	 */
 	public static final String DOOR_LEVEL = "DoorUpgradeLevel";
 
@@ -126,7 +129,7 @@ public class OVDConstants {
 	public static final String MENU_ATLAS = "img/main_menus/.atlas.atlas";
 	public static final String RESOURCE_ATLAS = "img/ui_icons/.atlas.atlas";
 
-	public static final String FLOORPLAN_ATLAS = "internal://overdrive-assets/images/floorplan.atlas";
-	public static final String CUSTOM_HANGAR_ATLAS = "internal://overdrive-assets/images/hangar-ui/hangar.atlas";
-	public static final String INCIDENT_DIALOG_SKIN = "internal://overdrive-assets/skins/incident-dialog.json";
+	public static final String FLOORPLAN_ATLAS = "overdrive-assets/images/floorplan.atlas";
+	public static final String CUSTOM_HANGAR_ATLAS = "overdrive-assets/images/hangar-ui/hangar.atlas";
+	public static final String INCIDENT_DIALOG_SKIN = "overdrive-assets/skins/incident-dialog.json";
 }
