@@ -28,6 +28,11 @@ public class OVDEventManager {
 		this( false );
 	}
 
+	/**
+	 * @param serverMode
+	 *            whether this event manager should act as server, scrutinizing events
+	 *            and redistributing them to connected clients.
+	 */
 	public OVDEventManager( boolean serverMode ) {
 		this.serverMode = serverMode;
 	}
@@ -92,11 +97,13 @@ public class OVDEventManager {
 	 * Enqueues a delayed event that will be processed only after the required amount
 	 * of game ticks has passed.
 	 * 
+	 * @param e
+	 *            the event that is to be delayed
 	 * @param ticks
 	 *            how many ticks have to pass before the event is processed
 	 */
 	public void postDelayedEvent( OVDEvent e, int ticks ) {
-		// TODO
+		outQueue.addLast( new DelayedEvent( ticks, e ) );
 	}
 
 	/**
@@ -123,6 +130,10 @@ public class OVDEventManager {
 	 */
 	public <T extends OVDEventListener> void addEventListener( T l, Class<T> listenerClass ) {
 		inListenerList.add( listenerClass, l );
+	}
+
+	public <T extends OVDEventListener> void removeEventListener( T l, Class<T> listenerClass ) {
+		inListenerList.remove( listenerClass, l );
 	}
 
 	/**

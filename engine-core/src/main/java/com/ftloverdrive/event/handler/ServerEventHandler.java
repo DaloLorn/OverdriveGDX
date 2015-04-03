@@ -1,6 +1,7 @@
 package com.ftloverdrive.event.handler;
 
 import com.ftloverdrive.core.OverdriveContext;
+import com.ftloverdrive.event.DelayedEvent;
 import com.ftloverdrive.event.OVDEvent;
 import com.ftloverdrive.event.OVDEventHandler;
 import com.ftloverdrive.event.TickListenerEvent;
@@ -14,7 +15,8 @@ public class ServerEventHandler implements OVDEventHandler {
 
 	public ServerEventHandler() {
 		eventClasses = new Class[] {
-				TickListenerEvent.class
+				TickListenerEvent.class,
+				DelayedEvent.class
 		};
 		listenerClasses = new Class[] {
 				};
@@ -39,7 +41,11 @@ public class ServerEventHandler implements OVDEventHandler {
 				context.getGame().getServer().incrTick( event.getTickCount() );
 			else
 				context.getGame().getServer().decrTick( event.getTickCount() );
-			event.cancel();
+		}
+		else if ( e instanceof DelayedEvent ) {
+			DelayedEvent event = (DelayedEvent)e;
+
+			context.getGame().getServer().postDelayedEvent( event );
 		}
 	}
 

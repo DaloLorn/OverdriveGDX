@@ -2,6 +2,7 @@ package com.ftloverdrive.net;
 
 import com.badlogic.gdx.utils.Array;
 import com.esotericsoftware.kryo.Kryo;
+import com.ftloverdrive.event.DelayedEvent;
 import com.ftloverdrive.event.TickEvent;
 import com.ftloverdrive.event.TickListenerEvent;
 import com.ftloverdrive.event.engine.ModelDestructionEvent;
@@ -127,6 +128,7 @@ public class OVDNetManager {
 
 		kryo.register( TickEvent.class );
 		kryo.register( TickListenerEvent.class );
+		kryo.register( DelayedEvent.class );
 		kryo.register( ModelDestructionEvent.class );
 		kryo.register( GamePlayerShipChangeEvent.class );
 		kryo.register( BranchCreationEvent.class );

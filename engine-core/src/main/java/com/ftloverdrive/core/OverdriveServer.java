@@ -7,10 +7,10 @@ import com.badlogic.gdx.utils.Logger;
 import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Listener;
 import com.esotericsoftware.kryonet.Server;
+import com.ftloverdrive.event.DelayedEvent;
 import com.ftloverdrive.event.OVDEvent;
 import com.ftloverdrive.event.OVDEventHandler;
 import com.ftloverdrive.event.OVDEventManager;
-import com.ftloverdrive.event.TickListenerEvent;
 import com.ftloverdrive.event.handler.ServerEventHandler;
 import com.ftloverdrive.net.OVDNetManager;
 import com.ftloverdrive.util.OVDReferenceManager;
@@ -41,7 +41,8 @@ public class OverdriveServer implements Disposable {
 
 		eventManager = new OVDEventManager( true );
 		OVDEventHandler handler = new ServerEventHandler();
-		eventManager.setEventHandler( TickListenerEvent.class, handler );
+		for ( Class c : handler.getEventClasses() )
+			eventManager.setEventHandler( c, handler );
 
 		clock = new OVDClock( eventManager );
 
@@ -99,6 +100,10 @@ public class OverdriveServer implements Disposable {
 
 	public void resume() {
 		paused = false;
+	}
+
+	public void postDelayedEvent( DelayedEvent de ) {
+		clock.postDelayedEvent( de );
 	}
 
 	public void incrTick( int tickCount ) {
