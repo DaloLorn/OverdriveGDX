@@ -256,8 +256,14 @@ public class AbstractShipModel extends AbstractOVDModel implements ShipModel {
 
 		// TODO: Handle shield piercing & ion damage here, and others...
 		// TODO: Implement DamageHandlers that handle damage, so that Models can just reference them?
+		int shields = getProperties().getInt( OVDConstants.SHIELD );
+		if ( shields > 0 ) {
+			if ( shields == getProperties().getInt( OVDConstants.SHIELD_MAX ) ) {
+				ShipPropertyEvent event = Pools.get( ShipPropertyEvent.class ).obtain();
+				event.init( selfRefId, ShipPropertyEvent.INT_TYPE, ShipPropertyEvent.INCREMENT_ACTION, OVDConstants.SHIELD, 1 );
+				context.getScreenEventManager().postDelayedEvent( event, 3 );
+			}
 
-		if ( getProperties().getInt( OVDConstants.SHIELD ) > 0 ) {
 			ShipPropertyEvent event = Pools.get( ShipPropertyEvent.class ).obtain();
 			event.init( selfRefId, ShipPropertyEvent.INT_TYPE, ShipPropertyEvent.INCREMENT_ACTION, OVDConstants.SHIELD, -1 );
 			context.getScreenEventManager().postDelayedEvent( event );

@@ -14,6 +14,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.utils.SpriteDrawable;
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.IntMap;
+import com.badlogic.gdx.utils.Pools;
 import com.ftloverdrive.core.OverdriveContext;
 import com.ftloverdrive.event.TickEvent;
 import com.ftloverdrive.event.TickListener;
@@ -62,7 +63,7 @@ public class ShipActor extends ModelActor
 
 
 	public ShipActor( OverdriveContext context ) {
-		super(context);
+		super( context );
 		assetManager = context.getAssetManager();
 
 		assetManager.load( OVDConstants.ROOT_ATLAS, TextureAtlas.class );
@@ -156,11 +157,20 @@ public class ShipActor extends ModelActor
 	public void shipPropertyChanged( OverdriveContext context, ShipPropertyEvent e ) {
 		if ( e.getShipRefId() != shipModelRefId ) return;
 
-		// if ( e.getPropertyType() == ShipPropertyEvent.INT_TYPE ) {
-		// if ( OVDConstants.HULL.equals( e.getPropertyKey() ) || OVDConstants.HULL_MAX.equals( e.getPropertyKey() ) ) {
-		// updateShipInfo( context );
-		// }
-		// }
+		ShipModel shipModel = context.getReferenceManager().getObject( shipModelRefId, ShipModel.class );
+		if ( e.getPropertyType() == ShipPropertyEvent.INT_TYPE ) {
+			if ( OVDConstants.SHIELD.equals( e.getPropertyKey() ) || OVDConstants.SHIELD_MAX.equals( e.getPropertyKey() ) ) {
+				if ( e.getIntValue() > 0 ) {
+					int shield = shipModel.getProperties().getInt( OVDConstants.SHIELD );
+					int shieldMax = shipModel.getProperties().getInt( OVDConstants.SHIELD_MAX );
+					if ( shield < shieldMax ) {
+						ShipPropertyEvent event = Pools.get( ShipPropertyEvent.class ).obtain();
+						event.init( shipModelRefId, ShipPropertyEvent.INT_TYPE, ShipPropertyEvent.INCREMENT_ACTION, OVDConstants.SHIELD, 1 );
+						context.getScreenEventManager().postDelayedEvent( event, 3 );
+					}
+				}
+			}
+		}
 	}
 
 
@@ -361,10 +371,7 @@ public class ShipActor extends ModelActor
 
 	@Override
 	public float getHeight() {
-		if ( baseImgSpec == null )
-			return 0;
-		else
-			return baseImage.getHeight();
+		return baseImgSpec == null ? 0 : baseImage.getHeight();
 	}
 
 	protected boolean isEqual( Object a, Object b ) {
@@ -390,13 +397,7 @@ public class ShipActor extends ModelActor
 		return false;
 	}
 
-
 	@Override
 	public void ticksAccumulated( TickEvent e ) {
-		GameModel gameModel = context.getReferenceManager().getObject( context.getGameModelRefId(), GameModel.class );
-		int shipRefId = gameModel.getPlayerShip( context.getNetManager().getLocalPlayerRefId() );
-		if ( shipRefId != -1 ) {
-			ShipModel shipModel = context.getReferenceManager().getObject( shipRefId, ShipModel.class );
-		}
 	}
 }

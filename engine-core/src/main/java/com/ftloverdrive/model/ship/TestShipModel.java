@@ -27,5 +27,7 @@ public class TestShipModel extends AbstractShipModel {
 
 		this.getProperties().setInt( OVDConstants.HULL_MAX, 30 );
 		this.getProperties().setInt( OVDConstants.SHIELD_MAX, 4 );
+		this.getProperties().setInt( OVDConstants.SHIELD, getProperties().getInt( OVDConstants.SHIELD_MAX ) );
+
 	}
 }
