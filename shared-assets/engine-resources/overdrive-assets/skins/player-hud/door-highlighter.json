@@ -1,0 +1,16 @@
+{
+  com.ftloverdrive.io.ImageSpec: {
+    door-highlighter:  { atlasPath: "img/effects/.atlas.atlas", regionName: "door-highlight" }
+  },
+
+  // Fields the game is hardcoded to look for.
+  // Values can be changed freely, but entry names must remain the same.
+
+  com.badlogic.gdx.graphics.g2d.Sprite: {
+    door-highlighter:  { texture: door-highlighter }
+  },
+
+  java.lang.Float: {
+    door-highlighter-alpha: 0.5
+  }
+}
