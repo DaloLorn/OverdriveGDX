@@ -1,8 +1,8 @@
 package com.ftloverdrive.ui;
 
-import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Event;
 import com.badlogic.gdx.scenes.scene2d.EventListener;
+import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.utils.Pools;
 import com.ftloverdrive.core.OverdriveContext;
@@ -18,7 +18,7 @@ import com.ftloverdrive.event.local.LocalActorClickedEvent;
  * so that the context won't have to be cached?
  *
  */
-public abstract class LocalActor extends Actor implements EventListener {
+public abstract class LocalActor extends Group implements EventListener {
 
 	protected OverdriveContext context;
 

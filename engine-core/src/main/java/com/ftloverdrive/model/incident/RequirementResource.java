@@ -12,6 +12,9 @@ public class RequirementResource implements PlotBranchRequirement {
 	private int quantity = -1;
 
 
+	protected RequirementResource() {
+	}
+	
 	/**
 	 * 
 	 * @param resourceId

@@ -52,7 +52,7 @@ public abstract class BaseScreen implements Disposable, OVDScreen {
 		log = new Logger( getClass().getCanonicalName(), Logger.INFO );
 
 		stageManager = new OVDStageManager();
-		eventManager = new OVDEventManager();
+		eventManager = new OVDEventManager( false );
 		scriptManager = new OVDScriptManager();
 		inputMultiplexer = new InputMultiplexer();
 
@@ -77,8 +77,6 @@ public abstract class BaseScreen implements Disposable, OVDScreen {
 	}
 
 	public void render( float delta ) {
-		if ( renderedPreviousFrame )
-			getEventManager().secondsElapsed( delta );
 		getEventManager().processEvents( context );
 
 		Gdx.gl.glClearColor( 0, 0, 0, 0 );

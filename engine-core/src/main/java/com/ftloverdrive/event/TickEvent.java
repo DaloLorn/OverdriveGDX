@@ -1,8 +1,8 @@
 package com.ftloverdrive.event;
 
 
-
 public class TickEvent extends AbstractOVDEvent {
+
 	protected int tickCount = 0;
 
 
@@ -50,5 +50,15 @@ public class TickEvent extends AbstractOVDEvent {
 	 * Subclasses overriding this must call super.init();
 	 */
 	public void init() {
+	}
+
+	public String toString() {
+		String result = getClass().getSimpleName();
+		result += " { ";
+		result += "ticks: ";
+		result += tickCount;
+		result += " }";
+
+		return result;
 	}
 }

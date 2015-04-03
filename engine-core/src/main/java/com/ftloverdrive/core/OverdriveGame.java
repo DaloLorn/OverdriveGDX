@@ -1,6 +1,7 @@
 package com.ftloverdrive.core;
 
 import java.io.File;
+import java.io.IOException;
 
 import com.badlogic.gdx.Application;
 import com.badlogic.gdx.ApplicationListener;
@@ -13,7 +14,11 @@ import com.badlogic.gdx.assets.loaders.resolvers.InternalFileHandleResolver;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.utils.Logger;
+import com.esotericsoftware.kryonet.Client;
+import com.esotericsoftware.kryonet.Connection;
+import com.esotericsoftware.kryonet.Listener;
 import com.ftloverdrive.blueprint.OVDBlueprintManager;
+import com.ftloverdrive.event.OVDEvent;
 import com.ftloverdrive.io.FreeTypeFontLoader;
 import com.ftloverdrive.io.OVDSkin;
 import com.ftloverdrive.io.OVDSkinLoader;
@@ -22,6 +27,7 @@ import com.ftloverdrive.io.URIFileHandleResolver;
 import com.ftloverdrive.net.OVDNetManager;
 import com.ftloverdrive.script.ScriptLoader;
 import com.ftloverdrive.script.ScriptResource;
+import com.ftloverdrive.ui.screen.OVDScreen;
 import com.ftloverdrive.ui.screen.OVDScreenManager;
 import com.ftloverdrive.util.OVDReferenceManager;
 
@@ -38,6 +44,7 @@ public class OverdriveGame implements ApplicationListener {
 	private Logger log;
 	private File appDir;
 	private File resourcesDir;
+	private Client kryoClient;
 
 	private URIFileHandleResolver fileHandleResolver;
 
@@ -46,7 +53,11 @@ public class OverdriveGame implements ApplicationListener {
 	private OVDReferenceManager refManager;
 	private OVDBlueprintManager blueManager;
 	private OVDNetManager netManager;
-	private Screen currentScreen = null;
+	private OVDScreen currentScreen = null;
+
+	// Every client is capable of acting as a server, but only does so if it is the
+	// host in a multiplayer game, or the user is playing single.
+	private OverdriveServer server;
 
 
 	@Override
@@ -102,27 +113,77 @@ public class OverdriveGame implements ApplicationListener {
 		context.init( this, null, -1 );
 		screenManager = new OVDScreenManager( context );
 
+		kryoClient = new Client();
+		OVDNetManager.registerClasses( kryoClient.getKryo() );
+		kryoClient.addListener( new Listener() {
+
+			public void received( Connection connection, Object object ) {
+				if ( object instanceof OVDEvent ) {
+					currentScreen.getEventManager().postDelayedInboundEvent( (OVDEvent)object );
+				}
+			}
+		} );
+
 		screenManager.showScreen( screenManager.getInitScreenKey() );
+
+		server = new OverdriveServer( context );
 	}
 
+	/**
+	 * @param host
+	 *            may be null to connect to localhost (useful for single-player)
+	 */
+	public void connect( String host ) {
+		try {
+			kryoClient.stop();
+			if ( host == null )
+				host = "127.0.0.1";
+			kryoClient.start();
+			kryoClient.connect( 5000, host, 54555, 54777 );
+		}
+		catch ( IOException e ) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
+	public void disconnect() {
+		kryoClient.stop();
+	}
+
+	public void sendTCP( Object o ) {
+		if ( kryoClient.isConnected() ) {
+			try {
+				kryoClient.sendTCP( o );
+			}
+			catch ( Exception e ) {
+				e.printStackTrace();
+				dispose();
+			}
+		}
+		else {
+			// TODO Actual error handling
+			log.error( "Client not connected!" );
+		}
+	}
 
 	/**
 	 * Returns the main FileHandleResolver.
 	 *
 	 * Usage:
-	 * FileHandle fh = getFileHandleResolver().resolve( pathString );
-	 * // If you need a File object...
-	 * File f = fh.file();
+	 *     FileHandle fh = getFileHandleResolver().resolve( pathString );
+	 *     // If you need a File object...
+	 *     File f = fh.file();
 	 *
 	 * Given a string, this resolver will look in several locations.
-	 * {current_dir|APP_PATH}/resources/...
-	 * {current_dir|APP_PATH}/...
-	 * {internal}/...
+	 *     {current_dir|APP_PATH}/resources/...
+	 *     {current_dir|APP_PATH}/...
+	 *     {internal}/...
 	 *
 	 * If a URI prefix is found, that will be stripped, and a specific
 	 * location will be checked instead.
-	 * internal://... - Root of the jar, and current dir on desktop.
-	 * external://... - Android SD card, or desktop user's home dir.
+	 *     internal://... - Root of the jar, and current dir on desktop.
+	 *     external://... - Android SD card, or desktop user's home dir.
 	 */
 	public FileHandleResolver getFileHandleResolver() {
 		return fileHandleResolver;
@@ -132,10 +193,10 @@ public class OverdriveGame implements ApplicationListener {
 	 * Returns a manager to load assets.
 	 *
 	 * This one can load ttf fonts:
-	 * String assetString = ".../myfont.ttf?size=10";
-	 * assetManager.load( assetString, BitmapFont.class );
-	 * assetManager.finishLoading();
-	 * BitmapFont font = assetManager.get( assetString, BitmapFont.class );
+	 *     String assetString = ".../myfont.ttf?size=10";
+	 *     assetManager.load( assetString, BitmapFont.class );
+	 *     assetManager.finishLoading();
+	 *     BitmapFont font = assetManager.get( assetString, BitmapFont.class );
 	 */
 	public AssetManager getAssetManager() {
 		return assetManager;
@@ -169,13 +230,17 @@ public class OverdriveGame implements ApplicationListener {
 		return netManager;
 	}
 
+	public OverdriveServer getServer() {
+		return server;
+	}
+
 	/**
 	 * Hides the current screen and shows another.
 	 *
 	 * This shouldn't be called directly.
 	 * Use getScreenManager() instead.
 	 */
-	public void setScreen( Screen screen ) {
+	public void setScreen( OVDScreen screen ) {
 		if ( currentScreen != null ) currentScreen.hide();
 
 		currentScreen = screen;
@@ -194,7 +259,9 @@ public class OverdriveGame implements ApplicationListener {
 
 	@Override
 	public void render() {
-		if ( currentScreen != null ) currentScreen.render( Gdx.graphics.getDeltaTime() );
+		float delta = Gdx.graphics.getDeltaTime();
+		if ( currentScreen != null ) currentScreen.render( delta );
+		if ( server != null ) server.update( delta );
 	}
 
 	@Override
@@ -209,6 +276,8 @@ public class OverdriveGame implements ApplicationListener {
 
 	@Override
 	public void dispose() {
+		disconnect();
+		server.dispose();
 		if ( currentScreen != null ) currentScreen.dispose();
 		screenManager.dispose();
 		assetManager.dispose();

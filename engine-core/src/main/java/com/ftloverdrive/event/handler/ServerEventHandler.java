@@ -1,26 +1,23 @@
 package com.ftloverdrive.event.handler;
 
-import com.badlogic.gdx.utils.Pools;
 import com.ftloverdrive.core.OverdriveContext;
 import com.ftloverdrive.event.OVDEvent;
 import com.ftloverdrive.event.OVDEventHandler;
-import com.ftloverdrive.event.TickEvent;
-import com.ftloverdrive.event.TickListener;
+import com.ftloverdrive.event.TickListenerEvent;
 
 
-public class TickEventHandler implements OVDEventHandler {
+public class ServerEventHandler implements OVDEventHandler {
 
 	private Class[] eventClasses;
 	private Class[] listenerClasses;
 
 
-	public TickEventHandler() {
+	public ServerEventHandler() {
 		eventClasses = new Class[] {
-				TickEvent.class
+				TickListenerEvent.class
 		};
 		listenerClasses = new Class[] {
-				TickListener.class
-		};
+				};
 	}
 
 	@Override
@@ -35,21 +32,18 @@ public class TickEventHandler implements OVDEventHandler {
 
 	@Override
 	public void handle( OverdriveContext context, OVDEvent e, Object[] listeners ) {
-		if ( e instanceof TickEvent ) {
-			TickEvent event = (TickEvent)e;
+		if ( e instanceof TickListenerEvent ) {
+			TickListenerEvent event = (TickListenerEvent)e;
 
-			for ( int i = listeners.length - 2; i >= 0; i -= 2 ) {
-				if ( listeners[i] == TickListener.class ) {
-					( (TickListener)listeners[i + 1] ).ticksAccumulated( event );
-				}
-			}
+			if ( event.isIncrement() )
+				context.getGame().getServer().incrTick( event.getTickCount() );
+			else
+				context.getGame().getServer().decrTick( event.getTickCount() );
+			event.cancel();
 		}
 	}
 
 	@Override
 	public void disposeEvent( OVDEvent e ) {
-		if ( e.getClass() == TickEvent.class ) {
-			Pools.get( TickEvent.class ).free( (TickEvent)e );
-		}
 	}
 }

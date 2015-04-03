@@ -15,6 +15,7 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Scaling;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.ftloverdrive.core.OverdriveContext;
+import com.ftloverdrive.core.OverdriveServer;
 import com.ftloverdrive.ui.ShatteredImage;
 import com.ftloverdrive.util.OVDConstants;
 
@@ -86,6 +87,9 @@ public class MainMenuScreen extends BaseScreen {
 		buttonPlay.addListener( new ClickListener() {
 
 			public void clicked( InputEvent event, float x, float y ) {
+				context.getGame().getServer().start();
+				context.getGame().connect( null );
+
 				context.getScreenManager().continueToNextScreen();
 			}
 		} );

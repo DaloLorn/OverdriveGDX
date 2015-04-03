@@ -5,16 +5,13 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.LinkedBlockingDeque;
 
-import com.badlogic.gdx.utils.Pool;
-import com.badlogic.gdx.utils.Pools;
 import com.ftloverdrive.core.OverdriveContext;
 
 
 /**
  * Queues and dispatches OVDEvents.
  *
- * TODO: Maybe coalesce repeat events when posting, like in
- * java.awt.EventQueue?
+ * TODO: Maybe coalesce repeat events when posting, like in java.awt.EventQueue?
  */
 public class OVDEventManager {
 
@@ -24,17 +21,16 @@ public class OVDEventManager {
 	OVDEventListenerList inListenerList = new OVDEventListenerList();
 	Map<Class, OVDEventHandler> handlerMap = new HashMap<Class, OVDEventHandler>();
 
-	private final int tickRate = 1000;  // Milliseconds per tick of game-time.
-	private int spareTime = 0;          // Remembers leftover milliseconds between ticks.
-
-	private int elapsedTicks;           // Micro-optimization to avoid redeclaring a variable.
-	private final Pool<TickEvent> tickEventPool;
+	private final boolean serverMode;
 
 
 	public OVDEventManager() {
-		tickEventPool = Pools.get( TickEvent.class );
+		this( false );
 	}
 
+	public OVDEventManager( boolean serverMode ) {
+		this.serverMode = serverMode;
+	}
 
 	/**
 	 * Dispatches any pending events and returns.
@@ -47,22 +43,30 @@ public class OVDEventManager {
 				h.handle( context, event, inListenerList.getListenerList() );
 				h.disposeEvent( event );
 			}
+			else if ( serverMode ) {
+				// TODO: Scrutinize the event
+				postDelayedEvent( event );
+			}
 			else {
 				System.out.println( "Unhandled event: " + event );
 			}
 		}
 		while ( ( event = outQueue.poll() ) != null ) {
-			// TODO: A registry of handlers to dispatch various event types.
-			// Otherwise this will just be a hardcoded if/else instance check.
+			if ( event.isCancelled() )
+				continue; // TODO: Dispose the event?
 
-			if ( !event.isCancelled() ) {
-				if ( event instanceof AbstractLocalEvent ) {
-					// Local events are not sent to the server.
-					postDelayedInboundEvent( event );
+			if ( event instanceof AbstractLocalEvent ) {
+				// Local events are not sent to the server.
+				postDelayedInboundEvent( event );
+			}
+			else {
+				if ( serverMode ) {
+					context.getGame().getServer().sendAllTCP( event );
 				}
 				else {
+					context.getGame().sendTCP( event );
 					// Pretend it went to the server and back.
-					postDelayedInboundEvent( event );
+					// postDelayedInboundEvent( event );
 				}
 			}
 		}
@@ -85,32 +89,22 @@ public class OVDEventManager {
 	}
 
 	/**
+	 * Enqueues a delayed event that will be processed only after the required amount
+	 * of game ticks has passed.
+	 * 
+	 * @param ticks
+	 *            how many ticks have to pass before the event is processed
+	 */
+	public void postDelayedEvent( OVDEvent e, int ticks ) {
+		// TODO
+	}
+
+	/**
 	 * Adds an event to the start of the outbound queue. (thread-safe)
 	 */
 	public void postPreemptiveEvent( OVDEvent e ) {
 		outQueue.addFirst( e );
 	}
-
-
-	/**
-	 * Signals that real-world time has elapsed since the last call.
-	 *
-	 * As enough time accumulates, TickEvents may be generated.
-	 */
-	public void secondsElapsed( float t ) {
-		spareTime += (int)( t * 1000 ); // Add as milliseconds.
-		elapsedTicks = spareTime / tickRate;
-		if ( elapsedTicks > 0 ) {
-			spareTime = spareTime % tickRate;
-			TickEvent tickEvent = tickEventPool.obtain();
-			tickEvent.init();
-			tickEvent.setTickCount( elapsedTicks );
-
-			// Pretend the server issued this event.
-			postDelayedInboundEvent( tickEvent );
-		}
-	}
-
 
 	/**
 	 * Sets the handler for a specific event class.
@@ -129,5 +123,43 @@ public class OVDEventManager {
 	 */
 	public <T extends OVDEventListener> void addEventListener( T l, Class<T> listenerClass ) {
 		inListenerList.add( listenerClass, l );
+	}
+
+	/**
+	 * TODO: This is just about incrementing an internal ref counter. No need to pose as
+	 * listener registration?
+	 * 
+	 * @param tickCount
+	 *            the tick count that the listener wants to react to
+	 */
+	public void addTickListener( int tickCount, TickListener l ) {
+		if ( tickCount < 1 )
+			throw new IllegalArgumentException( "Argument must be greater than 0." );
+
+		if ( l != null )
+			inListenerList.add( TickListener.class, l );
+		if ( tickCount > 1 ) {
+			// Inform the server's clock that it now needs to issue tick events for this tick count.
+			TickListenerEvent ev = new TickListenerEvent( tickCount, true );
+			postDelayedEvent( ev );
+		}
+	}
+
+	/**
+	 * 
+	 * @param tickCount
+	 *            the tick count that the listener was reacting to
+	 */
+	public void removeTickListener( int tickCount, TickListener l ) {
+		if ( tickCount < 1 )
+			throw new IllegalArgumentException( "Argument must be greater than 0." );
+
+		if ( l != null )
+			inListenerList.remove( TickListener.class, l );
+		if ( tickCount > 1 ) {
+			// Inform the server's clock that it no longer needs to issue tick events for this tick count.
+			TickListenerEvent ev = new TickListenerEvent( tickCount, false );
+			postDelayedEvent( ev );
+		}
 	}
 }

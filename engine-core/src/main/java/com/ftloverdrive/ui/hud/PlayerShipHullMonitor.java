@@ -118,7 +118,6 @@ public class PlayerShipHullMonitor extends Actor implements Disposable, GamePlay
 				barClipWidth = Math.min( ( (float)hullAmt / hullMax ) * barSprite.getWidth(), barSprite.getWidth() );
 
 				float p = ( (float)hullAmt ) / hullMax;
-				System.out.println( p );
 				if ( p > 0.66f )
 					cCurrent = cHigh;
 				else if ( p > 0.33f )

@@ -15,6 +15,8 @@ import com.badlogic.gdx.scenes.scene2d.utils.SpriteDrawable;
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.IntMap;
 import com.ftloverdrive.core.OverdriveContext;
+import com.ftloverdrive.event.TickEvent;
+import com.ftloverdrive.event.TickListener;
 import com.ftloverdrive.event.game.GamePlayerShipChangeEvent;
 import com.ftloverdrive.event.game.GamePlayerShipChangeListener;
 import com.ftloverdrive.event.local.LocalActorClickedListener;
@@ -22,14 +24,16 @@ import com.ftloverdrive.event.player.OrderListener;
 import com.ftloverdrive.event.ship.ShipPropertyEvent;
 import com.ftloverdrive.event.ship.ShipPropertyListener;
 import com.ftloverdrive.io.ImageSpec;
+import com.ftloverdrive.model.GameModel;
 import com.ftloverdrive.model.ship.RoomModel;
 import com.ftloverdrive.model.ship.ShipCoordinate;
 import com.ftloverdrive.model.ship.ShipModel;
+import com.ftloverdrive.ui.ModelActor;
 import com.ftloverdrive.util.OVDConstants;
 
 
-public class ShipActor extends Group
-		implements Disposable, GamePlayerShipChangeListener, ShipPropertyListener, EventListener {
+public class ShipActor extends ModelActor
+		implements Disposable, GamePlayerShipChangeListener, ShipPropertyListener, EventListener, TickListener {
 
 	protected AssetManager assetManager;
 
@@ -58,7 +62,7 @@ public class ShipActor extends Group
 
 
 	public ShipActor( OverdriveContext context ) {
-		super();
+		super(context);
 		assetManager = context.getAssetManager();
 
 		assetManager.load( OVDConstants.ROOT_ATLAS, TextureAtlas.class );
@@ -134,7 +138,7 @@ public class ShipActor extends Group
 
 	public void setShipModel( OverdriveContext context, int shipModelRefId ) {
 		this.shipModelRefId = shipModelRefId;
-		updateShipInfo( context );
+		updateInfo( context );
 	}
 
 
@@ -163,7 +167,7 @@ public class ShipActor extends Group
 	/**
 	 * Updates the everything to match the current ShipModel.
 	 */
-	private void updateShipInfo( OverdriveContext context ) {
+	protected void updateInfo( OverdriveContext context ) {
 
 		if ( shipModelRefId == -1 ) {
 			shipFudgeGroup.setPosition( 0, 0 );
@@ -384,5 +388,15 @@ public class ShipActor extends Group
 		}
 
 		return false;
+	}
+
+
+	@Override
+	public void ticksAccumulated( TickEvent e ) {
+		GameModel gameModel = context.getReferenceManager().getObject( context.getGameModelRefId(), GameModel.class );
+		int shipRefId = gameModel.getPlayerShip( context.getNetManager().getLocalPlayerRefId() );
+		if ( shipRefId != -1 ) {
+			ShipModel shipModel = context.getReferenceManager().getObject( shipRefId, ShipModel.class );
+		}
 	}
 }

@@ -33,7 +33,6 @@ import com.ftloverdrive.model.GameModel;
 import com.ftloverdrive.model.PlayerModel;
 import com.ftloverdrive.model.incident.RequirementShip;
 import com.ftloverdrive.model.ship.ShipModel;
-import com.ftloverdrive.net.NetTest;
 import com.ftloverdrive.ui.ShatteredImage;
 import com.ftloverdrive.ui.hud.PlayerScrapMonitor;
 import com.ftloverdrive.ui.hud.PlayerShipDoorHighlighter;
@@ -198,6 +197,8 @@ public class TestScreen extends BaseScreen {
 		eventManager.addEventListener( shipActor, GamePlayerShipChangeListener.class );
 		eventManager.addEventListener( shipActor, ShipPropertyListener.class );
 
+		// This method is just about incrementing an internal ref counter, so there's no need to pass an actual listener
+		eventManager.addTickListener( 3, null );
 		// When there's a ship, increment its hull after every tick.
 		eventManager.addEventListener( new TickListener() {
 
@@ -209,20 +210,25 @@ public class TestScreen extends BaseScreen {
 				int shipRefId = gameModel.getPlayerShip( context.getNetManager().getLocalPlayerRefId() );
 				if ( shipRefId != -1 ) {
 					ShipModel shipModel = context.getReferenceManager().getObject( shipRefId, ShipModel.class );
-					int hull = shipModel.getProperties().getInt( OVDConstants.HULL );
-					int hullMax = shipModel.getProperties().getInt( OVDConstants.HULL_MAX );
-					if ( hull < hullMax ) {
-						ShipPropertyEvent event = Pools.get( ShipPropertyEvent.class ).obtain();
-						event.init( shipRefId, ShipPropertyEvent.INT_TYPE, ShipPropertyEvent.INCREMENT_ACTION, OVDConstants.HULL, 1 );
-						context.getScreenEventManager().postDelayedEvent( event );
+
+					if ( e.getTickCount() == 1 ) {
+						int hull = shipModel.getProperties().getInt( OVDConstants.HULL );
+						int hullMax = shipModel.getProperties().getInt( OVDConstants.HULL_MAX );
+						if ( hull < hullMax ) {
+							ShipPropertyEvent event = Pools.get( ShipPropertyEvent.class ).obtain();
+							event.init( shipRefId, ShipPropertyEvent.INT_TYPE, ShipPropertyEvent.INCREMENT_ACTION, OVDConstants.HULL, 1 );
+							context.getScreenEventManager().postDelayedEvent( event );
+						}
 					}
 
-					int shield = shipModel.getProperties().getInt( OVDConstants.SHIELD );
-					int shieldMax = shipModel.getProperties().getInt( OVDConstants.SHIELD_MAX );
-					if ( shield < shieldMax ) {
-						ShipPropertyEvent event = Pools.get( ShipPropertyEvent.class ).obtain();
-						event.init( shipRefId, ShipPropertyEvent.INT_TYPE, ShipPropertyEvent.INCREMENT_ACTION, OVDConstants.SHIELD, 1 );
-						context.getScreenEventManager().postDelayedEvent( event );
+					if ( e.getTickCount() == 3 ) {
+						int shield = shipModel.getProperties().getInt( OVDConstants.SHIELD );
+						int shieldMax = shipModel.getProperties().getInt( OVDConstants.SHIELD_MAX );
+						if ( shield < shieldMax ) {
+							ShipPropertyEvent event = Pools.get( ShipPropertyEvent.class ).obtain();
+							event.init( shipRefId, ShipPropertyEvent.INT_TYPE, ShipPropertyEvent.INCREMENT_ACTION, OVDConstants.SHIELD, 1 );
+							context.getScreenEventManager().postDelayedEvent( event );
+						}
 					}
 				}
 
@@ -245,14 +251,6 @@ public class TestScreen extends BaseScreen {
 		incidentWindowDemo();
 
 		resize( getScreenWidth(), getScreenHeight() );
-
-		try {
-			NetTest test = new NetTest();
-			test.shutdown();
-		}
-		catch ( Exception e ) {
-			e.printStackTrace();
-		}
 	}
 
 	private void incidentWindowDemo() {

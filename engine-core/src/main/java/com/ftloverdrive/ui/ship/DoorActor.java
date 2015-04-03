@@ -179,9 +179,9 @@ public class DoorActor extends ModelActor
 	@Override
 	public void ticksAccumulated( TickEvent e ) {
 		// TODO: Test code, remove later
-		DoorPropertyEvent ev = Pools.get( DoorPropertyEvent.class ).obtain();
-		ev.init( modelRefId, DoorPropertyEvent.INT_TYPE, DoorPropertyEvent.INCREMENT_ACTION, OVDConstants.DOOR_HEALTH, 10 );
-		context.getScreenEventManager().postDelayedEvent( ev );
+		//DoorPropertyEvent ev = Pools.get( DoorPropertyEvent.class ).obtain();
+		//ev.init( modelRefId, DoorPropertyEvent.INT_TYPE, DoorPropertyEvent.INCREMENT_ACTION, OVDConstants.DOOR_HEALTH, 10 );
+		//context.getScreenEventManager().postDelayedEvent( ev );
 		// End test code
 	}
 
