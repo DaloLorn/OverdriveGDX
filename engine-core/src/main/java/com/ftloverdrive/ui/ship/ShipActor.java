@@ -123,6 +123,7 @@ public class ShipActor extends ModelActor
 		shipFloorplanGroup.addActor( doorGroup );
 
 		// TODO: Where to draw crew layer?
+		// Needs to be drawn above door layer for sure
 		crewGroup = new Group();
 		crewGroup.setTouchable( Touchable.childrenOnly );
 		shipFloorplanGroup.addActor( crewGroup );

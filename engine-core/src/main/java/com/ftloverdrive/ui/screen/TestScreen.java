@@ -258,6 +258,10 @@ public class TestScreen extends BaseScreen {
 		branchBlueprint = new PlotBranchBlueprint( "TEST_INCIDENT_3", "(Test Ship) Need moar scrap!" );
 		branchBlueprint.addRequirement( new RequirementShip( "DEFAULT" ) );
 		incBlueprint.addPlotBranch( branchBlueprint );
+
+		branchBlueprint = new PlotBranchBlueprint( "TEST_INCIDENT_1", "Nested test" );
+		incBlueprint.addPlotBranch( branchBlueprint );
+
 		incBlueprint.addPlotBranch( new PlotBranchBlueprint() );
 
 		context.getBlueprintManager().storeBlueprint( "TEST_INCIDENT_1", incBlueprint );
@@ -266,10 +270,10 @@ public class TestScreen extends BaseScreen {
 		incBlueprint = new IncidentBlueprint( "TEST_INCIDENT_2" );
 		incBlueprint.setTextTemplate( "This is a looped event!" );
 
-		incBlueprint.addConsequence( new ConsequenceResourceBlueprint( OVDConstants.SCRAP, 15, 30 ) );
-		incBlueprint.addConsequence( new ConsequenceResourceBlueprint( OVDConstants.DRONES, 0, 1 ) );
-		incBlueprint.addConsequence( new ConsequenceResourceBlueprint( OVDConstants.MISSILES, 0, 1 ) );
 		incBlueprint.addConsequence( new ConsequenceResourceBlueprint( OVDConstants.FUEL, 0, 3 ) );
+		incBlueprint.addConsequence( new ConsequenceResourceBlueprint( OVDConstants.MISSILES, 0, 1 ) );
+		incBlueprint.addConsequence( new ConsequenceResourceBlueprint( OVDConstants.DRONES, 0, 1 ) );
+		incBlueprint.addConsequence( new ConsequenceResourceBlueprint( OVDConstants.SCRAP, 15, 30 ) );
 		incBlueprint.addConsequence( new ConsequenceDamageBlueprint( 1, 5 ) );
 
 		branchBlueprint = new PlotBranchBlueprint( "TEST_INCIDENT_1", "Go to event 1" );
@@ -279,8 +283,8 @@ public class TestScreen extends BaseScreen {
 
 		incBlueprint = new IncidentBlueprint( "TEST_INCIDENT_3" );
 		incBlueprint.setTextTemplate( "Requirement test" );
-		incBlueprint.addConsequence( new ConsequenceResourceBlueprint( OVDConstants.SCRAP, -50, -60 ) );
 		incBlueprint.addConsequence( new ConsequenceResourceBlueprint( OVDConstants.FUEL, 1, 3 ) );
+		incBlueprint.addConsequence( new ConsequenceResourceBlueprint( OVDConstants.SCRAP, -50, -60 ) );
 		incBlueprint.addPlotBranch( branchBlueprint );
 		context.getBlueprintManager().storeBlueprint( "TEST_INCIDENT_3", incBlueprint );
 

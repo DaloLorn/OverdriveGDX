@@ -41,15 +41,20 @@ public class EngineEventHandler implements OVDEventHandler {
 		if ( e instanceof ModelDestructionEvent ) {
 			ModelDestructionEvent event = (ModelDestructionEvent)e;
 
-			int refId = event.getModelRefId();
-			OVDModel model = context.getReferenceManager().getObject( refId, OVDModel.class );
-			if ( model instanceof Disposable )
-				( (Disposable)model ).dispose();
-			context.getReferenceManager().forget( refId );
+			int[] refIds = event.getModelRefIds();
+			for ( int refId : refIds ) {
+				OVDModel model = context.getReferenceManager().getObject( refId, OVDModel.class );
+				if ( model == null )
+					continue;
+				if ( model instanceof Disposable )
+					( (Disposable)model ).dispose();
+				context.getReferenceManager().forget( refId );
+				context.getNetManager().returnRefId( refId );
 
-			for ( int i = listeners.length - 2; i >= 0; i -= 2 ) {
-				if ( listeners[i] == ModelDestructionListener.class ) {
-					( (ModelDestructionListener)listeners[i + 1] ).modelDestroyed( context, event );
+				for ( int i = listeners.length - 2; i >= 0; i -= 2 ) {
+					if ( listeners[i] == ModelDestructionListener.class ) {
+						( (ModelDestructionListener)listeners[i + 1] ).modelDestroyed( context, event );
+					}
 				}
 			}
 		}

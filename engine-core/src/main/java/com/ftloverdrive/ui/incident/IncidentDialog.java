@@ -22,11 +22,12 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.Pools;
 import com.ftloverdrive.core.OverdriveContext;
-import com.ftloverdrive.event.engine.DisposeListener;
 import com.ftloverdrive.event.incident.IncidentSelectionEvent;
 import com.ftloverdrive.io.OVDSkin;
 import com.ftloverdrive.model.incident.Consequence;
 import com.ftloverdrive.model.incident.DefaultBranchCriteria;
+import com.ftloverdrive.model.incident.DefaultPlotBranch;
+import com.ftloverdrive.model.incident.DeferredIncidentModel;
 import com.ftloverdrive.model.incident.IncidentModel;
 import com.ftloverdrive.model.incident.PlotBranch;
 import com.ftloverdrive.model.incident.PlotBranchCriteria;
@@ -83,8 +84,9 @@ public class IncidentDialog extends Window implements Disposable, EventListener 
 	private int choiceCount = 0; // Total choice count
 	private int availableChoiceCount = 0; // Available (non-grayed out and visible) choice count
 	private PlotBranch[] hotkeyChoices = new PlotBranch[maxHHotkeyChoiceCount];
+	// Only used to call dispose, can be direct reference.
+	private DeferredIncidentModel curIncModel = null;
 
-	private Array<DisposeListener> disposeListeners = new Array<DisposeListener>( false, 1 );
 	private boolean captureInput = false;
 	private boolean dragging = false;
 
@@ -169,6 +171,34 @@ public class IncidentDialog extends Window implements Disposable, EventListener 
 	 */
 	public void setCaptureInput( boolean block ) {
 		captureInput = block;
+	}
+
+	public void setCurrentIncident( DeferredIncidentModel incident ) {
+		curIncModel = incident;
+		setCaptureInput( true );
+		setIncidentText( incident.getText() );
+
+		int[] conseqRefIds = incident.consequenceRefIds();
+		if ( conseqRefIds.length == 0 ) {
+			showConseequenceBox( false );
+		}
+		else {
+			showConseequenceBox( true );
+			for ( int conseqRefId : conseqRefIds ) {
+				Consequence conseq = context.getReferenceManager().getObject( conseqRefId, Consequence.class );
+				addConsequence( conseq );
+			}
+		}
+
+		int[] branchRefIds = incident.branchRefIds();
+		for ( int branchRefId : branchRefIds ) {
+			PlotBranch branch = context.getReferenceManager().getObject( branchRefId, PlotBranch.class );
+			addChoice( branch );
+		}
+		// If the incident defines no branches, or none of the added branches are available / visible, then
+		// add the default "Continue..." choice.
+		if ( availableChoiceCount == 0 )
+			addChoice( new DefaultPlotBranch() );
 	}
 
 	public void setIncidentText( String text ) {
@@ -281,10 +311,6 @@ public class IncidentDialog extends Window implements Disposable, EventListener 
 			tbChoice.addListener( listener );
 	}
 
-	public int countAvailableChoices() {
-		return availableChoiceCount;
-	}
-
 	public void addConsequence( Consequence conseq ) {
 		conseq.placeConsequenceActor( context, conseqBox );
 	}
@@ -327,18 +353,18 @@ public class IncidentDialog extends Window implements Disposable, EventListener 
 		float result = 0;
 		Array<Cell> cells = t.getCells();
 		for ( int row = 0; row < t.getRows(); ++row ) {
-			float maxH = 0;
+			float maxHeight = 0;
 			for ( int col = 0; col < t.getColumns(); ++col ) {
-				int i = row * t.getColumns() + col;
-				if ( i >= cells.size )
+				int index = row * t.getColumns() + col;
+				if ( index >= cells.size )
 					continue;
-				Cell c = cells.get( i );
-				float pad = c.getComputedPadTop() + c.getComputedPadBottom();
-				float cHeight = c.getMinHeight() + pad;
-				if ( cHeight > maxH )
-					maxH = cHeight;
+				Cell c = cells.get( index );
+				float vPad = c.getComputedPadTop() + c.getComputedPadBottom();
+				float cellHeight = c.getMinHeight() + vPad;
+				if ( cellHeight > maxHeight )
+					maxHeight = cellHeight;
 			}
-			result += maxH;
+			result += maxHeight;
 		}
 		return result;
 	}
@@ -366,7 +392,7 @@ public class IncidentDialog extends Window implements Disposable, EventListener 
 	private void reset0() {
 		if ( choiceCount > maxHHotkeyChoiceCount )
 			choiceCount = maxHHotkeyChoiceCount;
-		for ( ; choiceCount > 0; ) {
+		while ( choiceCount > 0 ) {
 			--choiceCount;
 			hotkeyChoices[choiceCount] = null;
 		}
@@ -375,9 +401,6 @@ public class IncidentDialog extends Window implements Disposable, EventListener 
 		// Hide the conseqTable to prevent it from flickering when the dialog is changing
 		conseqBox.setVisible( false );
 		vgChoices.clear();
-
-		fireDisposedEvent();
-		disposeListeners.clear();
 
 		System.gc();
 	}
@@ -390,21 +413,11 @@ public class IncidentDialog extends Window implements Disposable, EventListener 
 		stage.getRoot().removeActor( this );
 		stage.removeListener( this );
 
+		curIncModel.dispose( context );
+		curIncModel = null;
+
 		Pools.get( OverdriveContext.class ).free( context );
 		System.gc();
-	}
-
-	private void fireDisposedEvent() {
-		for ( DisposeListener listener : disposeListeners )
-			listener.objectDisposed( context, this );
-	}
-
-	public void addDisposeListener( DisposeListener listener ) {
-		disposeListeners.add( listener );
-	}
-
-	public void removeDisposeListener( DisposeListener listener ) {
-		disposeListeners.removeValue( listener, true );
 	}
 
 	/*
@@ -442,6 +455,7 @@ public class IncidentDialog extends Window implements Disposable, EventListener 
 			context.getScreenEventManager().postDelayedEvent( incSelectionE );
 
 			reset0();
+			curIncModel.disposeExcept( context, incRefId );
 		}
 	}
 

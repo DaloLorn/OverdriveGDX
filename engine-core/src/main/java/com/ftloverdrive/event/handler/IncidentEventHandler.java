@@ -61,7 +61,7 @@ public class IncidentEventHandler implements OVDEventHandler {
 		if ( e instanceof IncidentCreationEvent ) {
 			IncidentCreationEvent ev = (IncidentCreationEvent)e;
 
-			IncidentModel incModel = new DeferredIncidentModel( ev.getIncidentId() );
+			IncidentModel incModel = new DeferredIncidentModel( ev.getIncidentId(), ev.getTargetPlayerRefId() );
 			incModel.setText( ev.getIncidentText() );
 			int incRefId = ev.getIncidentRefId();
 			context.getReferenceManager().addObject( incModel, incRefId );

@@ -139,6 +139,7 @@ public class OverdriveGame implements ApplicationListener {
 			if ( host == null )
 				host = "127.0.0.1";
 			kryoClient.start();
+			// TODO Run connection in another thread, show window w/ abort button in this one
 			kryoClient.connect( 5000, host, 54555, 54777 );
 		}
 		catch ( IOException e ) {

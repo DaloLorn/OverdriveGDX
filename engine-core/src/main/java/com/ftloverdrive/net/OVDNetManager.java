@@ -40,14 +40,16 @@ public class OVDNetManager {
 
 	protected Array<Range> idRanges;
 	protected int nextId = 0;
+	protected Array<Integer> returnedIds;
 	protected int localPlayerModelRefId = -1;
+	protected int enemyPlayerModelRefId = -1;
 
 
 	public OVDNetManager() {
 		idRanges = new Array<Range>( true, 1 );
 		idRanges.add( new Range( 0, Integer.MAX_VALUE ) ); // Default range.
+		returnedIds = new Array<Integer>( true, 16 );
 	}
-
 
 	/**
 	 * Sets a range of assignable reference ids, clearing all others.
@@ -55,7 +57,7 @@ public class OVDNetManager {
 	 *
 	 * @param start
 	 *            the start of the range, inclusive
-	 * @param start
+	 * @param end
 	 *            the end of the range, exclusive
 	 */
 	public void setRefIdRange( int start, int end ) {
@@ -69,7 +71,7 @@ public class OVDNetManager {
 	 *
 	 * @param start
 	 *            the start of the range, inclusive
-	 * @param start
+	 * @param end
 	 *            the end of the range, exclusive
 	 */
 	public void addRefIdRange( int start, int end ) {
@@ -78,6 +80,8 @@ public class OVDNetManager {
 
 	/**
 	 * Reserves and returns the next available reference id.
+	 * If there are any ids in the reusable pool, then the a refId from that pool
+	 * will be returned instead.
 	 *
 	 * TODO: Have the server pre-assign each player a different large range
 	 * of ids. When this is called, get the next id from the range; if that's
@@ -85,6 +89,9 @@ public class OVDNetManager {
 	 * ids.
 	 */
 	public int requestNewRefId() {
+		if ( returnedIds.size > 0 ) {
+			return returnedIds.removeIndex( 0 );
+		}
 		while ( idRanges.size > 0 && nextId >= idRanges.get( 0 ).end ) {
 			idRanges.removeIndex( 0 );
 		}
@@ -94,6 +101,21 @@ public class OVDNetManager {
 		return nextId++;
 	}
 
+	/**
+	 * Returns the refId to the pool of reusable ids.
+	 */
+	public void returnRefId( int refId ) {
+		// Don't add the refId to the pool if it doesn't belong to any
+		// of our ranges.
+		boolean local = false;
+		for ( int i = 0; i < idRanges.size && !local; ++i ) {
+			Range r = idRanges.get( i );
+			local = refId >= r.start && refId < r.end;
+		}
+
+		if ( local )
+			returnedIds.add( refId );
+	}
 
 	/**
 	 * Sets the reference id for the local PlayerModel.
@@ -107,12 +129,24 @@ public class OVDNetManager {
 	}
 
 	/**
+	 * Sets the reference id for the enemy PlayerModel.
+	 */
+	public void setEnemyPlayerRefId( int playerRefId ) {
+		enemyPlayerModelRefId = playerRefId;
+	}
+
+	public int getEnemyPlayerRefId() {
+		return enemyPlayerModelRefId;
+	}
+
+	/**
 	 * KryoNet requires ahead-of-time knowledge about what classes will be transferred between
 	 * the server and the client.
 	 * 
 	 * TODO: There's probably a better way to handle this, or at least elsewhere?
 	 */
 	public static void registerClasses( Kryo kryo ) {
+		// Data classes
 		kryo.register( Object[].class );
 		kryo.register( int[].class );
 		kryo.register( Integer[].class );
@@ -126,6 +160,7 @@ public class OVDNetManager {
 		kryo.register( RequirementShip.class );
 		kryo.register( RequirementResource.class );
 
+		// Event classes
 		kryo.register( TickEvent.class );
 		kryo.register( TickListenerEvent.class );
 		kryo.register( DelayedEvent.class );

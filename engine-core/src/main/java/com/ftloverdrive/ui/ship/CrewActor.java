@@ -27,6 +27,11 @@ import com.ftloverdrive.model.ship.ShipModel;
 import com.ftloverdrive.ui.AmbulActor;
 
 
+/**
+ * TODO: If the game window is resized / moved while the crew is moving,
+ * weird shit sometimes happens (crew moves slowly until it reaches the next
+ * waypoint, or beelines off the screen)
+ */
 public class CrewActor extends AmbulActor
 		implements Disposable, CrewPropertyListener, LocalActorClickedListener, OrderListener {
 
