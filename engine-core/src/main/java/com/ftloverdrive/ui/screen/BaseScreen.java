@@ -125,42 +125,37 @@ public abstract class BaseScreen implements Disposable, OVDScreen {
 	 * =============================================================
 	 */
 
-	protected static Button createPushButton( TextureAtlas atlas, String up, String down, String over ) {
-		ButtonStyle style = new ButtonStyle();
-
-		String[] args = new String[] { up, down, over };
-		TextureRegionDrawable[] temp = new TextureRegionDrawable[args.length];
-		initTextures( atlas, args, temp );
-
-		style.up = temp[0];
-		style.down = temp[1];
-		style.over = temp[2];
-
-		return new Button( style );
+	protected static Button createButton( TextureAtlas atlas, String enabled, String hover ) {
+		return createButton( atlas, enabled, null, hover, hover, null, null );
 	}
 
-	protected static Button createCheckButton( TextureAtlas atlas, String up, String down, String over, String checked ) {
+	protected static Button createButton( TextureAtlas atlas, String enabled, String disabled, String pressed, String hover,
+			String checked, String checkedHover ) {
 		ButtonStyle style = new ButtonStyle();
 
-		String[] args = new String[] { up, down, over, checked };
+		String[] args = new String[] { enabled, disabled, pressed, hover, checked, checkedHover };
 		TextureRegionDrawable[] temp = new TextureRegionDrawable[args.length];
 		initTextures( atlas, args, temp );
 
 		style.up = temp[0];
-		style.down = temp[1];
-		style.over = temp[2];
-		style.checked = temp[3];
+		style.disabled = temp[1];
+		style.down = temp[2];
+		style.over = temp[3];
+		style.checked = temp[4];
+		style.checkedOver = temp[5];
 
 		return new Button( style );
 	}
 
 	private static void initTextures( TextureAtlas atlas, String[] regionNames, TextureRegionDrawable[] drawables ) {
 		for ( int i = 0; i < drawables.length; ++i ) {
+			if ( regionNames[i] == null )
+				continue;
 			drawables[i] = new TextureRegionDrawable( atlas.findRegion( regionNames[i] ) );
 		}
 		for ( int i = 0; i < drawables.length; ++i ) {
 			for ( int j = i; j < drawables.length; ++j ) {
-				if ( i != j && regionNames[i].equals( regionNames[j] ) ) {
+				if ( i != j && regionNames[i] != null && regionNames[i].equals( regionNames[j] ) ) {
 					drawables[j] = drawables[i];
 				}
 			}

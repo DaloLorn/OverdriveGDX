@@ -1,21 +1,20 @@
 package com.ftloverdrive.ui.screen;
 
+import java.util.Scanner;
+
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
-import com.badlogic.gdx.scenes.scene2d.ui.Button.ButtonStyle;
 import com.badlogic.gdx.scenes.scene2d.ui.VerticalGroup;
 import com.badlogic.gdx.scenes.scene2d.utils.Align;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
-import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Scaling;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.ftloverdrive.core.OverdriveContext;
-import com.ftloverdrive.core.OverdriveServer;
 import com.ftloverdrive.ui.ShatteredImage;
 import com.ftloverdrive.util.OVDConstants;
 
@@ -59,26 +58,14 @@ public class MainMenuScreen extends BaseScreen {
 
 		// Set up the main menu buttons
 		menuTable = new VerticalGroup();
-		TextureRegionDrawable temp = null;
 
-		ButtonStyle btnStylePlay = new ButtonStyle();
-		btnStylePlay.up = new TextureRegionDrawable( menuAtlas.findRegion( "start-on" ) );
-		btnStylePlay.disabled = new TextureRegionDrawable( menuAtlas.findRegion( "start-off" ) );
-		temp = new TextureRegionDrawable( menuAtlas.findRegion( "start-select2" ) );
-		btnStylePlay.down = temp;
-		btnStylePlay.over = temp;
-		Button buttonPlay = new Button( btnStylePlay );
-
-		ButtonStyle btnStyleExit = new ButtonStyle();
-		btnStyleExit.up = new TextureRegionDrawable( menuAtlas.findRegion( "quit-on" ) );
-		btnStyleExit.disabled = new TextureRegionDrawable( menuAtlas.findRegion( "quit-off" ) );
-		temp = new TextureRegionDrawable( menuAtlas.findRegion( "quit-select2" ) );
-		btnStyleExit.down = temp;
-		btnStyleExit.over = temp;
-		Button buttonExit = new Button( btnStyleExit );
+		Button buttonPlay = createButton( menuAtlas, "start-on", "start-select2" );
+		Button buttonConnect = createButton( menuAtlas, "continue-on", "continue-select2" );
+		Button buttonExit = createButton( menuAtlas, "quit-on", "quit-select2" );
 
 		// Add the buttons to the stage
 		menuTable.addActor( buttonPlay );
+		menuTable.addActor( buttonConnect );
 		menuTable.addActor( buttonExit );
 		menuTable.setFillParent( true );
 		menuTable.align( Align.right );
@@ -91,6 +78,23 @@ public class MainMenuScreen extends BaseScreen {
 				context.getGame().connect( null );
 
 				context.getScreenManager().continueToNextScreen();
+			}
+		} );
+
+		buttonConnect.addListener( new ClickListener() {
+
+			public void clicked( InputEvent event, float x, float y ) {
+				try {
+					context.getGame().discoverLocalHosts();
+					Scanner sc = new Scanner( System.in );
+					System.out.print( "IP address to connect to > " );
+					String ip = sc.nextLine();
+					context.getGame().connect( ip );
+					context.getScreenManager().continueToNextScreen();
+				}
+				catch ( Exception e ) {
+					e.printStackTrace();
+				}
 			}
 		} );
 

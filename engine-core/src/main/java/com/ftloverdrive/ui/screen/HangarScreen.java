@@ -106,14 +106,17 @@ public class HangarScreen extends BaseScreen implements EventListener {
 		}
 
 		// Set up the buttons
-		btnPlay = createPushButton( hangarAtlas, "button-start-on", "button-start-select2", "button-start-select2" );
+		btnPlay = createButton( hangarAtlas, "button-start-on", "button-start-select2" );
 		mainStage.addActor( btnPlay );
 
-		btnEasy = createCheckButton( hangarAtlas, "button-easy-on", "button-easy-select2", "button-easy-select2", "button-easy-select2" );
+		btnEasy = createButton( hangarAtlas, "button-easy-on", "button-easy-off", "button-easy-select2", "button-easy-select2",
+				"button-easy-select2", "button-easy-select2" );
 		mainStage.addActor( btnEasy );
-		btnNorm = createCheckButton( hangarAtlas, "button-normal-on", "button-normal-select2", "button-normal-select2", "button-normal-select2" );
+		btnNorm = createButton( hangarAtlas, "button-normal-on", "button-normal-off", "button-normal-select2", "button-normal-select2",
+				"button-normal-select2", "button-normal-select2" );
 		mainStage.addActor( btnNorm );
-		btnHard = createCheckButton( hangarAtlas, "button-hard-on", "button-hard-select2", "button-hard-select2", "button-hard-select2" );
+		btnHard = createButton( hangarAtlas, "button-hard-on", "button-hard-off", "button-hard-select2", "button-hard-select2",
+				"button-hard-select2", "button-hard-select2" );
 		mainStage.addActor( btnHard );
 
 		ButtonGroup btngDiff = new ButtonGroup();
@@ -122,14 +125,15 @@ public class HangarScreen extends BaseScreen implements EventListener {
 		btngDiff.add( btnHard );
 		btnNorm.setChecked( true );
 
-		btnRename = createCheckButton( hangarAtlas, "button-name-on", "button-name-select2", "button-name-select2", "button-name-select2" );
+		btnRename = createButton( hangarAtlas, "button-name-on", null, "button-name-select2", "button-name-select2",
+				"button-name-select2", "button-name-select2" );
 		mainStage.addActor( btnRename );
 
-		btnEnableAE = createCheckButton( hangarAtlas, "button-enabled-on", "button-enabled-select2", "button-enabled-select2",
-				"button-enabled-select2" );
+		btnEnableAE = createButton( hangarAtlas, "button-enabled-on", null, "button-enabled-select2", "button-enabled-select2",
+				"button-enabled-select2", "button-enabled-select2" );
 		mainStage.addActor( btnEnableAE );
-		btnDisableAE = createCheckButton( hangarAtlas, "button-disabled-on", "button-disabled-select2", "button-disabled-select2",
-				"button-disabled-select2" );
+		btnDisableAE = createButton( hangarAtlas, "button-disabled-on", null, "button-disabled-select2", "button-disabled-select2",
+				"button-disabled-select2", "button-disabled-select2" );
 		mainStage.addActor( btnDisableAE );
 
 		ButtonGroup btngAE = new ButtonGroup();
