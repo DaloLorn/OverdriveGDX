@@ -10,7 +10,6 @@ import com.ftloverdrive.event.engine.ModelDestructionEvent;
 import com.ftloverdrive.event.engine.TickEvent;
 import com.ftloverdrive.event.engine.TickListenerEvent;
 import com.ftloverdrive.event.game.GamePlayerShipChangeEvent;
-import com.ftloverdrive.event.game.GameSpawnPlayerEvent;
 import com.ftloverdrive.event.incident.BranchCreationEvent;
 import com.ftloverdrive.event.incident.ConsequenceDamageCreationEvent;
 import com.ftloverdrive.event.incident.ConsequenceResourceCreationEvent;
@@ -186,7 +185,6 @@ public class OVDNetManager {
 		kryo.register( DelayedEvent.class );
 		kryo.register( ModelDestructionEvent.class );
 		kryo.register( GamePlayerShipChangeEvent.class );
-		kryo.register( GameSpawnPlayerEvent.class );
 		kryo.register( BranchCreationEvent.class );
 		kryo.register( ConsequenceDamageCreationEvent.class );
 		kryo.register( ConsequenceResourceCreationEvent.class );
