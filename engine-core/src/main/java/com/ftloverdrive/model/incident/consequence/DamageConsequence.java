@@ -1,20 +1,22 @@
-package com.ftloverdrive.model.incident;
+package com.ftloverdrive.model.incident.consequence;
 
 import com.badlogic.gdx.scenes.scene2d.ui.Cell;
 import com.ftloverdrive.core.OverdriveContext;
 import com.ftloverdrive.model.AbstractOVDModel;
 import com.ftloverdrive.model.Damagable;
 import com.ftloverdrive.model.GameModel;
+import com.ftloverdrive.model.incident.Consequence;
+import com.ftloverdrive.model.incident.PlotBranch;
 import com.ftloverdrive.ui.ShaderLabel;
 import com.ftloverdrive.ui.incident.ConsequenceBox;
 
 
-public class ConsequenceDamage extends AbstractOVDModel implements Consequence {
+public class DamageConsequence extends AbstractOVDModel implements Consequence {
 
 	private int damageValue = 0;
 
 
-	public ConsequenceDamage( int value ) {
+	public DamageConsequence( int value ) {
 		damageValue = value;
 	}
 

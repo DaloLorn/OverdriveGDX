@@ -9,7 +9,7 @@ import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.IntMap;
 import com.ftloverdrive.core.OverdriveContext;
-import com.ftloverdrive.event.TickListener;
+import com.ftloverdrive.event.engine.TickListener;
 import com.ftloverdrive.event.local.LocalActorClickedListener;
 import com.ftloverdrive.event.ship.DoorPropertyListener;
 import com.ftloverdrive.event.ship.ShipPropertyEvent;

@@ -4,9 +4,9 @@ import com.badlogic.gdx.utils.IntIntMap;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.Pool;
 import com.badlogic.gdx.utils.Pools;
-import com.ftloverdrive.event.DelayedEvent;
 import com.ftloverdrive.event.OVDEventManager;
-import com.ftloverdrive.event.TickEvent;
+import com.ftloverdrive.event.engine.DelayedEvent;
+import com.ftloverdrive.event.engine.TickEvent;
 
 
 public class OVDClock {

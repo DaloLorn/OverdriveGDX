@@ -1,10 +1,10 @@
 package com.ftloverdrive.event.handler;
 
 import com.ftloverdrive.core.OverdriveContext;
-import com.ftloverdrive.event.DelayedEvent;
 import com.ftloverdrive.event.OVDEvent;
 import com.ftloverdrive.event.OVDEventHandler;
-import com.ftloverdrive.event.TickListenerEvent;
+import com.ftloverdrive.event.engine.DelayedEvent;
+import com.ftloverdrive.event.engine.TickListenerEvent;
 
 
 public class ServerEventHandler implements OVDEventHandler {

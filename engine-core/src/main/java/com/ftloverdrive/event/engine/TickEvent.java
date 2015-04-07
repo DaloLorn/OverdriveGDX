@@ -1,4 +1,6 @@
-package com.ftloverdrive.event;
+package com.ftloverdrive.event.engine;
+
+import com.ftloverdrive.event.AbstractOVDEvent;
 
 
 public class TickEvent extends AbstractOVDEvent {

@@ -8,7 +8,6 @@ import com.ftloverdrive.blueprint.AbstractOVDBlueprint;
 import com.ftloverdrive.core.OverdriveContext;
 import com.ftloverdrive.event.incident.IncidentAddConsequenceEvent;
 import com.ftloverdrive.event.incident.IncidentCreationEvent;
-import com.ftloverdrive.model.GameModel;
 
 
 public class IncidentBlueprint extends AbstractOVDBlueprint {

@@ -4,8 +4,8 @@ import com.badlogic.gdx.utils.Pools;
 import com.ftloverdrive.core.OverdriveContext;
 import com.ftloverdrive.event.OVDEvent;
 import com.ftloverdrive.event.OVDEventHandler;
-import com.ftloverdrive.event.TickEvent;
-import com.ftloverdrive.event.TickListener;
+import com.ftloverdrive.event.engine.TickEvent;
+import com.ftloverdrive.event.engine.TickListener;
 
 
 public class TickEventHandler implements OVDEventHandler {

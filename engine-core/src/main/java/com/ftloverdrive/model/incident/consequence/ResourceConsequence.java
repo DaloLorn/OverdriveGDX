@@ -1,4 +1,4 @@
-package com.ftloverdrive.model.incident;
+package com.ftloverdrive.model.incident.consequence;
 
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.scenes.scene2d.ui.Cell;
@@ -10,12 +10,15 @@ import com.ftloverdrive.core.OverdriveContext;
 import com.ftloverdrive.event.ship.ShipPropertyEvent;
 import com.ftloverdrive.model.AbstractOVDModel;
 import com.ftloverdrive.model.GameModel;
+import com.ftloverdrive.model.incident.Consequence;
+import com.ftloverdrive.model.incident.PlotBranch;
+import com.ftloverdrive.model.incident.requirement.ResourceRequirement;
 import com.ftloverdrive.ui.ShaderLabel;
 import com.ftloverdrive.ui.incident.ConsequenceBox;
 import com.ftloverdrive.util.OVDConstants;
 
 
-public class ConsequenceResource extends AbstractOVDModel implements Consequence, Disposable {
+public class ResourceConsequence extends AbstractOVDModel implements Consequence, Disposable {
 
 	private OverdriveContext context;
 
@@ -24,7 +27,7 @@ public class ConsequenceResource extends AbstractOVDModel implements Consequence
 	private boolean requires = true;
 
 
-	public ConsequenceResource( OverdriveContext context, String resourceId, int value, boolean requires ) {
+	public ResourceConsequence( OverdriveContext context, String resourceId, int value, boolean requires ) {
 		this.context = context;
 		this.resourceId = resourceId;
 		amount = value;
@@ -97,11 +100,15 @@ public class ConsequenceResource extends AbstractOVDModel implements Consequence
 	@Override
 	public void addRequirements( PlotBranch branch ) {
 		if ( requires )
-			branch.addRequirement( new RequirementResource( resourceId, -amount ) );
+			branch.addRequirement( new ResourceRequirement( resourceId, -amount ) );
 	}
 
 	@Override
 	public void dispose() {
-		context.getAssetManager().unload( OVDConstants.RESOURCE_ATLAS );
+		// Consequences are created even if the incident is not selected. This means that the placeConsequenceActor() method
+		// may potentially never be called, thus the texture atlas will not be loaded, and load count not incremented.
+		// Since decrementing the load count below 0 causes a GDX exception, we need to ward against that.
+		if ( context.getAssetManager().isLoaded( OVDConstants.RESOURCE_ATLAS, TextureAtlas.class ) )
+			context.getAssetManager().unload( OVDConstants.RESOURCE_ATLAS );
 	}
 }

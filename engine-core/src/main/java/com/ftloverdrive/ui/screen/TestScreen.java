@@ -13,9 +13,8 @@ import com.ftloverdrive.blueprint.incident.IncidentBlueprint;
 import com.ftloverdrive.blueprint.incident.PlotBranchBlueprint;
 import com.ftloverdrive.blueprint.ship.TestShipBlueprint;
 import com.ftloverdrive.core.OverdriveContext;
-import com.ftloverdrive.event.DelayedEvent;
-import com.ftloverdrive.event.TickEvent;
-import com.ftloverdrive.event.TickListener;
+import com.ftloverdrive.event.engine.TickEvent;
+import com.ftloverdrive.event.engine.TickListener;
 import com.ftloverdrive.event.game.GamePlayerShipChangeEvent;
 import com.ftloverdrive.event.game.GamePlayerShipChangeListener;
 import com.ftloverdrive.event.handler.DoorEventHandler;
@@ -32,7 +31,7 @@ import com.ftloverdrive.model.DefaultGameModel;
 import com.ftloverdrive.model.DefaultPlayerModel;
 import com.ftloverdrive.model.GameModel;
 import com.ftloverdrive.model.PlayerModel;
-import com.ftloverdrive.model.incident.RequirementShip;
+import com.ftloverdrive.model.incident.requirement.ShipRequirement;
 import com.ftloverdrive.model.ship.ShipModel;
 import com.ftloverdrive.ui.ShatteredImage;
 import com.ftloverdrive.ui.hud.PlayerScrapMonitor;
@@ -122,11 +121,6 @@ public class TestScreen extends BaseScreen {
 		bg.setSize( bgImage.getCompleteWidth(), bgImage.getCompleteHeight() );
 		bg.addActor( bgImage );
 
-		int playerRefId = context.getNetManager().requestNewRefId();
-		PlayerModel playerModel = new DefaultPlayerModel();
-		context.getReferenceManager().addObject( playerModel, playerRefId );
-		context.getNetManager().setLocalPlayerRefId( playerRefId );
-
 		int gameRefId = context.getNetManager().requestNewRefId();
 		GameModel gameModel = new DefaultGameModel();
 		context.getReferenceManager().addObject( gameModel, gameRefId );
@@ -154,7 +148,7 @@ public class TestScreen extends BaseScreen {
 		shipActor = new ShipActor( context );
 		// Ship's offset from the window's top left corner in FTL: X + 350, Y + 170
 		// At this point, shipActor's height is 0...
-		shipActor.setPosition( 350, mainStage.getHeight() - shipActor.getHeight() - 170 );
+		// shipActor.setPosition( 350, mainStage.getHeight() - shipActor.getHeight() - 170 );
 		mainStage.addActor( shipActor );
 		mainStage.addListener( shipActor );
 
@@ -229,6 +223,17 @@ public class TestScreen extends BaseScreen {
 			}
 		}, TickListener.class );
 
+		int playerRefId = context.getNetManager().requestNewRefId();
+		PlayerModel playerModel = new DefaultPlayerModel();
+		context.getReferenceManager().addObject( playerModel, playerRefId );
+		context.getNetManager().setLocalPlayerRefId( playerRefId );
+
+		// GameSpawnPlayerEvent spawnEvent = new GameSpawnPlayerEvent();
+		// spawnEvent.init( playerRefId );
+		// eventManager.postDelayedEvent( spawnEvent );
+		// TODO create the player model when the server starts, and then send the spawn player
+		// event to any client that connects?
+
 		// Create a test ship.
 
 		int shipRefId = new TestShipBlueprint( null ).construct( context );
@@ -256,12 +261,8 @@ public class TestScreen extends BaseScreen {
 				"Go to event 2. Also a branch with a very long selection text that hopefully will wrap correctly." );
 		incBlueprint.addPlotBranch( branchBlueprint );
 		branchBlueprint = new PlotBranchBlueprint( "TEST_INCIDENT_3", "(Test Ship) Need moar scrap!" );
-		branchBlueprint.addRequirement( new RequirementShip( "DEFAULT" ) );
+		branchBlueprint.addRequirement( new ShipRequirement( "DEFAULT" ) );
 		incBlueprint.addPlotBranch( branchBlueprint );
-
-		branchBlueprint = new PlotBranchBlueprint( "TEST_INCIDENT_1", "Nested test" );
-		incBlueprint.addPlotBranch( branchBlueprint );
-
 		incBlueprint.addPlotBranch( new PlotBranchBlueprint() );
 
 		context.getBlueprintManager().storeBlueprint( "TEST_INCIDENT_1", incBlueprint );

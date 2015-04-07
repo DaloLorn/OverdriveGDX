@@ -1,20 +1,21 @@
-package com.ftloverdrive.model.incident;
+package com.ftloverdrive.model.incident.requirement;
 
 import com.ftloverdrive.core.OverdriveContext;
 import com.ftloverdrive.model.GameModel;
 import com.ftloverdrive.model.incident.PlotBranchCriteria.CriteriaResult;
+import com.ftloverdrive.model.incident.PlotBranchRequirement;
 import com.ftloverdrive.model.ship.ShipModel;
 import com.ftloverdrive.util.OVDConstants;
 
 
-public class RequirementShip implements PlotBranchRequirement {
+public class ShipRequirement implements PlotBranchRequirement {
 
 	private String shipId = null;
 
-	protected RequirementShip() {
+	protected ShipRequirement() {
 	}
 
-	public RequirementShip( String shipId ) {
+	public ShipRequirement( String shipId ) {
 		this.shipId = shipId;
 	}
 

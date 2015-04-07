@@ -483,9 +483,9 @@ public class ShipLayout {
 
 		// Construct the path
 		Stack<ShipCoordinate> path = new Stack<ShipCoordinate>();
-		path.push( end );
-		while ( !path.peek().equals( start ) ) {
-			ShipCoordinate predecessor = prevMap.get( path.peek() );
+		ShipCoordinate predecessor = path.push( end );
+		while ( !predecessor.equals( start ) ) {
+			predecessor = prevMap.get( path.peek() );
 			if ( predecessor == null ) {
 				// If we encounter a node with no predecessor (before we've reached start node),
 				// then that means that there's no valid path

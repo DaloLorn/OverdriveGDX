@@ -15,12 +15,12 @@ import com.ftloverdrive.event.incident.IncidentCreationEvent;
 import com.ftloverdrive.event.incident.IncidentSelectionEvent;
 import com.ftloverdrive.event.incident.IncidentTriggerEvent;
 import com.ftloverdrive.model.incident.Consequence;
-import com.ftloverdrive.model.incident.ConsequenceDamage;
-import com.ftloverdrive.model.incident.ConsequenceResource;
 import com.ftloverdrive.model.incident.DefaultPlotBranch;
 import com.ftloverdrive.model.incident.DeferredIncidentModel;
 import com.ftloverdrive.model.incident.IncidentModel;
 import com.ftloverdrive.model.incident.PlotBranch;
+import com.ftloverdrive.model.incident.consequence.DamageConsequence;
+import com.ftloverdrive.model.incident.consequence.ResourceConsequence;
 
 
 public class IncidentEventHandler implements OVDEventHandler {
@@ -135,14 +135,14 @@ public class IncidentEventHandler implements OVDEventHandler {
 			ConsequenceDamageCreationEvent ev = (ConsequenceDamageCreationEvent)e;
 
 			int cRefId = ev.getConsequenceRefId();
-			ConsequenceDamage consequence = new ConsequenceDamage( ev.getDamage() );
+			DamageConsequence consequence = new DamageConsequence( ev.getDamage() );
 			context.getReferenceManager().addObject( consequence, cRefId );
 		}
 		else if ( e instanceof ConsequenceResourceCreationEvent ) {
 			ConsequenceResourceCreationEvent ev = (ConsequenceResourceCreationEvent)e;
 
 			int cRefId = ev.getConsequenceRefId();
-			ConsequenceResource consequence = new ConsequenceResource( context, ev.getResource(), ev.getAmount(), ev.getRequires() );
+			ResourceConsequence consequence = new ResourceConsequence( context, ev.getResource(), ev.getAmount(), ev.getRequires() );
 			context.getReferenceManager().addObject( consequence, cRefId );
 		}
 	}

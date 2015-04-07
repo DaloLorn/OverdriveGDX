@@ -1,6 +1,7 @@
-package com.ftloverdrive.event;
+package com.ftloverdrive.event.engine;
 
-import com.ftloverdrive.event.TickEvent;
+import com.ftloverdrive.event.OVDEventListener;
+import com.ftloverdrive.event.engine.TickEvent;
 
 
 public interface TickListener extends OVDEventListener {

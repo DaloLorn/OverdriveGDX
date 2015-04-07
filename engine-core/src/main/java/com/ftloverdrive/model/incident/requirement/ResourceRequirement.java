@@ -1,18 +1,20 @@
-package com.ftloverdrive.model.incident;
+package com.ftloverdrive.model.incident.requirement;
 
 import com.ftloverdrive.core.OverdriveContext;
 import com.ftloverdrive.model.GameModel;
+import com.ftloverdrive.model.incident.PlotBranchCriteria;
+import com.ftloverdrive.model.incident.PlotBranchRequirement;
 import com.ftloverdrive.model.incident.PlotBranchCriteria.CriteriaResult;
 import com.ftloverdrive.model.ship.ShipModel;
 
 
-public class RequirementResource implements PlotBranchRequirement {
+public class ResourceRequirement implements PlotBranchRequirement {
 
 	private String resourceId = null;
 	private int quantity = -1;
 
 
-	protected RequirementResource() {
+	protected ResourceRequirement() {
 	}
 	
 	/**
@@ -22,7 +24,7 @@ public class RequirementResource implements PlotBranchRequirement {
 	 * @param quantity
 	 *            the required amount
 	 */
-	public RequirementResource( String resourceId, int quantity ) {
+	public ResourceRequirement( String resourceId, int quantity ) {
 		this.resourceId = resourceId;
 		this.quantity = quantity;
 	}
