@@ -55,6 +55,7 @@ public class TestScreen extends BaseScreen {
 
 	public TestScreen( OverdriveContext srcContext ) {
 		super( srcContext );
+		context.getNetManager().requestNewRefId();
 
 		// These layers are mainly notes. Many will probably be moved inside actors.
 		Array<String> mainLayerNames = new Array<String>();

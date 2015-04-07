@@ -1,12 +1,16 @@
 package com.ftloverdrive.net;
 
+import java.rmi.registry.LocateRegistry;
+import java.rmi.registry.Registry;
+
 import com.badlogic.gdx.utils.Array;
 import com.esotericsoftware.kryo.Kryo;
-import com.ftloverdrive.event.DelayedEvent;
-import com.ftloverdrive.event.TickEvent;
-import com.ftloverdrive.event.TickListenerEvent;
+import com.ftloverdrive.event.engine.DelayedEvent;
 import com.ftloverdrive.event.engine.ModelDestructionEvent;
+import com.ftloverdrive.event.engine.TickEvent;
+import com.ftloverdrive.event.engine.TickListenerEvent;
 import com.ftloverdrive.event.game.GamePlayerShipChangeEvent;
+import com.ftloverdrive.event.game.GameSpawnPlayerEvent;
 import com.ftloverdrive.event.incident.BranchCreationEvent;
 import com.ftloverdrive.event.incident.ConsequenceDamageCreationEvent;
 import com.ftloverdrive.event.incident.ConsequenceResourceCreationEvent;
@@ -31,8 +35,8 @@ import com.ftloverdrive.event.ship.ShipRoomImageChangeEvent;
 import com.ftloverdrive.io.AnimSpec;
 import com.ftloverdrive.io.ImageSpec;
 import com.ftloverdrive.model.incident.PlotBranchRequirement;
-import com.ftloverdrive.model.incident.RequirementResource;
-import com.ftloverdrive.model.incident.RequirementShip;
+import com.ftloverdrive.model.incident.requirement.ResourceRequirement;
+import com.ftloverdrive.model.incident.requirement.ShipRequirement;
 import com.ftloverdrive.model.ship.ShipCoordinate;
 
 
@@ -47,7 +51,7 @@ public class OVDNetManager {
 
 	public OVDNetManager() {
 		idRanges = new Array<Range>( true, 1 );
-		idRanges.add( new Range( 0, Integer.MAX_VALUE ) ); // Default range.
+		// idRanges.add( new Range( 0, Integer.MAX_VALUE ) ); // Default range.
 		returnedIds = new Array<Integer>( true, 16 );
 	}
 
@@ -61,6 +65,7 @@ public class OVDNetManager {
 	 *            the end of the range, exclusive
 	 */
 	public void setRefIdRange( int start, int end ) {
+		returnedIds.clear();
 		idRanges.clear();
 		idRanges.add( new Range( start, end ) );
 		nextId = start;
@@ -97,6 +102,18 @@ public class OVDNetManager {
 		}
 		if ( idRanges.size == 0 ) {
 			// TODO: Make a synchronous RMI call to fetch a new range.
+			try {
+				// TODO: Use constants instead of magic numbers and strings
+				// TODO: Need a way to get IP address of the server we're connected to
+				Registry registry = LocateRegistry.getRegistry( "127.0.0.1", 54556 );
+				FetchRefIdRange stub = (FetchRefIdRange)registry.lookup( "FetchRefIdRange" );
+				Range range = stub.fetchRefIdRange();
+				System.out.println( "Received refId range: " + range );
+				addRefIdRange( range.start, range.end );
+			}
+			catch ( Exception e ) {
+				e.printStackTrace();
+			}
 		}
 		return nextId++;
 	}
@@ -105,8 +122,7 @@ public class OVDNetManager {
 	 * Returns the refId to the pool of reusable ids.
 	 */
 	public void returnRefId( int refId ) {
-		// Don't add the refId to the pool if it doesn't belong to any
-		// of our ranges.
+		// Don't add the refId to the pool if it doesn't belong to us
 		boolean local = false;
 		for ( int i = 0; i < idRanges.size && !local; ++i ) {
 			Range r = idRanges.get( i );
@@ -146,19 +162,23 @@ public class OVDNetManager {
 	 * TODO: There's probably a better way to handle this, or at least elsewhere?
 	 */
 	public static void registerClasses( Kryo kryo ) {
+		// TODO: Could use an external file to list classnames, and use
+		// ClassReflection.forName( String ) to load and register them.
+
 		// Data classes
+		// - Java
 		kryo.register( Object[].class );
 		kryo.register( int[].class );
 		kryo.register( Integer[].class );
-
+		// - OVD
 		kryo.register( ImageSpec.class );
 		kryo.register( AnimSpec.class );
 		kryo.register( ShipCoordinate.class );
 		kryo.register( ShipCoordinate[].class );
 		kryo.register( PlotBranchRequirement.class );
 		kryo.register( PlotBranchRequirement[].class );
-		kryo.register( RequirementShip.class );
-		kryo.register( RequirementResource.class );
+		kryo.register( ShipRequirement.class );
+		kryo.register( ResourceRequirement.class );
 
 		// Event classes
 		kryo.register( TickEvent.class );
@@ -166,6 +186,7 @@ public class OVDNetManager {
 		kryo.register( DelayedEvent.class );
 		kryo.register( ModelDestructionEvent.class );
 		kryo.register( GamePlayerShipChangeEvent.class );
+		kryo.register( GameSpawnPlayerEvent.class );
 		kryo.register( BranchCreationEvent.class );
 		kryo.register( ConsequenceDamageCreationEvent.class );
 		kryo.register( ConsequenceResourceCreationEvent.class );
@@ -187,21 +208,5 @@ public class OVDNetManager {
 		kryo.register( ShipLayoutRoomAddEvent.class );
 		kryo.register( ShipPropertyEvent.class );
 		kryo.register( ShipRoomImageChangeEvent.class );
-	}
-
-
-	public static class Range {
-
-		public int start = 0;
-		public int end = 0;
-
-
-		public Range( int start, int end ) {
-			this.start = start;
-			this.end = end;
-		}
-
-		public Range() {
-		}
 	}
 }

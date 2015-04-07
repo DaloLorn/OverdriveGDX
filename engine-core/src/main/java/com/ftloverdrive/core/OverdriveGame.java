@@ -148,8 +148,18 @@ public class OverdriveGame implements ApplicationListener {
 		}
 	}
 
+	public int getConnectionId() {
+		return kryoClient.getID();
+	}
+
 	public void disconnect() {
 		kryoClient.stop();
+	}
+
+	// TODO: Test code, remove (or wrap in a nice UI)
+	public void discoverLocalHosts() {
+		// Prints debug messages of its own
+		kryoClient.discoverHosts( 54777, 1000 );
 	}
 
 	public void sendTCP( Object o ) {
@@ -268,11 +278,13 @@ public class OverdriveGame implements ApplicationListener {
 	@Override
 	public void pause() {
 		if ( currentScreen != null ) currentScreen.pause();
+		if ( server != null ) server.pause();
 	}
 
 	@Override
 	public void resume() {
 		if ( currentScreen != null ) currentScreen.resume();
+		if ( server != null ) server.resume();
 	}
 
 	@Override

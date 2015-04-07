@@ -1,6 +1,9 @@
 package com.ftloverdrive.net;
 
-public class Range {
+import java.io.Serializable;
+
+
+public class Range implements Serializable {
 
 	public int start = 0;
 	public int end = 0;
@@ -12,5 +15,9 @@ public class Range {
 	}
 
 	public Range() {
+	}
+
+	public String toString() {
+		return getClass().getSimpleName() + " { " + start + ", " + end + " }";
 	}
 }
