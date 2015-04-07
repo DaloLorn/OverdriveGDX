@@ -6,6 +6,9 @@ import java.util.Map;
 import java.util.concurrent.LinkedBlockingDeque;
 
 import com.ftloverdrive.core.OverdriveContext;
+import com.ftloverdrive.event.engine.DelayedEvent;
+import com.ftloverdrive.event.engine.TickListener;
+import com.ftloverdrive.event.engine.TickListenerEvent;
 
 
 /**
@@ -66,12 +69,13 @@ public class OVDEventManager {
 			}
 			else {
 				if ( serverMode ) {
-					context.getGame().getServer().sendAllTCP( event );
+					if ( event instanceof AbstractQueryEvent )
+						context.getGame().getServer().sendTCP( ( (AbstractQueryEvent)event ).getConnectionId(), event );
+					else
+						context.getGame().getServer().sendAllTCP( event );
 				}
 				else {
 					context.getGame().sendTCP( event );
-					// Pretend it went to the server and back.
-					// postDelayedInboundEvent( event );
 				}
 			}
 		}
