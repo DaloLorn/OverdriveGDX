@@ -48,9 +48,7 @@ public class OverdriveServer implements Disposable, FetchRefIdRange {
 		this.context = context;
 
 		connectionRangeMap = new HashMap<Integer, List<Range>>();
-		nextRangeStart = 0;;
-		// refManager = new OVDReferenceManager();
-		// netManager = new OVDNetManager();
+		nextRangeStart = 0;
 
 		eventManager = new OVDEventManager( true );
 		OVDEventHandler handler = new ServerEventHandler();
@@ -69,11 +67,15 @@ public class OverdriveServer implements Disposable, FetchRefIdRange {
 					eventManager.postDelayedInboundEvent( (OVDEvent)object );
 				}
 			}
+
+			public void connected( Connection connection ) {
+				onClientConnected( connection );
+			}
 		} );
 	}
 
 	public void sendAllTCP( Object o ) {
-		kryoServer.sendToAllUDP( o );
+		kryoServer.sendToAllTCP( o );
 	}
 
 	public void sendTCP( int connectionId, Object o ) {
@@ -121,6 +123,16 @@ public class OverdriveServer implements Disposable, FetchRefIdRange {
 
 	public void resume() {
 		paused = false;
+	}
+
+	public void onClientConnected( Connection connection ) {
+		// TODO: Send some kind of condensed object representing the data needed to bring the
+		// client up to speed
+		// connection.sendTCP( "" );
+	}
+
+	public OVDEventManager getEventManager() {
+		return eventManager;
 	}
 
 	public void postDelayedEvent( DelayedEvent de ) {
