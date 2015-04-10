@@ -41,6 +41,7 @@ public class ShipLayoutDoorAddEvent extends AbstractOVDEvent implements Poolable
 
 	@Override
 	public void reset() {
+		super.reset();
 		shipRefId = -1;
 		doorRefId = -1;
 		doorCoords = null;

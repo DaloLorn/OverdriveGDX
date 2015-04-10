@@ -46,6 +46,7 @@ public class ShipRoomImageChangeEvent extends AbstractOVDEvent implements Poolab
 
 	@Override
 	public void reset() {
+		super.reset();
 		eventType = DECOR;
 		roomRefId = -1;
 		imageSpec = null;

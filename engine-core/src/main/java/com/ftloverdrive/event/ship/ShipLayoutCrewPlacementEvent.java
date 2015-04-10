@@ -44,6 +44,7 @@ public class ShipLayoutCrewPlacementEvent extends AbstractOVDEvent implements Po
 
 	@Override
 	public void reset() {
+		super.reset();
 		shipRefId = -1;
 		crewRefId = -1;
 		crewCoords = null;

@@ -1,14 +1,10 @@
 package com.ftloverdrive.event;
 
-import com.badlogic.gdx.utils.Pool.Poolable;
-
-
-public abstract class AbstractOVDEvent implements OVDEvent, Poolable {
+public abstract class AbstractOVDEvent implements OVDEvent {
 	protected int sourceRefId = -1;
 	protected boolean cancelled = false;
 
-
-	public void setSource( int srcRefId ) {
+	public void setSource(int srcRefId) {
 		this.sourceRefId = srcRefId;
 	}
 

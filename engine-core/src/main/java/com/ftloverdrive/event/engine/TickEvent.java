@@ -1,9 +1,10 @@
 package com.ftloverdrive.event.engine;
 
+import com.badlogic.gdx.utils.Pool.Poolable;
 import com.ftloverdrive.event.AbstractOVDEvent;
 
 
-public class TickEvent extends AbstractOVDEvent {
+public class TickEvent extends AbstractOVDEvent implements Poolable {
 
 	protected int tickCount = 0;
 

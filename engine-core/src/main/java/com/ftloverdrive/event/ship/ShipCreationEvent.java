@@ -47,6 +47,7 @@ public class ShipCreationEvent extends AbstractOVDEvent implements Poolable {
 
 	@Override
 	public void reset() {
+		super.reset();
 		shipRefId = -1;
 		shipBlueprintId = null;
 		constructorArgs = null;

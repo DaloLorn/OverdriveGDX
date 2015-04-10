@@ -36,6 +36,7 @@ public class ShipPropertyEvent extends AbstractPropertyEvent implements Poolable
 
 	@Override
 	public void reset() {
+		super.reset();
 		shipRefId = -1;
 		propertyType = -1;
 		action = -1;

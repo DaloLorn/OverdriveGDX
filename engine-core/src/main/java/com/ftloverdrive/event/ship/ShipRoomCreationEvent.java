@@ -29,6 +29,7 @@ public class ShipRoomCreationEvent extends AbstractOVDEvent implements Poolable 
 
 	@Override
 	public void reset() {
+		super.reset();
 		roomRefId = -1;
 	}
 }

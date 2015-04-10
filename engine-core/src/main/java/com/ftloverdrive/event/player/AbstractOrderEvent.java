@@ -1,9 +1,10 @@
 package com.ftloverdrive.event.player;
 
+import com.badlogic.gdx.utils.Pool.Poolable;
 import com.ftloverdrive.event.AbstractOVDEvent;
 
 
-public abstract class AbstractOrderEvent extends AbstractOVDEvent {
+public abstract class AbstractOrderEvent extends AbstractOVDEvent implements Poolable {
 
 	protected int playerRefId = -1;
 	protected int[] targetRefIds = null;

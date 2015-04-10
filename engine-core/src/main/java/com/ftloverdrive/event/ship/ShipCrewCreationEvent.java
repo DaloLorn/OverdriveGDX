@@ -25,6 +25,7 @@ public class ShipCrewCreationEvent extends AbstractOVDEvent implements Poolable 
 
 	@Override
 	public void reset() {
+		super.reset();
 		crewRefId = -1;
 	}
 }

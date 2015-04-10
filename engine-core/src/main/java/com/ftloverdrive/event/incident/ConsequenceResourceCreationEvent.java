@@ -1,9 +1,10 @@
 package com.ftloverdrive.event.incident;
 
+import com.badlogic.gdx.utils.Pool.Poolable;
 import com.ftloverdrive.event.AbstractOVDEvent;
 
 
-public class ConsequenceResourceCreationEvent extends AbstractOVDEvent {
+public class ConsequenceResourceCreationEvent extends AbstractOVDEvent implements Poolable {
 
 	protected int cseqRefId = -1;
 	protected String resourceId = null;
@@ -53,6 +54,7 @@ public class ConsequenceResourceCreationEvent extends AbstractOVDEvent {
 
 	@Override
 	public void reset() {
+		super.reset();
 		cseqRefId = -1;
 		amount = 0;
 		resourceId = null;

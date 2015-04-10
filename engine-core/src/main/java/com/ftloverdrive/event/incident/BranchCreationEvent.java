@@ -1,17 +1,17 @@
 package com.ftloverdrive.event.incident;
 
+import com.badlogic.gdx.utils.Pool.Poolable;
 import com.ftloverdrive.event.AbstractOVDEvent;
 import com.ftloverdrive.model.incident.PlotBranchRequirement;
 
 
-public class BranchCreationEvent extends AbstractOVDEvent {
+public class BranchCreationEvent extends AbstractOVDEvent implements Poolable {
 
 	protected int bRefId = -1;
 	protected int incRefId = -1;
 	protected String text = null;
 	protected boolean spoiler = true;
 	protected PlotBranchRequirement[] reqs = null;
-
 
 	public BranchCreationEvent() {
 	}
@@ -52,6 +52,7 @@ public class BranchCreationEvent extends AbstractOVDEvent {
 
 	@Override
 	public void reset() {
+		super.reset();
 		bRefId = -1;
 	}
 }

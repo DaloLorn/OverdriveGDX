@@ -42,6 +42,7 @@ public class GamePlayerShipChangeEvent extends AbstractOVDEvent implements Poola
 
 	@Override
 	public void reset() {
+		super.reset();
 		gameRefId = -1;
 		shipRefId = -1;
 	}

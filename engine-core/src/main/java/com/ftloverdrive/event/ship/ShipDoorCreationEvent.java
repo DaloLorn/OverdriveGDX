@@ -1,9 +1,10 @@
 package com.ftloverdrive.event.ship;
 
+import com.badlogic.gdx.utils.Pool.Poolable;
 import com.ftloverdrive.event.AbstractOVDEvent;
 
 
-public class ShipDoorCreationEvent extends AbstractOVDEvent {
+public class ShipDoorCreationEvent extends AbstractOVDEvent implements Poolable {
 	protected int doorRefId = -1;
 
 	public ShipDoorCreationEvent() {
@@ -25,6 +26,7 @@ public class ShipDoorCreationEvent extends AbstractOVDEvent {
 
 	@Override
 	public void reset() {
+		super.reset();
 		doorRefId = -1;
 	}
 }

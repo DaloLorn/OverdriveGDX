@@ -1,9 +1,10 @@
 package com.ftloverdrive.event.incident;
 
+import com.badlogic.gdx.utils.Pool.Poolable;
 import com.ftloverdrive.event.AbstractOVDEvent;
 
 
-public class IncidentAddBranchEvent extends AbstractOVDEvent {
+public class IncidentAddBranchEvent extends AbstractOVDEvent implements Poolable {
 
 	protected int incidentRefId = -1;
 	protected int branchRefId = -1;
@@ -35,6 +36,7 @@ public class IncidentAddBranchEvent extends AbstractOVDEvent {
 
 	@Override
 	public void reset() {
+		super.reset();
 		incidentRefId = -1;
 		branchRefId = -1;
 	}
