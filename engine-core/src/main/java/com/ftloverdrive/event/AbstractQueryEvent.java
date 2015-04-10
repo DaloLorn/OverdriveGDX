@@ -1,6 +1,7 @@
 package com.ftloverdrive.event;
 
 import com.ftloverdrive.core.OverdriveContext;
+import com.ftloverdrive.core.OverdriveGame;
 
 
 /**
@@ -17,6 +18,10 @@ public abstract class AbstractQueryEvent extends AbstractOVDEvent {
 
 	public void init( OverdriveContext c ) {
 		recipientId = c.getGame().getConnectionId();
+	}
+
+	public void init( OverdriveGame g ) {
+		recipientId = g.getConnectionId();
 	}
 
 	public int getConnectionId() {
