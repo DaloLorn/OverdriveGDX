@@ -2,7 +2,6 @@ package com.ftloverdrive.ui;
 
 import com.badlogic.gdx.scenes.scene2d.EventListener;
 import com.ftloverdrive.core.OverdriveContext;
-import com.ftloverdrive.model.ship.ShipCoordinate;
 
 
 /**
@@ -12,7 +11,6 @@ import com.ftloverdrive.model.ship.ShipCoordinate;
 public abstract class ModelActor extends LocalActor implements EventListener {
 
 	protected int modelRefId = -1;
-	protected ShipCoordinate nextWaypoint = null;
 
 
 	public ModelActor( OverdriveContext context ) {
