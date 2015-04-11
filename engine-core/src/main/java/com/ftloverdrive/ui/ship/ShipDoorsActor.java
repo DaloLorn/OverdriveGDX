@@ -9,7 +9,6 @@ import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.IntMap;
 import com.ftloverdrive.core.OverdriveContext;
-import com.ftloverdrive.event.engine.TickListener;
 import com.ftloverdrive.event.local.LocalActorClickedListener;
 import com.ftloverdrive.event.ship.DoorPropertyListener;
 import com.ftloverdrive.event.ship.ShipPropertyEvent;
@@ -18,14 +17,17 @@ import com.ftloverdrive.model.ship.ShipCoordinate;
 import com.ftloverdrive.model.ship.ShipModel;
 import com.ftloverdrive.util.OVDConstants;
 
+
 public class ShipDoorsActor extends Group
 		implements Disposable, ShipPropertyListener {
+
 	protected AssetManager assetManager;
 
 	protected float tileSize;
 	private TextureRegion floorTileRegion;
 
 	protected int shipModelRefId = -1;
+
 
 	public ShipDoorsActor( OverdriveContext context ) {
 		super();
@@ -98,7 +100,6 @@ public class ShipDoorsActor extends Group
 
 		context.getScreenEventManager().addEventListener( doorActor, LocalActorClickedListener.class );
 		context.getScreenEventManager().addEventListener( doorActor, DoorPropertyListener.class );
-		context.getScreenEventManager().addEventListener( doorActor, TickListener.class );
 	}
 
 	public void shipPropertyChanged( OverdriveContext context, ShipPropertyEvent e ) {
@@ -124,11 +125,11 @@ public class ShipDoorsActor extends Group
 			// TODO: Interpret the door level into an animSpec, eg.
 			// SystemModel system = shipModel.getSystemByType( OVDConstants.SYSTEM_DOOR );
 			// AnimSpec animSpec = (AnimSpec) system.interpretIntValue( doorUpgradeLevel, OVDConstants.DOOR_SYSTEM_LEVEL );
-			
+
 			for ( IntMap.Keys it = shipModel.getLayout().doorRefIds(); it.hasNext; ) {
-				//int doorRefId = it.next();
-				//DoorModel doorModel = context.getReferenceManager().getObject( doorRefId, DoorModel.class );
-				//doorModel.setAnimSpec(  );
+				// int doorRefId = it.next();
+				// DoorModel doorModel = context.getReferenceManager().getObject( doorRefId, DoorModel.class );
+				// doorModel.setAnimSpec( );
 			}
 		}
 	}
@@ -137,7 +138,7 @@ public class ShipDoorsActor extends Group
 		assetManager.unload( OVDConstants.FLOORPLAN_ATLAS );
 		for ( Actor actor : getChildren() ) {
 			if ( actor instanceof Disposable )
-				((Disposable) actor).dispose();
+				( (Disposable)actor ).dispose();
 		}
 		// TODO ?
 	}

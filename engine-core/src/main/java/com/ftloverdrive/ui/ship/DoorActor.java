@@ -13,8 +13,6 @@ import com.badlogic.gdx.utils.Pools;
 import com.ftloverdrive.command.DoorToggleCommand;
 import com.ftloverdrive.command.ModelCommand;
 import com.ftloverdrive.core.OverdriveContext;
-import com.ftloverdrive.event.engine.TickEvent;
-import com.ftloverdrive.event.engine.TickListener;
 import com.ftloverdrive.event.local.LocalActorClickedEvent;
 import com.ftloverdrive.event.local.LocalActorClickedListener;
 import com.ftloverdrive.event.ship.DoorPropertyEvent;
@@ -29,7 +27,7 @@ import com.ftloverdrive.util.OVDConstants;
  * An actor that represents a single door.
  */
 public class DoorActor extends ModelActor
-		implements Disposable, DoorPropertyListener, TickListener, LocalActorClickedListener {
+		implements Disposable, DoorPropertyListener, LocalActorClickedListener {
 
 	protected AnimSpec animSpec;
 	protected Animation doorAnim;
@@ -137,7 +135,7 @@ public class DoorActor extends ModelActor
 	public void doorPropertyChanged( OverdriveContext context, DoorPropertyEvent e ) {
 		if ( e.getDoorRefId() != modelRefId ) return;
 
-		if ( e.getPropertyKey() == OVDConstants.DOOR_OPEN ) {
+		if ( e.getPropertyKey().equals( OVDConstants.DOOR_OPEN ) ) {
 			updateInfo( context );
 		}
 		else if ( e.getPropertyKey().equals( OVDConstants.DOOR_HEALTH ) ) {
@@ -165,7 +163,7 @@ public class DoorActor extends ModelActor
 				context.getScreenEventManager().postDelayedEvent( ev );
 			}
 		}
-		else if ( e.getPropertyKey() == OVDConstants.DOOR_ANIM_SPEC ) {
+		else if ( e.getPropertyKey().equals( OVDConstants.DOOR_ANIM_SPEC ) ) {
 			// TODO: Get the spec from event
 			AnimSpec newSpec = new AnimSpec( OVDConstants.EFFECTS_ATLAS, "door-sheet", 35, 35, 5, 0, 1, 0.25f );
 
@@ -174,15 +172,6 @@ public class DoorActor extends ModelActor
 
 			updateInfo( context );
 		}
-	}
-
-	@Override
-	public void ticksAccumulated( TickEvent e ) {
-		// TODO: Test code, remove later
-		//DoorPropertyEvent ev = Pools.get( DoorPropertyEvent.class ).obtain();
-		//ev.init( modelRefId, DoorPropertyEvent.INT_TYPE, DoorPropertyEvent.INCREMENT_ACTION, OVDConstants.DOOR_HEALTH, 10 );
-		//context.getScreenEventManager().postDelayedEvent( ev );
-		// End test code
 	}
 
 	@Override
