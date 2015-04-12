@@ -202,7 +202,13 @@ public class OVDNetManager {
 		kryo.register( ShipRequirement.class );
 		kryo.register( ResourceRequirement.class );
 
+		kryo.register( DefaultGameModel.class );
+		kryo.register( NamedProperties.class );
+		kryo.register( IntIntMap.class );
 		// Event classes
+		kryo.register( RequestGameStateEvent.class );
+		kryo.register( SignalReadyEvent.class );
+
 		kryo.register( TickEvent.class );
 		kryo.register( TickListenerEvent.class );
 		kryo.register( DelayedEvent.class );

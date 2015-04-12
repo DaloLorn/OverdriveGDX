@@ -27,7 +27,6 @@ import com.ftloverdrive.event.handler.TickEventHandler;
 import com.ftloverdrive.event.incident.IncidentSelectionEvent;
 import com.ftloverdrive.event.ship.ShipPropertyEvent;
 import com.ftloverdrive.event.ship.ShipPropertyListener;
-import com.ftloverdrive.model.DefaultGameModel;
 import com.ftloverdrive.model.DefaultPlayerModel;
 import com.ftloverdrive.model.GameModel;
 import com.ftloverdrive.model.PlayerModel;
@@ -55,7 +54,6 @@ public class TestScreen extends BaseScreen {
 
 	public TestScreen( OverdriveContext srcContext ) {
 		super( srcContext );
-		context.getNetManager().requestNewRefId();
 
 		// These layers are mainly notes. Many will probably be moved inside actors.
 		Array<String> mainLayerNames = new Array<String>();
@@ -121,11 +119,6 @@ public class TestScreen extends BaseScreen {
 		Group bg = mainStage.getRoot().findActor( "Background" );
 		bg.setSize( bgImage.getCompleteWidth(), bgImage.getCompleteHeight() );
 		bg.addActor( bgImage );
-
-		int gameRefId = context.getNetManager().requestNewRefId();
-		GameModel gameModel = new DefaultGameModel();
-		context.getReferenceManager().addObject( gameModel, gameRefId );
-		context.setGameModelRefId( gameRefId );
 
 		playerShipHullMonitor = new PlayerShipHullMonitor( context );
 		playerShipHullMonitor.setPosition( 0, hudStage.getHeight() - playerShipHullMonitor.getHeight() );
@@ -193,7 +186,37 @@ public class TestScreen extends BaseScreen {
 		eventManager.addEventListener( shipActor, GamePlayerShipChangeListener.class );
 		eventManager.addEventListener( shipActor, ShipPropertyListener.class );
 
-		// eventManager.addTickListener( 3, shipActor );
+		// XXX: Periodic events can be registered like this...
+		// eventManager.addTickListener( numberOfTicks, tickListener );
+
+		int playerRefId = context.getNetManager().requestNewRefId();
+		PlayerModel playerModel = new DefaultPlayerModel();
+		context.getReferenceManager().addObject( playerModel, playerRefId );
+		context.getNetManager().setLocalPlayerRefId( playerRefId );
+
+		if ( context.getGame().getServerAddress().equals( "127.0.0.1" ) )
+			serverSetup();
+
+		// Create a test ship.
+
+		int shipRefId = new TestShipBlueprint( null ).construct( context );
+
+		playerShipHullMonitor.setShipModel( srcContext, shipRefId );
+		playerShipShieldMonitor.setShipModel( srcContext, shipRefId );
+		playerScrapMonitor.setShipModel( srcContext, shipRefId );
+
+		int gameRefId = context.getGameModelRefId();
+		// Set it as the player's ship.
+		GamePlayerShipChangeEvent shipChangeEvent = Pools.get( GamePlayerShipChangeEvent.class ).obtain();
+		shipChangeEvent.init( gameRefId, playerRefId, shipRefId );
+		eventManager.postDelayedEvent( shipChangeEvent );
+
+		incidentWindowDemo();
+
+		resize( getScreenWidth(), getScreenHeight() );
+	}
+
+	private void serverSetup() {
 		// When there's a ship, increment its hull after every tick.
 		eventManager.addEventListener( new TickListener() {
 
@@ -223,30 +246,6 @@ public class TestScreen extends BaseScreen {
 				// the names' associated maxes?
 			}
 		}, TickListener.class );
-
-		int playerRefId = context.getNetManager().requestNewRefId();
-		PlayerModel playerModel = new DefaultPlayerModel();
-		context.getReferenceManager().addObject( playerModel, playerRefId );
-		context.getNetManager().setLocalPlayerRefId( playerRefId );
-
-		// GameSpawnPlayerEvent spawnEvent = new GameSpawnPlayerEvent();
-		// spawnEvent.init( playerRefId );
-		// eventManager.postDelayedEvent( spawnEvent );
-		// TODO create the player model when the server starts, and then send the spawn player
-		// event to any client that connects?
-
-		// Create a test ship.
-
-		int shipRefId = new TestShipBlueprint( null ).construct( context );
-
-		// Set it as the player's ship.
-		GamePlayerShipChangeEvent shipChangeEvent = Pools.get( GamePlayerShipChangeEvent.class ).obtain();
-		shipChangeEvent.init( gameRefId, playerRefId, shipRefId );
-		eventManager.postDelayedEvent( shipChangeEvent );
-
-		incidentWindowDemo();
-
-		resize( getScreenWidth(), getScreenHeight() );
 	}
 
 	private void incidentWindowDemo() {
@@ -290,9 +289,11 @@ public class TestScreen extends BaseScreen {
 		incBlueprint.addPlotBranch( branchBlueprint );
 		context.getBlueprintManager().storeBlueprint( "TEST_INCIDENT_3", incBlueprint );
 
-		IncidentSelectionEvent incSelectionE = Pools.get( IncidentSelectionEvent.class ).obtain();
-		incSelectionE.init( incRefId );
-		context.getScreenEventManager().postDelayedEvent( incSelectionE );
+		if ( context.getGame().getServerAddress().equals( "127.0.0.1" ) ) {
+			IncidentSelectionEvent incSelectionE = Pools.get( IncidentSelectionEvent.class ).obtain();
+			incSelectionE.init( context, incRefId );
+			context.getScreenEventManager().postDelayedEvent( incSelectionE );
+		}
 	}
 
 	@Override

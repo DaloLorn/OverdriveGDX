@@ -15,8 +15,19 @@ import com.badlogic.gdx.scenes.scene2d.ui.ButtonGroup;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.Predicate;
 import com.badlogic.gdx.utils.Scaling;
 import com.ftloverdrive.core.OverdriveContext;
+import com.ftloverdrive.event.OVDEventManager;
+import com.ftloverdrive.event.engine.RequestGameStateEvent;
+import com.ftloverdrive.event.engine.SignalReadyEvent;
+import com.ftloverdrive.event.handler.DoorEventHandler;
+import com.ftloverdrive.event.handler.EngineEventHandler;
+import com.ftloverdrive.event.handler.GameEventHandler;
+import com.ftloverdrive.event.handler.IncidentEventHandler;
+import com.ftloverdrive.event.handler.LocalEventHandler;
+import com.ftloverdrive.event.handler.ShipEventHandler;
+import com.ftloverdrive.event.handler.TickEventHandler;
 import com.ftloverdrive.ui.ShatteredImage;
 import com.ftloverdrive.util.OVDConstants;
 
@@ -145,7 +156,54 @@ public class HangarScreen extends BaseScreen implements EventListener {
 		btnPlay.addListener( new ClickListener() {
 
 			public void clicked( InputEvent event, float x, float y ) {
-				context.getScreenManager().continueToNextScreen();
+
+				// Connect screen setup
+				context.getScreenManager().showScreen( OVDScreenManager.CONNECT_SCREEN );
+				ConnectScreen screen = (ConnectScreen)context.getGame().getScreen();
+				screen.setCondition( new Predicate<OverdriveContext>() {
+
+					public boolean evaluate( OverdriveContext context ) {
+						return false;
+					}
+				} );
+				screen.setNextScreenKey( OVDScreenManager.TEST_SCREEN );
+
+				// Operations to perform while the screen is being displayed
+
+				// Wire up the event manager...
+				OVDEventManager eventManager = screen.getEventManager();
+				TickEventHandler tickHandler = new TickEventHandler();
+				for ( Class c : tickHandler.getEventClasses() )
+					eventManager.setEventHandler( c, tickHandler );
+
+				EngineEventHandler engineHandler = new EngineEventHandler();
+				for ( Class c : engineHandler.getEventClasses() )
+					eventManager.setEventHandler( c, engineHandler );
+
+				LocalEventHandler localHandler = new LocalEventHandler();
+				for ( Class c : localHandler.getEventClasses() )
+					eventManager.setEventHandler( c, localHandler );
+
+				GameEventHandler gameHandler = new GameEventHandler();
+				for ( Class c : gameHandler.getEventClasses() )
+					eventManager.setEventHandler( c, gameHandler );
+
+				ShipEventHandler shipHandler = new ShipEventHandler();
+				for ( Class c : shipHandler.getEventClasses() )
+					eventManager.setEventHandler( c, shipHandler );
+
+				DoorEventHandler doorHandler = new DoorEventHandler();
+				for ( Class c : doorHandler.getEventClasses() )
+					eventManager.setEventHandler( c, doorHandler );
+
+				IncidentEventHandler incHandler = new IncidentEventHandler();
+				for ( Class c : incHandler.getEventClasses() )
+					eventManager.setEventHandler( c, incHandler );
+
+				// Request the game state from the server
+				SignalReadyEvent srEvent = new SignalReadyEvent();
+				srEvent.init( context );
+				screen.getEventManager().postDelayedEvent( srEvent );
 			}
 		} );
 

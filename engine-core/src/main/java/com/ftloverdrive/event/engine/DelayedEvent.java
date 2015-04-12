@@ -6,6 +6,10 @@ import com.ftloverdrive.event.OVDEvent;
 
 /**
  * An event wrapper that allows posting of significantly delayed events.
+ * 
+ * TODO: Problem: if the event is enqueued right before a tick event happens,
+ * the delay will be shorter, because the required tick count will be reached
+ * sooner. Changing to real-time delay would fix it.
  */
 public class DelayedEvent extends AbstractOVDEvent {
 

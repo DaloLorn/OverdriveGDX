@@ -74,6 +74,10 @@ public class OverdriveServer implements Disposable, FetchRefIdRange {
 		} );
 	}
 
+	public int countConnectedClients() {
+		return kryoServer.getConnections().length;
+	}
+
 	public void sendAllTCP( Object o ) {
 		kryoServer.sendToAllTCP( o );
 	}
@@ -109,6 +113,7 @@ public class OverdriveServer implements Disposable, FetchRefIdRange {
 	@Override
 	public void dispose() {
 		stop();
+		// TODO: Other cleanup?
 	}
 
 	public void update( float delta ) {
@@ -128,7 +133,7 @@ public class OverdriveServer implements Disposable, FetchRefIdRange {
 	public void onClientConnected( Connection connection ) {
 		// TODO: Send some kind of condensed object representing the data needed to bring the
 		// client up to speed
-		// connection.sendTCP( "" );
+		// connection.sendTCP( Object );
 	}
 
 	public OVDEventManager getEventManager() {

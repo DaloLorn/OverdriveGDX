@@ -6,7 +6,10 @@ import com.ftloverdrive.event.OVDEvent;
 import com.ftloverdrive.event.OVDEventHandler;
 import com.ftloverdrive.event.engine.ModelDestructionEvent;
 import com.ftloverdrive.event.engine.ModelDestructionListener;
+import com.ftloverdrive.event.engine.RequestGameStateEvent;
+import com.ftloverdrive.event.engine.SignalReadyEvent;
 import com.ftloverdrive.model.OVDModel;
+import com.ftloverdrive.ui.screen.ConnectScreen;
 
 
 public class EngineEventHandler implements OVDEventHandler {
@@ -17,7 +20,9 @@ public class EngineEventHandler implements OVDEventHandler {
 
 	public EngineEventHandler() {
 		eventClasses = new Class[] {
-				ModelDestructionEvent.class
+				ModelDestructionEvent.class,
+				RequestGameStateEvent.class,
+				SignalReadyEvent.class
 		};
 		listenerClasses = new Class[] {
 				ModelDestructionListener.class
@@ -54,6 +59,23 @@ public class EngineEventHandler implements OVDEventHandler {
 						( (ModelDestructionListener)listeners[i + 1] ).modelDestroyed( context, event );
 					}
 				}
+			}
+		}
+		else if ( e instanceof RequestGameStateEvent ) {
+			RequestGameStateEvent event = (RequestGameStateEvent)e;
+
+			context.getReferenceManager().addObject( event.getGameModel(), event.getGameModelRefId() );
+			context.setGameModelRefId( event.getGameModelRefId() );
+		}
+		else if ( e instanceof SignalReadyEvent ) {
+			SignalReadyEvent event = (SignalReadyEvent)e;
+
+			if ( event.isAborted() ) {
+				// TODO
+			}
+			else {
+				ConnectScreen screen = (ConnectScreen)context.getGame().getScreen();
+				screen.setCondition( null );
 			}
 		}
 	}

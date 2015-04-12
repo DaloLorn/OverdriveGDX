@@ -12,9 +12,11 @@ import com.badlogic.gdx.scenes.scene2d.ui.VerticalGroup;
 import com.badlogic.gdx.scenes.scene2d.utils.Align;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.Predicate;
 import com.badlogic.gdx.utils.Scaling;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.ftloverdrive.core.OverdriveContext;
+import com.ftloverdrive.event.engine.RequestGameStateEvent;
 import com.ftloverdrive.ui.ShatteredImage;
 import com.ftloverdrive.util.OVDConstants;
 
@@ -77,7 +79,26 @@ public class MainMenuScreen extends BaseScreen {
 				context.getGame().getServer().start();
 				context.getGame().connect( null );
 
-				context.getScreenManager().continueToNextScreen();
+				// Connect screen setup
+				context.getScreenManager().showScreen( OVDScreenManager.CONNECT_SCREEN );
+				ConnectScreen screen = (ConnectScreen)context.getGame().getScreen();
+				screen.setCondition( new Predicate<OverdriveContext>() {
+
+					public boolean evaluate( OverdriveContext context ) {
+						return context.getGameModelRefId() != -1;
+					}
+				} );
+				screen.setNextScreenKey( OVDScreenManager.HANGAR_SCREEN );
+
+				// Operations to perform while the screen is being displayed
+
+				// Grab a batch of refIds first
+				context.getNetManager().fetchNewRefIdRange();
+
+				// Request the game state from the server
+				RequestGameStateEvent rgsEvent = new RequestGameStateEvent();
+				rgsEvent.init( context );
+				screen.getEventManager().postDelayedEvent( rgsEvent );
 			}
 		} );
 
@@ -90,7 +111,27 @@ public class MainMenuScreen extends BaseScreen {
 					System.out.print( "IP address to connect to > " );
 					String ip = sc.nextLine();
 					context.getGame().connect( ip );
-					context.getScreenManager().continueToNextScreen();
+
+					// Connect screen setup
+					context.getScreenManager().showScreen( OVDScreenManager.CONNECT_SCREEN );
+					ConnectScreen screen = (ConnectScreen)context.getGame().getScreen();
+					screen.setCondition( new Predicate<OverdriveContext>() {
+
+						public boolean evaluate( OverdriveContext context ) {
+							return context.getGameModelRefId() != -1;
+						}
+					} );
+					screen.setNextScreenKey( OVDScreenManager.HANGAR_SCREEN );
+
+					// Operations to perform while the screen is being displayed
+
+					// Grab a batch of refIds first
+					context.getNetManager().fetchNewRefIdRange();
+
+					// Request the game state from the server
+					RequestGameStateEvent rgsEvent = new RequestGameStateEvent();
+					rgsEvent.init( context );
+					screen.getEventManager().postDelayedEvent( rgsEvent );
 				}
 				catch ( Exception e ) {
 					e.printStackTrace();

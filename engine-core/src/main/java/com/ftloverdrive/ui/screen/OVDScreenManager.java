@@ -16,6 +16,7 @@ public class OVDScreenManager implements Disposable {
 	public static final String LOADING_SCREEN = "Loading";
 	public static final String MAINMENU_SCREEN = "MainMenu";
 	public static final String HANGAR_SCREEN = "Hangar";
+	public static final String CONNECT_SCREEN = "Connect";
 	public static final String CAMPAIGN_SCREEN = "Campaign";
 	public static final String CREDITS_SCREEN = "Credits";
 
@@ -38,6 +39,26 @@ public class OVDScreenManager implements Disposable {
 	 */
 	public String getInitScreenKey() {
 		return LOADING_SCREEN;
+	}
+
+	/**
+	 * Returns the key for the next screen that should be shown after the current one.
+	 */
+	public String getNextScreenKey() {
+		String nextScreenKey = null;
+		if ( currentScreenKey == null ) {
+			nextScreenKey = TEST_SCREEN;
+		}
+		else if ( LOADING_SCREEN.equals( currentScreenKey ) ) {
+			nextScreenKey = MAINMENU_SCREEN;
+		}
+		else if ( MAINMENU_SCREEN.equals( currentScreenKey ) ) {
+			nextScreenKey = HANGAR_SCREEN;
+		}
+		else if ( HANGAR_SCREEN.equals( currentScreenKey ) ) {
+			nextScreenKey = TEST_SCREEN;
+		}
+		return nextScreenKey;
 	}
 
 
@@ -76,6 +97,9 @@ public class OVDScreenManager implements Disposable {
 			else if ( HANGAR_SCREEN.equals( key ) ) {
 				screen = new HangarScreen( context );
 			}
+			else if ( CONNECT_SCREEN.equals( key ) ) {
+				screen = new ConnectScreen( context );
+			}
 			if ( screen != null ) {
 				screenMap.put( key, screen );
 			}
@@ -89,20 +113,7 @@ public class OVDScreenManager implements Disposable {
 	 * The next screen will be created if necessary.
 	 */
 	public void continueToNextScreen() {
-		String nextScreenKey = null;
-
-		if ( currentScreenKey == null ) {
-			nextScreenKey = TEST_SCREEN;
-		}
-		else if ( LOADING_SCREEN.equals( currentScreenKey ) ) {
-			nextScreenKey = MAINMENU_SCREEN;
-		}
-		else if ( MAINMENU_SCREEN.equals( currentScreenKey ) ) {
-			nextScreenKey = HANGAR_SCREEN;
-		}
-		else if ( HANGAR_SCREEN.equals( currentScreenKey ) ) {
-			nextScreenKey = TEST_SCREEN;
-		}
+		String nextScreenKey = getNextScreenKey();
 
 		disposeCurrentScreen();
 
