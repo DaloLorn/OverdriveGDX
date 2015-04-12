@@ -120,6 +120,10 @@ public class OverdriveGame implements ApplicationListener {
 
 			public void received( Connection connection, Object object ) {
 				if ( object instanceof OVDEvent ) {
+					if ( currentScreen.getEventManager() == null ) {
+						log.debug( "Received event " + object + ", but could not handle it because eventManager was not instantiated yet." );
+						return;
+					}
 					currentScreen.getEventManager().postDelayedInboundEvent( (OVDEvent)object );
 				}
 			}
