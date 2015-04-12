@@ -23,12 +23,14 @@ public class ResourceConsequence extends AbstractOVDModel implements Consequence
 	private OverdriveContext context;
 
 	private String resourceId = null;
+	private int targetPlayerRefId = -1;
 	private int amount = 0;
 	private boolean requires = true;
 
 
-	public ResourceConsequence( OverdriveContext context, String resourceId, int value, boolean requires ) {
+	public ResourceConsequence( OverdriveContext context, int targetRefId, String resourceId, int value, boolean requires ) {
 		this.context = context;
+		targetPlayerRefId = targetRefId;
 		this.resourceId = resourceId;
 		amount = value;
 		this.requires = requires;
@@ -83,14 +85,9 @@ public class ResourceConsequence extends AbstractOVDModel implements Consequence
 		if ( amount == 0 )
 			return;
 
-		// TODO Consequences need a target player ref id
-
-		// TODO: Resources in player model or ship model? Consider ship as in-game avatar of the player,
-		// and the player model only holds data immediately pertaining to the player (name, etc)??
-
 		int gameRefId = context.getGameModelRefId();
 		GameModel game = context.getReferenceManager().getObject( gameRefId, GameModel.class );
-		int shipRefId = game.getPlayerShip( context.getNetManager().getLocalPlayerRefId() );
+		int shipRefId = game.getPlayerShip( targetPlayerRefId );
 
 		ShipPropertyEvent event = Pools.get( ShipPropertyEvent.class ).obtain();
 		event.init( shipRefId, ShipPropertyEvent.INT_TYPE, ShipPropertyEvent.INCREMENT_ACTION, resourceId, amount );

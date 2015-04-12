@@ -22,9 +22,20 @@ public class ConsequenceDamageBlueprint extends ConsequenceBlueprint {
 	public int construct( OverdriveContext context ) {
 		int consequenceRefId = context.getNetManager().requestNewRefId();
 
+		int targetRefId = -1;
+		if ( target == TargetPlayers.PLAYER )
+			targetRefId = context.getNetManager().getLocalPlayerRefId();
+		else if ( target == TargetPlayers.ENEMY )
+			targetRefId = context.getNetManager().getEnemyPlayerRefId();
+
+		if ( targetRefId == -1 ) {
+			// TODO: Actual error handling
+			throw new IllegalArgumentException( "TargetRefId is -1" );
+		}
+
 		ConsequenceDamageCreationEvent createE = Pools.get( ConsequenceDamageCreationEvent.class ).obtain();
 		int damageValue = damageMin + (int)Math.round( Math.random() * ( damageMax - damageMin ) );
-		createE.init( consequenceRefId, damageValue );
+		createE.init( consequenceRefId, targetRefId, damageValue );
 		context.getScreenEventManager().postDelayedEvent( createE );
 
 		return consequenceRefId;

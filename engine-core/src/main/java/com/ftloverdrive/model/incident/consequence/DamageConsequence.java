@@ -13,10 +13,12 @@ import com.ftloverdrive.ui.incident.ConsequenceBox;
 
 public class DamageConsequence extends AbstractOVDModel implements Consequence {
 
+	private int targetRefId = -1;
 	private int damageValue = 0;
 
 
-	public DamageConsequence( int value ) {
+	public DamageConsequence( int targetPlayerRefId, int value ) {
+		targetRefId = targetPlayerRefId;
 		damageValue = value;
 	}
 
@@ -40,7 +42,7 @@ public class DamageConsequence extends AbstractOVDModel implements Consequence {
 	public void execute( OverdriveContext context ) {
 		int gameRefId = context.getGameModelRefId();
 		GameModel game = context.getReferenceManager().getObject( gameRefId, GameModel.class );
-		int shipRefId = game.getPlayerShip( context.getNetManager().getLocalPlayerRefId() );
+		int shipRefId = game.getPlayerShip( targetRefId );
 
 		Damagable target = context.getReferenceManager().getObject( shipRefId, Damagable.class );
 		target.damage( context, damageValue );

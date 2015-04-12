@@ -135,14 +135,15 @@ public class IncidentEventHandler implements OVDEventHandler {
 			ConsequenceDamageCreationEvent ev = (ConsequenceDamageCreationEvent)e;
 
 			int cRefId = ev.getConsequenceRefId();
-			DamageConsequence consequence = new DamageConsequence( ev.getDamage() );
+			DamageConsequence consequence = new DamageConsequence( ev.getTargetRefId(), ev.getDamage() );
 			context.getReferenceManager().addObject( consequence, cRefId );
 		}
 		else if ( e instanceof ConsequenceResourceCreationEvent ) {
 			ConsequenceResourceCreationEvent ev = (ConsequenceResourceCreationEvent)e;
 
 			int cRefId = ev.getConsequenceRefId();
-			ResourceConsequence consequence = new ResourceConsequence( context, ev.getResource(), ev.getAmount(), ev.getRequires() );
+			ResourceConsequence consequence = new ResourceConsequence( context, ev.getTargetRefId(), ev.getResource(),
+					ev.getAmount(), ev.getRequires() );
 			context.getReferenceManager().addObject( consequence, cRefId );
 		}
 	}

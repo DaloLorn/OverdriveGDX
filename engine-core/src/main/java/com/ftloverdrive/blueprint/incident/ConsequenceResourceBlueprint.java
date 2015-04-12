@@ -61,9 +61,20 @@ public class ConsequenceResourceBlueprint extends ConsequenceBlueprint {
 	public int construct( OverdriveContext context ) {
 		int consequenceRefId = context.getNetManager().requestNewRefId();
 
+		int targetRefId = -1;
+		if ( target == TargetPlayers.PLAYER )
+			targetRefId = context.getNetManager().getLocalPlayerRefId();
+		else if ( target == TargetPlayers.ENEMY )
+			targetRefId = context.getNetManager().getEnemyPlayerRefId();
+
+		if ( targetRefId == -1 ) {
+			// TODO: Actual error handling
+			throw new IllegalArgumentException( "TargetRefId is -1" );
+		}
+
 		int amount = amountMin + (int)Math.round( Math.random() * ( amountMax - amountMin ) );
 		ConsequenceResourceCreationEvent createE = Pools.get( ConsequenceResourceCreationEvent.class ).obtain();
-		createE.init( consequenceRefId, resourceId, amount, requires && amount < 0 );
+		createE.init( consequenceRefId, targetRefId, resourceId, amount, requires && amount < 0 );
 		context.getScreenEventManager().postDelayedEvent( createE );
 
 		return consequenceRefId;

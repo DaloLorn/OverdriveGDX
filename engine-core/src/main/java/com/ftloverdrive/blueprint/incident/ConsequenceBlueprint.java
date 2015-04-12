@@ -9,8 +9,14 @@ import com.ftloverdrive.blueprint.AbstractOVDBlueprint;
  */
 public abstract class ConsequenceBlueprint extends AbstractOVDBlueprint {
 
+	protected TargetPlayers target = TargetPlayers.PLAYER;
+
 
 	public ConsequenceBlueprint() {
 		super( null );
+	}
+
+	public void setTargetPlayer( TargetPlayers target ) {
+		this.target = target;
 	}
 }
