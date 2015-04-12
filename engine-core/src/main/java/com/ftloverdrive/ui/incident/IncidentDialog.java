@@ -340,14 +340,8 @@ public class IncidentDialog extends Window implements Disposable, EventListener 
 	public float computePreferredWidth( int w ) {
 		validate();
 		float bw = w - ( getPadLeft() + getPadRight() );
-
-		System.out.println( bw );
-		System.out.println( Math.ceil( bw / middleWidth ) * middleWidth );
-		if ( bw % middleWidth != 0 ) {
-			System.out.println( middleWidth );
-			System.out.println( middleWidth - bw % middleWidth );
+		if ( bw % middleWidth != 0 )
 			w += middleWidth - bw % middleWidth;
-		}
 		return w;
 	}
 
