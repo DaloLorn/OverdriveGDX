@@ -107,11 +107,11 @@ public class PlayerShipHullMonitor extends Actor implements Disposable, GamePlay
 	 * Updates the bar to match the player ship's Hull/HullMax.
 	 */
 	private void updateShipInfo( OverdriveContext context ) {
-		ShipModel shipModel = context.getReferenceManager().getObject( shipModelRefId, ShipModel.class );
-		if ( shipModel == null ) {
+		if ( shipModelRefId == -1 ) {
 			barClipWidth = 0;
 		}
 		else {
+			ShipModel shipModel = context.getReferenceManager().getObject( shipModelRefId, ShipModel.class );
 			int hullAmt = shipModel.getProperties().getInt( OVDConstants.HULL );
 			int hullMax = shipModel.getProperties().getInt( OVDConstants.HULL_MAX );
 			if ( hullMax != 0 ) {

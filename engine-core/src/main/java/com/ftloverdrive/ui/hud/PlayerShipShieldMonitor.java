@@ -105,12 +105,12 @@ public class PlayerShipShieldMonitor extends Actor implements Disposable, GamePl
 	 * Updates the bar to match the player ship's Shield/ShieldMax.
 	 */
 	private void updateShipInfo( OverdriveContext context ) {
-		ShipModel shipModel = context.getReferenceManager().getObject( shipModelRefId, ShipModel.class );
-		if ( shipModel == null ) {
+		if ( shipModelRefId == -1 ) {
 			shieldMax = 0;
 			shieldFull = 0;
 		}
 		else {
+			ShipModel shipModel = context.getReferenceManager().getObject( shipModelRefId, ShipModel.class );
 			shieldFull = shipModel.getProperties().getInt( OVDConstants.SHIELD );
 			shieldMax = shipModel.getProperties().getInt( OVDConstants.SHIELD_MAX );
 		}

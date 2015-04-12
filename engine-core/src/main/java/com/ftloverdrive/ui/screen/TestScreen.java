@@ -179,7 +179,6 @@ public class TestScreen extends BaseScreen {
 		eventManager.addEventListener( playerShipHullMonitor, ShipPropertyListener.class );
 		eventManager.addEventListener( playerShipShieldMonitor, GamePlayerShipChangeListener.class );
 		eventManager.addEventListener( playerShipShieldMonitor, ShipPropertyListener.class );
-
 		eventManager.addEventListener( playerScrapMonitor, GamePlayerShipChangeListener.class );
 		eventManager.addEventListener( playerScrapMonitor, ShipPropertyListener.class );
 
@@ -200,10 +199,6 @@ public class TestScreen extends BaseScreen {
 		// Create a test ship.
 
 		int shipRefId = new TestShipBlueprint( null ).construct( context );
-
-		playerShipHullMonitor.setShipModel( srcContext, shipRefId );
-		playerShipShieldMonitor.setShipModel( srcContext, shipRefId );
-		playerScrapMonitor.setShipModel( srcContext, shipRefId );
 
 		int gameRefId = context.getGameModelRefId();
 		// Set it as the player's ship.

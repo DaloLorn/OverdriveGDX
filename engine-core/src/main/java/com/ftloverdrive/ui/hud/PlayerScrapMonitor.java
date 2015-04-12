@@ -91,11 +91,11 @@ public class PlayerScrapMonitor extends Group implements Disposable, GamePlayerS
 	}
 
 	private void updateShipInfo( OverdriveContext context ) {
-		ShipModel shipModel = context.getReferenceManager().getObject( shipModelRefId, ShipModel.class );
-		if ( shipModel == null ) {
+		if ( shipModelRefId == -1 ) {
 			bgSprite = redSprite;
 		}
 		else {
+			ShipModel shipModel = context.getReferenceManager().getObject( shipModelRefId, ShipModel.class );
 			int scrapAmount = shipModel.getProperties().getInt( OVDConstants.SCRAP );
 			bgSprite = scrapAmount > 0 ? normalSprite : redSprite;
 			lblScrap.setText( "" + scrapAmount );
