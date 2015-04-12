@@ -24,6 +24,8 @@ public class TiledNinePatchDrawable extends BaseDrawable {
 
 	private TextureRegion[] corners = null;
 	private TiledDrawable[] bodies = null;
+	private int middleWidth = 0;
+	private int middleHeight = 0;
 
 
 	protected TiledNinePatchDrawable() {
@@ -39,8 +41,8 @@ public class TiledNinePatchDrawable extends BaseDrawable {
 
 	public void setRegion( TextureRegion region, int left, int right, int top, int bottom ) {
 		if ( region == null ) throw new IllegalArgumentException( "region cannot be null." );
-		final int middleWidth = region.getRegionWidth() - left - right;
-		final int middleHeight = region.getRegionHeight() - top - bottom;
+		middleWidth = region.getRegionWidth() - left - right;
+		middleHeight = region.getRegionHeight() - top - bottom;
 
 		corners = new TextureRegion[4];
 		bodies = new TiledDrawable[5];
@@ -75,6 +77,28 @@ public class TiledNinePatchDrawable extends BaseDrawable {
 		setRightWidth( right );
 		setBottomHeight( bottom );
 		setLeftWidth( left );
+	}
+
+	public int getTileWidth() {
+		return middleWidth;
+	}
+
+	public int getTileHeight() {
+		return middleHeight;
+	}
+
+	public float computeTiledWidth( float w ) {
+		float bw = w - ( getLeftWidth() + getRightWidth() );
+		if ( bw % middleWidth != 0 )
+			w += middleWidth - bw % middleWidth;
+		return w;
+	}
+
+	public float computeTiledHeight( float h ) {
+		float bh = h - ( getTopHeight() + getBottomHeight() );
+		if ( bh % middleHeight != 0 )
+			h += middleHeight - bh % middleHeight;
+		return h;
 	}
 
 	public void draw( Batch batch, float x, float y, float width, float height ) {
