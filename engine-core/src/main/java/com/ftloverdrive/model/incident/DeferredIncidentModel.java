@@ -55,29 +55,30 @@ public class DeferredIncidentModel extends AbstractOVDModel implements IncidentM
 
 		final Stage popupStage = context.getScreen().getStageManager().getStage( BaseScreen.POPUP_STAGE_ID );
 
+		// If there already is an IncidentDialog present in the stage, use that.
+		// Otherwise create a new one.
+		IncidentDialog dialog = popupStage.getRoot().findActor( IncidentDialog.ACTOR_NAME );
+		if ( dialog == null )
+			dialog = new IncidentDialog( context );
+
 		if ( targetRefId == context.getNetManager().getLocalPlayerRefId() ) {
-			// If there already is an IncidentDialog present in the stage, use that.
-			// Otherwise create a new one.
-			IncidentDialog dialog = popupStage.getRoot().findActor( IncidentDialog.ACTOR_NAME );
-			if ( dialog == null )
-				dialog = new IncidentDialog( context );
 			dialog.setCurrentIncident( this );
-
-			// Height depends on width and number of plot branches, so calculate it after everything's been added
-			dialog.setHeight( dialog.computePreferredHeight() );
-
-			if ( !popupStage.getActors().contains( dialog, true ) ) {
-				// setKeepWithinStage() only applies if added to the stage root. :/
-				popupStage.addActor( dialog );
-				popupStage.addListener( dialog );
-			}
-
-			// Position depends on size and stage, so set it last
-			dialog.usePreferredPosition();
 		}
 		else {
-			// TODO: "Waiting for other player's decision" kind of dialog
+			dialog.setCurrentIncident( null );
 		}
+
+		// Height depends on width and number of plot branches, so calculate it after everything's been added
+		dialog.setHeight( dialog.computePreferredHeight() );
+
+		if ( !popupStage.getActors().contains( dialog, true ) ) {
+			// setKeepWithinStage() only applies if added to the stage root. :/
+			popupStage.addActor( dialog );
+			popupStage.addListener( dialog );
+		}
+
+		// Position depends on size and stage, so set it last
+		dialog.usePreferredPosition();
 	}
 
 	@Override

@@ -44,14 +44,15 @@ import com.ftloverdrive.ui.ShaderLabel.ShaderLabelStyle;
 public class IncidentDialog extends Window implements Disposable, EventListener {
 
 	private static final WindowStyle defaultWindowStyle = new WindowStyle( new BitmapFont(), new Color(), null );
+	/** Only 10 number keys on the keyboard, so we can only support 10 hotkeyed plot branches */
 	private static final int maxHHotkeyChoiceCount = 10;
 
 	public static final String SKIN_PATH = "overdrive-assets/skins/incident-dialog/window.json";
 	public static final String ACTOR_NAME = "IncidentDialog";
 
 	// The window's last location.
-	protected static float lastX = -1;
-	protected static float lastTopY = -1;
+	protected float lastX = -1;
+	protected float lastTopY = -1;
 
 	// Separates branches from each other
 	protected int sepChoices = 0;
@@ -63,8 +64,8 @@ public class IncidentDialog extends Window implements Disposable, EventListener 
 	protected int sepBranchSpoiler = 0;
 
 	// Size of a single repeating tile of the background
-	protected float frameBodyWidth = 0;
-	protected float frameBodyHeight = 0;
+	protected float middleWidth = 0;
+	protected float middleHeight = 0;
 
 	protected OverdriveContext context;
 	protected OVDSkin skin;
@@ -80,11 +81,10 @@ public class IncidentDialog extends Window implements Disposable, EventListener 
 
 	protected PlotBranchCriteria branchCriteria;
 
-	// Only 10 keys on the numeric keyboard, so we can only support 10 hotkeyed plot branches
 	private int choiceCount = 0; // Total choice count
 	private int availableChoiceCount = 0; // Available (non-grayed out and visible) choice count
+	// TODO: Should use refIds instead?
 	private PlotBranch[] hotkeyChoices = new PlotBranch[maxHHotkeyChoiceCount];
-	// Only used to call dispose, can be direct reference.
 	private DeferredIncidentModel curIncModel = null;
 
 	private boolean captureInput = false;
@@ -122,8 +122,8 @@ public class IncidentDialog extends Window implements Disposable, EventListener 
 		setStyle( wndStyle );
 
 		Drawable d = wndStyle.background;
-		frameBodyWidth = d.getMinWidth() - ( d.getLeftWidth() + d.getRightWidth() );
-		frameBodyHeight = d.getMinHeight() - ( d.getTopHeight() + d.getBottomHeight() );
+		middleWidth = d.getMinWidth() - ( d.getLeftWidth() + d.getRightWidth() );
+		middleHeight = d.getMinHeight() - ( d.getTopHeight() + d.getBottomHeight() );
 
 		lblIncText = new ShaderLabel( "", incStyle );
 		lblIncText.setAlignment( Align.top | Align.left, Align.center | Align.left );
@@ -146,7 +146,7 @@ public class IncidentDialog extends Window implements Disposable, EventListener 
 		setWidth( computePreferredWidth( skin.getInt( "window-width" ) ) );
 	}
 
-	public void showConseequenceBox( boolean show ) {
+	public void showConsequenceBox( boolean show ) {
 		conseqBox.setVisible( show );
 		if ( show ) {
 			getCell( lblIncText ).spaceBottom( sepTextConseq );
@@ -173,32 +173,44 @@ public class IncidentDialog extends Window implements Disposable, EventListener 
 		captureInput = block;
 	}
 
+	/**
+	 * Instructs the dialog to display the incident passed in argument.
+	 * Can pass null to have dialog display the "waiting for other player" text,
+	 * blocking until it's this player's turn.
+	 */
 	public void setCurrentIncident( DeferredIncidentModel incident ) {
 		curIncModel = incident;
 		setCaptureInput( true );
-		setIncidentText( incident.getText() );
 
-		int[] conseqRefIds = incident.consequenceRefIds();
-		if ( conseqRefIds.length == 0 ) {
-			showConseequenceBox( false );
+		if ( incident == null ) {
+			setIncidentText( "Waiting for the other player's response..." );
+			showConsequenceBox( false );
 		}
 		else {
-			showConseequenceBox( true );
-			for ( int conseqRefId : conseqRefIds ) {
-				Consequence conseq = context.getReferenceManager().getObject( conseqRefId, Consequence.class );
-				addConsequence( conseq );
-			}
-		}
+			setIncidentText( incident.getText() );
 
-		int[] branchRefIds = incident.branchRefIds();
-		for ( int branchRefId : branchRefIds ) {
-			PlotBranch branch = context.getReferenceManager().getObject( branchRefId, PlotBranch.class );
-			addChoice( branch );
+			int[] conseqRefIds = incident.consequenceRefIds();
+			if ( conseqRefIds.length == 0 ) {
+				showConsequenceBox( false );
+			}
+			else {
+				showConsequenceBox( true );
+				for ( int conseqRefId : conseqRefIds ) {
+					Consequence conseq = context.getReferenceManager().getObject( conseqRefId, Consequence.class );
+					addConsequence( conseq );
+				}
+			}
+
+			int[] branchRefIds = incident.branchRefIds();
+			for ( int branchRefId : branchRefIds ) {
+				PlotBranch branch = context.getReferenceManager().getObject( branchRefId, PlotBranch.class );
+				addPlotBranch( branch );
+			}
+			// If the incident defines no branches, or none of the added branches are available / visible, then
+			// add the default "Continue..." choice.
+			if ( availableChoiceCount == 0 )
+				addPlotBranch( new DefaultPlotBranch() );
 		}
-		// If the incident defines no branches, or none of the added branches are available / visible, then
-		// add the default "Continue..." choice.
-		if ( availableChoiceCount == 0 )
-			addChoice( new DefaultPlotBranch() );
 	}
 
 	public void setIncidentText( String text ) {
@@ -206,7 +218,7 @@ public class IncidentDialog extends Window implements Disposable, EventListener 
 		lblIncText.setSize( lblIncText.getPrefWidth(), lblIncText.getPrefHeight() );
 	}
 
-	public void addChoice( final PlotBranch branch ) {
+	public void addPlotBranch( final PlotBranch branch ) {
 		// Determine what kind of plot branch this is, so we can set its appearance appropriately
 		CriteriaResult criterion = branchCriteria.classify( context, branch );
 		// Branches that get classified as blue don't show up as such if they don't show spoilers
@@ -328,8 +340,14 @@ public class IncidentDialog extends Window implements Disposable, EventListener 
 	public float computePreferredWidth( int w ) {
 		validate();
 		float bw = w - ( getPadLeft() + getPadRight() );
-		if ( bw % frameBodyWidth != 0 )
-			w += frameBodyWidth - bw % frameBodyWidth;
+
+		System.out.println( bw );
+		System.out.println( Math.ceil( bw / middleWidth ) * middleWidth );
+		if ( bw % middleWidth != 0 ) {
+			System.out.println( middleWidth );
+			System.out.println( middleWidth - bw % middleWidth );
+			w += middleWidth - bw % middleWidth;
+		}
 		return w;
 	}
 
@@ -343,8 +361,8 @@ public class IncidentDialog extends Window implements Disposable, EventListener 
 		validate();
 		float h = tableHeight( this );
 		h += ( availableChoiceCount - 1 ) * sepChoices;
-		if ( h % frameBodyHeight != 0 )
-			h += frameBodyHeight - h % frameBodyHeight;
+		if ( h % middleHeight != 0 )
+			h += middleHeight - h % middleHeight;
 		h += getPadTop() + getPadBottom();
 		return h;
 	}
@@ -390,6 +408,11 @@ public class IncidentDialog extends Window implements Disposable, EventListener 
 	 * A "soft dispose", resets the dialog so that it can be reused by another incident.
 	 */
 	private void reset0() {
+		// Store the current location of the window so that the new one is created at the same spot
+		// There's no need to share this data with the server/other players, so just preserve it statically
+		lastX = getX();
+		lastTopY = getTop();
+
 		if ( choiceCount > maxHHotkeyChoiceCount )
 			choiceCount = maxHHotkeyChoiceCount;
 		while ( choiceCount > 0 ) {
@@ -435,23 +458,13 @@ public class IncidentDialog extends Window implements Disposable, EventListener 
 
 		int incRefId = branch.getIncidentRefId();
 		if ( incRefId == -1 ) {
-			// TODO: Send notification that incident ended, to unpause the game?
-
-			// Once the incident chain is finished, reset the size, so that the next incident dialog
-			// will appear at the default location.
-			lastX = -1;
-			lastTopY = -1;
+			// TODO: Send notification that incident ended, to unpause the game, and free the other client
 			reset0();
 			dispose();
 		}
 		else {
-			// Store the current location of the window so that the new one is created at the same spot
-			// There's no need to share this data with the server/other players, so just preserve it statically
-			lastX = getX();
-			lastTopY = getTop();
-
 			IncidentSelectionEvent incSelectionE = Pools.get( IncidentSelectionEvent.class ).obtain();
-			incSelectionE.init( incRefId );
+			incSelectionE.init( context, incRefId );
 			context.getScreenEventManager().postDelayedEvent( incSelectionE );
 
 			reset0();
