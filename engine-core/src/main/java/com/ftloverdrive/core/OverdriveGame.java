@@ -2,6 +2,7 @@ package com.ftloverdrive.core;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.InetSocketAddress;
 
 import com.badlogic.gdx.Application;
 import com.badlogic.gdx.ApplicationListener;
@@ -102,7 +103,7 @@ public class OverdriveGame implements ApplicationListener {
 
 		refManager = new OVDReferenceManager();
 		blueManager = new OVDBlueprintManager();
-		netManager = new OVDNetManager();
+		netManager = new OVDNetManager( this );
 
 		assetManager = new AssetManager( fileHandleResolver );
 		assetManager.setLoader( BitmapFont.class, new FreeTypeFontLoader( fileHandleResolver ) );
@@ -122,11 +123,15 @@ public class OverdriveGame implements ApplicationListener {
 					currentScreen.getEventManager().postDelayedInboundEvent( (OVDEvent)object );
 				}
 			}
+
+			public void connected( Connection connection ) {
+				onConnected( connection );
+			}
 		} );
 
-		screenManager.showScreen( screenManager.getInitScreenKey() );
-
 		server = new OverdriveServer( context );
+
+		screenManager.showScreen( screenManager.getInitScreenKey() );
 	}
 
 	/**
@@ -148,12 +153,25 @@ public class OverdriveGame implements ApplicationListener {
 		}
 	}
 
+	/**
+	 * @return the String representation of the IP address of the server, or null if
+	 *         not connected. If the client this method was invoked on acts as a server,
+	 *         then this method returns the localhost address (127.0.0.1).
+	 */
+	public String getServerAddress() {
+		InetSocketAddress address = kryoClient.getRemoteAddressTCP();
+		return address == null ? null : address.getAddress().getHostAddress();
+	}
+
 	public int getConnectionId() {
 		return kryoClient.getID();
 	}
 
 	public void disconnect() {
 		kryoClient.stop();
+	}
+
+	public void onConnected( Connection connection ) {
 	}
 
 	// TODO: Test code, remove (or wrap in a nice UI)
@@ -182,19 +200,19 @@ public class OverdriveGame implements ApplicationListener {
 	 * Returns the main FileHandleResolver.
 	 *
 	 * Usage:
-	 *     FileHandle fh = getFileHandleResolver().resolve( pathString );
-	 *     // If you need a File object...
-	 *     File f = fh.file();
+	 * FileHandle fh = getFileHandleResolver().resolve( pathString );
+	 * // If you need a File object...
+	 * File f = fh.file();
 	 *
 	 * Given a string, this resolver will look in several locations.
-	 *     {current_dir|APP_PATH}/resources/...
-	 *     {current_dir|APP_PATH}/...
-	 *     {internal}/...
+	 * {current_dir|APP_PATH}/resources/...
+	 * {current_dir|APP_PATH}/...
+	 * {internal}/...
 	 *
 	 * If a URI prefix is found, that will be stripped, and a specific
 	 * location will be checked instead.
-	 *     internal://... - Root of the jar, and current dir on desktop.
-	 *     external://... - Android SD card, or desktop user's home dir.
+	 * internal://... - Root of the jar, and current dir on desktop.
+	 * external://... - Android SD card, or desktop user's home dir.
 	 */
 	public FileHandleResolver getFileHandleResolver() {
 		return fileHandleResolver;
@@ -204,10 +222,10 @@ public class OverdriveGame implements ApplicationListener {
 	 * Returns a manager to load assets.
 	 *
 	 * This one can load ttf fonts:
-	 *     String assetString = ".../myfont.ttf?size=10";
-	 *     assetManager.load( assetString, BitmapFont.class );
-	 *     assetManager.finishLoading();
-	 *     BitmapFont font = assetManager.get( assetString, BitmapFont.class );
+	 * String assetString = ".../myfont.ttf?size=10";
+	 * assetManager.load( assetString, BitmapFont.class );
+	 * assetManager.finishLoading();
+	 * BitmapFont font = assetManager.get( assetString, BitmapFont.class );
 	 */
 	public AssetManager getAssetManager() {
 		return assetManager;

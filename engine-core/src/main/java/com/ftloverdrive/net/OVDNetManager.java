@@ -4,9 +4,13 @@ import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.IntIntMap;
 import com.esotericsoftware.kryo.Kryo;
+import com.ftloverdrive.core.OverdriveGame;
 import com.ftloverdrive.event.engine.DelayedEvent;
 import com.ftloverdrive.event.engine.ModelDestructionEvent;
+import com.ftloverdrive.event.engine.RequestGameStateEvent;
+import com.ftloverdrive.event.engine.SignalReadyEvent;
 import com.ftloverdrive.event.engine.TickEvent;
 import com.ftloverdrive.event.engine.TickListenerEvent;
 import com.ftloverdrive.event.game.GamePlayerShipChangeEvent;
@@ -33,6 +37,8 @@ import com.ftloverdrive.event.ship.ShipRoomCreationEvent;
 import com.ftloverdrive.event.ship.ShipRoomImageChangeEvent;
 import com.ftloverdrive.io.AnimSpec;
 import com.ftloverdrive.io.ImageSpec;
+import com.ftloverdrive.model.DefaultGameModel;
+import com.ftloverdrive.model.NamedProperties;
 import com.ftloverdrive.model.incident.PlotBranchRequirement;
 import com.ftloverdrive.model.incident.requirement.ResourceRequirement;
 import com.ftloverdrive.model.incident.requirement.ShipRequirement;
@@ -47,11 +53,16 @@ public class OVDNetManager {
 	protected int localPlayerModelRefId = -1;
 	protected int enemyPlayerModelRefId = -1;
 
+	// Needed to get the address of the server we're connected to,
+	// for fetching of new refId ranges.
+	protected OverdriveGame game;
 
-	public OVDNetManager() {
+
+	public OVDNetManager( OverdriveGame game ) {
 		idRanges = new Array<Range>( true, 1 );
 		// idRanges.add( new Range( 0, Integer.MAX_VALUE ) ); // Default range.
 		returnedIds = new Array<Integer>( true, 16 );
+		this.game = game;
 	}
 
 	/**
@@ -99,20 +110,9 @@ public class OVDNetManager {
 		while ( idRanges.size > 0 && nextId >= idRanges.get( 0 ).end ) {
 			idRanges.removeIndex( 0 );
 		}
-		if ( idRanges.size == 0 ) {
+		if ( !hasIdRange() ) {
 			// TODO: Make a synchronous RMI call to fetch a new range.
-			try {
-				// TODO: Use constants instead of magic numbers and strings
-				// TODO: Need a way to get IP address of the server we're connected to
-				Registry registry = LocateRegistry.getRegistry( "127.0.0.1", 54556 );
-				FetchRefIdRange stub = (FetchRefIdRange)registry.lookup( "FetchRefIdRange" );
-				Range range = stub.fetchRefIdRange();
-				System.out.println( "Received refId range: " + range );
-				addRefIdRange( range.start, range.end );
-			}
-			catch ( Exception e ) {
-				e.printStackTrace();
-			}
+			fetchNewRefIdRange();
 		}
 		return nextId++;
 	}
@@ -130,6 +130,29 @@ public class OVDNetManager {
 
 		if ( local )
 			returnedIds.add( refId );
+	}
+
+	public boolean hasIdRange() {
+		return idRanges.size > 0;
+	}
+
+	public void fetchNewRefIdRange() {
+		try {
+			// TODO: Use constants instead of magic numbers and strings
+			// TODO: Need a way to get IP address of the server we're connected to
+
+			Registry registry = LocateRegistry.getRegistry( game.getServerAddress(), 54556 );
+			FetchRefIdRange stub = (FetchRefIdRange)registry.lookup( "FetchRefIdRange" );
+			Range range = stub.fetchRefIdRange();
+			System.out.println( "Received refId range: " + range );
+			if ( idRanges.size == 0 )
+				setRefIdRange( range.start, range.end );
+			else
+				addRefIdRange( range.start, range.end );
+		}
+		catch ( Exception e ) {
+			e.printStackTrace();
+		}
 	}
 
 	/**
