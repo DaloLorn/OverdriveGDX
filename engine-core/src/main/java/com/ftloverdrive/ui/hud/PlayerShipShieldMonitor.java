@@ -3,7 +3,6 @@ package com.ftloverdrive.ui.hud;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.Sprite;
-import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.utils.Disposable;
 import com.ftloverdrive.core.OverdriveContext;
@@ -77,7 +76,6 @@ public class PlayerShipShieldMonitor extends Actor implements Disposable, GamePl
 		}
 	}
 
-
 	public void setShipModel( OverdriveContext context, int shipModelRefId ) {
 		this.shipModelRefId = shipModelRefId;
 		updateShipInfo( context );
@@ -107,12 +105,12 @@ public class PlayerShipShieldMonitor extends Actor implements Disposable, GamePl
 	 * Updates the bar to match the player ship's Shield/ShieldMax.
 	 */
 	private void updateShipInfo( OverdriveContext context ) {
-		if ( shipModelRefId == -1 ) {
+		ShipModel shipModel = context.getReferenceManager().getObject( shipModelRefId, ShipModel.class );
+		if ( shipModel == null ) {
 			shieldMax = 0;
 			shieldFull = 0;
 		}
 		else {
-			ShipModel shipModel = context.getReferenceManager().getObject( shipModelRefId, ShipModel.class );
 			shieldFull = shipModel.getProperties().getInt( OVDConstants.SHIELD );
 			shieldMax = shipModel.getProperties().getInt( OVDConstants.SHIELD_MAX );
 		}
