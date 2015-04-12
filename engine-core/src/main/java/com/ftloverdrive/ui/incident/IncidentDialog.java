@@ -402,11 +402,6 @@ public class IncidentDialog extends Window implements Disposable, EventListener 
 	 * A "soft dispose", resets the dialog so that it can be reused by another incident.
 	 */
 	private void reset0() {
-		// Store the current location of the window so that the new one is created at the same spot
-		// There's no need to share this data with the server/other players, so just preserve it statically
-		lastX = getX();
-		lastTopY = getTop();
-
 		if ( choiceCount > maxHHotkeyChoiceCount )
 			choiceCount = maxHHotkeyChoiceCount;
 		while ( choiceCount > 0 ) {
@@ -513,6 +508,11 @@ public class IncidentDialog extends Window implements Disposable, EventListener 
 				for ( EventListener listener : a.getListeners() )
 					listener.handle( event );
 			}
+
+			// Store the current location of the window so that the new one is created at the same spot
+			// There's no need to share this data with the server/other players, so just preserve it statically
+			lastX = getX();
+			lastTopY = getTop();
 
 			if ( !captureInput )
 				super.touchUp( event, x, y, pointer, button );
