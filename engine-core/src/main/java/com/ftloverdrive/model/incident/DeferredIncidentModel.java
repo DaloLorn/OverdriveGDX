@@ -48,9 +48,11 @@ public class DeferredIncidentModel extends AbstractOVDModel implements IncidentM
 
 	@Override
 	public void execute( OverdriveContext context ) {
-		for ( int cseqRefId : consequenceRefIds ) {
-			Consequence consequence = context.getReferenceManager().getObject( cseqRefId, Consequence.class );
-			consequence.execute( context );
+		if ( targetRefId == context.getNetManager().getLocalPlayerRefId() ) {
+			for ( int cseqRefId : consequenceRefIds ) {
+				Consequence consequence = context.getReferenceManager().getObject( cseqRefId, Consequence.class );
+				consequence.execute( context );
+			}
 		}
 
 		final Stage popupStage = context.getScreen().getStageManager().getStage( BaseScreen.POPUP_STAGE_ID );
