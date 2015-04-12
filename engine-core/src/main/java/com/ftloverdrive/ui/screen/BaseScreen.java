@@ -35,6 +35,7 @@ public abstract class BaseScreen implements Disposable, OVDScreen {
 	protected InputMultiplexer inputMultiplexer;
 
 	protected OverdriveContext context;
+	private boolean copyContext = true;
 
 	protected Stage mainStage;
 	protected Stage hudStage;
@@ -45,9 +46,19 @@ public abstract class BaseScreen implements Disposable, OVDScreen {
 
 
 	public BaseScreen( OverdriveContext srcContext ) {
-		this.context = Pools.get( OverdriveContext.class ).obtain();
-		this.context.init( srcContext );
-		this.context.setScreen( this );
+		this( srcContext, true );
+	}
+
+	public BaseScreen( OverdriveContext srcContext, boolean copyContext ) {
+		this.copyContext = copyContext;
+		if ( copyContext ) {
+			context = Pools.get( OverdriveContext.class ).obtain();
+			context.init( srcContext );
+		}
+		else {
+			context = srcContext;
+		}
+		context.setScreen( this );
 
 		log = new Logger( getClass().getCanonicalName(), Logger.INFO );
 
@@ -106,7 +117,8 @@ public abstract class BaseScreen implements Disposable, OVDScreen {
 	 * Unloads all resources loaded by the script, and clears the screens namespace, if it exists.
 	 */
 	public void dispose() {
-		Pools.get( OverdriveContext.class ).free( context );
+		if ( copyContext )
+			Pools.get( OverdriveContext.class ).free( context );
 	}
 
 	public OVDStageManager getStageManager() {
