@@ -52,7 +52,7 @@ public class AnimSpec extends ImageSpec {
 		frameCount = fc;
 		xOffset = x;
 		yOffset = y;
-		interval = time / frameCount;
+		interval = frameCount == 0 ? 0 : time / Math.abs(frameCount);
 	}
 
 	public int getFrameWidth() {

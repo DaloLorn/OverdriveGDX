@@ -81,7 +81,7 @@ public class IncidentDialog extends Window implements Disposable, EventListener 
 
 	protected PlotBranchCriteria branchCriteria;
 
-	private int choiceCount = 0; // Total choice count
+	private int choiceCount = 0; // Total choice count (includes grayed-out, but not invisible ones)
 	private int availableChoiceCount = 0; // Available (non-grayed out and visible) choice count
 	// TODO: Should use refIds instead?
 	private PlotBranch[] hotkeyChoices = new PlotBranch[maxHHotkeyChoiceCount];

@@ -33,6 +33,11 @@ import com.ftloverdrive.ui.screen.OVDScreenManager;
 import com.ftloverdrive.util.OVDReferenceManager;
 
 
+/**
+ * TODO: Problem: pause()/resume() is not called when the application window
+ * is being moved on desktop. Possible workaround:
+ * http://stackoverflow.com/a/21731002
+ */
 public class OverdriveGame implements ApplicationListener {
 
 	public static final String APP_NAME = "Overdrive";
@@ -120,6 +125,10 @@ public class OverdriveGame implements ApplicationListener {
 
 			public void received( Connection connection, Object object ) {
 				if ( object instanceof OVDEvent ) {
+					if ( currentScreen == null ) {
+						log.debug( "Received event " + object + ", but could not handle it because screen is null." );
+						return;
+					}
 					if ( currentScreen.getEventManager() == null ) {
 						log.debug( "Received event " + object + ", but could not handle it because eventManager was not instantiated yet." );
 						return;

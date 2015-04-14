@@ -19,7 +19,7 @@ public class ShipLayoutDoorAddEvent extends AbstractOVDEvent implements Poolable
 	 *
 	 * @param shipRefId  a reserved reference id for the ShipModel
 	 * @param doorRefId  a reserved reference id for the DoorModel
-	 * @param roomCoords  ShipCoordinates to associate with the door
+	 * @param doorCoords  ShipCoordinates to associate with the door
 	 */
 	public void init( int shipRefId, int doorRefId, ShipCoordinate doorCoords ) {
 		this.shipRefId = shipRefId;

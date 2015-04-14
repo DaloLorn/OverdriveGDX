@@ -82,8 +82,8 @@ public class OVDClock {
 	}
 
 	/**
-	 * Increments an internal ref counter for how many listeners there are for each tick count.
-	 * This should not normally be used.
+	 * Increments an internal ref counter for how many listeners there are for the tick count.
+	 * This should not normally be used, save for the OVDServer.
 	 */
 	protected void incrTick( int tickCount ) {
 		if ( tickCount < 2 )
@@ -92,8 +92,8 @@ public class OVDClock {
 	}
 
 	/**
-	 * Decrements an internal ref counter for how many listeners there are for each tick count.
-	 * This should not normally be used.
+	 * Decrements an internal ref counter for how many listeners there are for the tick count.
+	 * This should not normally be used, save for the OVDServer.
 	 */
 	protected void decrTick( int tickCount ) {
 		if ( tickCount < 2 || !tickRefMap.containsKey( tickCount ) )

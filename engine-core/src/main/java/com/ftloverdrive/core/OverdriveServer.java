@@ -34,7 +34,7 @@ public class OverdriveServer implements Disposable, FetchRefIdRange {
 
 	private OVDClock clock;
 	private OVDEventManager eventManager;
-	private Map<Integer, List<Range>> connectionRangeMap;
+	private Map<Integer, List<Range>> connectionRangeMap; // Used by fetchRefIdRange( int )
 	private int nextRangeStart;
 
 	private OverdriveContext context;
@@ -117,6 +117,7 @@ public class OverdriveServer implements Disposable, FetchRefIdRange {
 	}
 
 	public void update( float delta ) {
+		// TODO: Clock sometimes doesn't unpause, no idea why
 		if ( !paused )
 			clock.secondsElapsed( delta );
 		eventManager.processEvents( context );
@@ -144,10 +145,18 @@ public class OverdriveServer implements Disposable, FetchRefIdRange {
 		clock.postDelayedEvent( de );
 	}
 
+	/**
+	 * Increments an internal ref counter for how many listeners there are for the tick count.
+	 * This should not normally be used. Use OVDEventManager#addTickListener instead.
+	 */
 	public void incrTick( int tickCount ) {
 		clock.incrTick( tickCount );
 	}
 
+	/**
+	 * Decrements an internal ref counter for how many listeners there are for the tick count.
+	 * This should not normally be used. Use OVDEventManager#removeTickListener instead.
+	 */
 	public void decrTick( int tickCount ) {
 		clock.decrTick( tickCount );
 	}

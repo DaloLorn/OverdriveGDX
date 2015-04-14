@@ -138,10 +138,13 @@ public class DeferredIncidentModel extends AbstractOVDModel implements IncidentM
 	/**
 	 * Disposes this incident and its own consequences and branches, as well as incidents referenced by branches,
 	 * except if the referenced incident's id matches the one passed in argument.
+	 * 
+	 * @param ignoredRefId
+	 *            refId of the child incident that's not to be disposed
 	 */
-	public void disposeExcept( OverdriveContext context, int ignore ) {
+	public void disposeExcept( OverdriveContext context, int ignoredRefId ) {
 		Array<Integer> ids = new Array<Integer>();
-		disposeRecursiveExcept( context, ignore, ids );
+		disposeRecursiveExcept( context, ignoredRefId, ids );
 
 		int[] refIds = new int[ids.size];
 		for ( int i = 0; i < ids.size; ++i )
