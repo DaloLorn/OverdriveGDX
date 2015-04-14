@@ -14,6 +14,7 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.IntMap;
 import com.badlogic.gdx.utils.ObjectIntMap;
 import com.badlogic.gdx.utils.Pools;
+import com.ftloverdrive.core.OverdriveContext;
 
 
 public class ShipLayout {
@@ -398,8 +399,9 @@ public class ShipLayout {
 	 * 
 	 * TODO: Could possibly extract this function, and have it take ShipLayout as argument
 	 */
-	public Stack<ShipCoordinate> findPath( ShipCoordinate start, ShipCoordinate end, ShipCoordinate comingFrom, ShipCoordinate movingTo ) {
-		Stack<ShipCoordinate> path = findPathDijkstra( start, end );
+	public Stack<ShipCoordinate> findPath( OverdriveContext context, ShipCoordinate start, ShipCoordinate end, ShipCoordinate comingFrom,
+			ShipCoordinate movingTo ) {
+		Stack<ShipCoordinate> path = findPathDijkstra( context, start, end );
 		if ( path == null ) return null;
 		streamlinePath( path );
 
@@ -438,7 +440,7 @@ public class ShipLayout {
 		return path;
 	}
 
-	private Stack<ShipCoordinate> findPathDijkstra( ShipCoordinate start, ShipCoordinate end ) {
+	private Stack<ShipCoordinate> findPathDijkstra( OverdriveContext context, ShipCoordinate start, ShipCoordinate end ) {
 		Map<ShipCoordinate, Float> distMap = new HashMap<ShipCoordinate, Float>();
 		Map<ShipCoordinate, ShipCoordinate> prevMap = new HashMap<ShipCoordinate, ShipCoordinate>();
 		List<ShipCoordinate> pending = new ArrayList<ShipCoordinate>();
@@ -450,7 +452,8 @@ public class ShipLayout {
 		// to break down locked doors / crystal lockdowns?
 
 		for ( ShipCoordinate v : allShipCoords ) {
-			if ( v.v == ShipCoordinate.TYPE_SQUARE || v.v == ShipCoordinate.TYPE_DOOR_H || v.v == ShipCoordinate.TYPE_DOOR_V ) {
+			if ( v.v == ShipCoordinate.TYPE_SQUARE || v.v == ShipCoordinate.TYPE_TPAD ||
+					v.v == ShipCoordinate.TYPE_DOOR_H || v.v == ShipCoordinate.TYPE_DOOR_V ) {
 				distMap.put( v, Float.MAX_VALUE );
 				prevMap.put( v, null );
 				pending.add( v );
@@ -459,7 +462,7 @@ public class ShipLayout {
 		distMap.put( start, 0.0f );
 
 		AdjacencyContext diagonalAdj = new DiagonalAdjacencyContext();
-		AdjacencyContext defaultAdj = new DefaultAdjacencyContext();
+		AdjacencyContext defaultAdj = new DefaultAdjacencyContext( context );
 		List<ShipCoordinate> neighbours = new ArrayList<ShipCoordinate>();
 
 		while ( !pending.isEmpty() ) {
@@ -505,6 +508,9 @@ public class ShipLayout {
 					if ( neigh.v == ShipCoordinate.TYPE_SQUARE ) {
 						dist = distMap.get( current ) + 1;
 					}
+					else if ( neigh.v == ShipCoordinate.TYPE_TPAD ) {
+						dist = distMap.get( current ) + 1.4f;
+					}
 					else {
 						// Door, either H or V
 						// Give it 0 weight so that it's not ignored, but doesn't
@@ -539,7 +545,7 @@ public class ShipLayout {
 	}
 
 	/**
-	 * Simplifies the path by removing all square nodes that do not border with a door
+	 * Simplifies the path by removing all square nodes that do not border with a door or a teleport pad
 	 * along the path.
 	 * 
 	 * Only has noticeable effect in rooms bigger than 2x2.
@@ -555,6 +561,10 @@ public class ShipLayout {
 				if ( i + 1 < path.size() ) {
 					keyNodes.add( path.get( i + 1 ) );
 				}
+			}
+			else if ( path.get( i ).v == ShipCoordinate.TYPE_TPAD ) {
+				keyNodes.add( path.get( i - 1 ) );
+				keyNodes.add( path.get( i ) );
 			}
 		}
 

@@ -7,6 +7,7 @@ import com.ftloverdrive.util.OVDConstants;
 public class DefaultTeleportPadModel implements TeleportPadModel {
 
 	protected ImageSpec padAnimSpec;
+	protected int connectedTpadRefId = -1;
 
 
 	public DefaultTeleportPadModel() {
@@ -21,5 +22,15 @@ public class DefaultTeleportPadModel implements TeleportPadModel {
 	@Override
 	public ImageSpec getAnimSpec() {
 		return padAnimSpec;
+	}
+
+	@Override
+	public void setConnectedTPadRefId( int tpadRefId ) {
+		connectedTpadRefId = tpadRefId;
+	}
+
+	@Override
+	public int getConnectedTPadRefId() {
+		return connectedTpadRefId;
 	}
 }

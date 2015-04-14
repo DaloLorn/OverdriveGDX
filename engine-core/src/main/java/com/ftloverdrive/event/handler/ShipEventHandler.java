@@ -10,6 +10,7 @@ import com.ftloverdrive.event.ship.ShipCreationEvent;
 import com.ftloverdrive.event.ship.ShipCrewAddEvent;
 import com.ftloverdrive.event.ship.ShipCrewCreationEvent;
 import com.ftloverdrive.event.ship.ShipDoorCreationEvent;
+import com.ftloverdrive.event.ship.ShipLayoutConnectTeleportPadsEvent;
 import com.ftloverdrive.event.ship.ShipLayoutCrewPlacementEvent;
 import com.ftloverdrive.event.ship.ShipLayoutDoorAddEvent;
 import com.ftloverdrive.event.ship.ShipLayoutListener;
@@ -50,6 +51,7 @@ public class ShipEventHandler implements OVDEventHandler {
 				ShipLayoutDoorAddEvent.class,
 				ShipDoorCreationEvent.class,
 				ShipLayoutTeleportPadAddEvent.class,
+				ShipLayoutConnectTeleportPadsEvent.class,
 				ShipTeleportPadCreationEvent.class,
 				ShipCrewCreationEvent.class,
 				ShipCrewAddEvent.class,
@@ -187,6 +189,13 @@ public class ShipEventHandler implements OVDEventHandler {
 					( (ShipLayoutListener)listeners[i + 1] ).shipLayoutTeleportPadAdded( context, event );
 			}
 		}
+		else if ( e instanceof ShipLayoutConnectTeleportPadsEvent ) {
+			ShipLayoutConnectTeleportPadsEvent event = (ShipLayoutConnectTeleportPadsEvent)e;
+
+			int tpadRefId = event.getTeleportPadRefId();
+			TeleportPadModel tpadModel = context.getReferenceManager().getObject( tpadRefId, TeleportPadModel.class );
+			tpadModel.setConnectedTPadRefId( event.getTargetTeleportPadRefId() );
+		}
 
 		else if ( e instanceof ShipCrewCreationEvent ) {
 			ShipCrewCreationEvent event = (ShipCrewCreationEvent)e;
@@ -251,6 +260,9 @@ public class ShipEventHandler implements OVDEventHandler {
 		}
 		else if ( e.getClass() == ShipLayoutTeleportPadAddEvent.class ) {
 			Pools.get( ShipLayoutTeleportPadAddEvent.class ).free( (ShipLayoutTeleportPadAddEvent)e );
+		}
+		else if ( e.getClass() == ShipLayoutConnectTeleportPadsEvent.class ) {
+			Pools.get( ShipLayoutConnectTeleportPadsEvent.class ).free( (ShipLayoutConnectTeleportPadsEvent)e );
 		}
 		else if ( e.getClass() == ShipCrewCreationEvent.class ) {
 			Pools.get( ShipCrewCreationEvent.class ).free( (ShipCrewCreationEvent)e );

@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.Set;
 
 import com.badlogic.gdx.utils.Pools;
+import com.ftloverdrive.core.OverdriveContext;
 
 
 /**
@@ -18,12 +19,13 @@ public class DefaultAdjacencyContext implements AdjacencyContext {
 	 */
 	protected ShipCoordinate tmpCoord;
 	private int i;
+	private OverdriveContext context;
 
 
-	public DefaultAdjacencyContext() {
+	public DefaultAdjacencyContext( OverdriveContext context ) {
+		this.context = context;
 		tmpCoord = Pools.get( ShipCoordinate.class ).obtain();
 	}
-
 
 	/**
 	 * Finds adjacent ShipCoordinates, then adds them to an existing
@@ -69,37 +71,44 @@ public class DefaultAdjacencyContext implements AdjacencyContext {
 				}
 			}
 
-			// Check doors adjacent to this tile
+			// Check doors and teleport pads adjacent to this tile
 			Set<ShipCoordinate> allCoords = layout.getAllShipCoords();
 
-			for ( ShipCoordinate door : allCoords ) {
-				if ( door.v != ShipCoordinate.TYPE_DOOR_H && door.v != ShipCoordinate.TYPE_DOOR_V ) {
+			for ( ShipCoordinate c : allCoords ) {
+				if ( c.v != ShipCoordinate.TYPE_DOOR_H && c.v != ShipCoordinate.TYPE_DOOR_V &&
+						c.v != ShipCoordinate.TYPE_TPAD ) {
 					continue;
 				}
 
 				tmpCoord.init( coord.x, coord.y + 1, ShipCoordinate.TYPE_DOOR_H );
-				if ( door.equals( tmpCoord ) ) {
-					results.add( door );
+				if ( c.equals( tmpCoord ) ) {
+					results.add( c );
 					continue;
 				}
 
 				// Doors snap to the left/upper side of the tile, hence checking current tile
 				tmpCoord.init( coord.x, coord.y, ShipCoordinate.TYPE_DOOR_H );
-				if ( door.equals( tmpCoord ) ) {
-					results.add( door );
+				if ( c.equals( tmpCoord ) ) {
+					results.add( c );
 					continue;
 				}
 
 				tmpCoord.init( coord.x + 1, coord.y, ShipCoordinate.TYPE_DOOR_V );
-				if ( door.equals( tmpCoord ) ) {
-					results.add( door );
+				if ( c.equals( tmpCoord ) ) {
+					results.add( c );
 					continue;
 				}
 
 				// Doors snap to the left/upper side of the tile, hence checking current tile
 				tmpCoord.init( coord.x, coord.y, ShipCoordinate.TYPE_DOOR_V );
-				if ( door.equals( tmpCoord ) ) {
-					results.add( door );
+				if ( c.equals( tmpCoord ) ) {
+					results.add( c );
+					continue;
+				}
+
+				tmpCoord.init( coord.x, coord.y, ShipCoordinate.TYPE_TPAD );
+				if ( c.equals( tmpCoord ) ) {
+					results.add( c );
 					continue;
 				}
 			}
@@ -155,6 +164,25 @@ public class DefaultAdjacencyContext implements AdjacencyContext {
 				tmpCoord = Pools.get( ShipCoordinate.class ).obtain();
 			}
 			tmpCoord.init( coord.x, coord.y, 0 );
+			if ( allCoords.contains( tmpCoord ) ) {
+				results.add( tmpCoord );
+				tmpCoord = Pools.get( ShipCoordinate.class ).obtain();
+			}
+		}
+		else if ( coord.v == ShipCoordinate.TYPE_TPAD ) {
+			// Teleport pad.
+			Set<ShipCoordinate> allCoords = layout.getAllShipCoords();
+			tmpCoord.init( coord.x, coord.y, ShipCoordinate.TYPE_SQUARE );
+			if ( allCoords.contains( tmpCoord ) ) {
+				results.add( tmpCoord );
+				tmpCoord = Pools.get( ShipCoordinate.class ).obtain();
+			}
+
+			int tpadRefId = layout.getTeleportPadRefIdOfCoords( coord );
+			TeleportPadModel tpadModel = context.getReferenceManager().getObject( tpadRefId, TeleportPadModel.class );
+			coord = layout.getTeleportPadCoords( tpadModel.getConnectedTPadRefId() );
+
+			tmpCoord.init( coord );
 			if ( allCoords.contains( tmpCoord ) ) {
 				results.add( tmpCoord );
 				tmpCoord = Pools.get( ShipCoordinate.class ).obtain();

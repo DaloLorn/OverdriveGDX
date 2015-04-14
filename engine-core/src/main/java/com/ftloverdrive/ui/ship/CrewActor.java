@@ -189,7 +189,7 @@ public class CrewActor extends AmbulActor
 
 				// Don't update the path if the crew member is already heading there
 				if ( !end.equals( crewModel.getAmbulationGoal() ) ) {
-					Stack<ShipCoordinate> path = shipModel.getLayout().findPath( start, end, prevWaypoint, nextWaypoint );
+					Stack<ShipCoordinate> path = shipModel.getLayout().findPath( context, start, end, prevWaypoint, nextWaypoint );
 					// Don't set the path if it doesn't exist. Prevents cancelling of movement in progress
 					// (due to overwriting the old, valid path with new, null path)
 					if ( path != null ) {

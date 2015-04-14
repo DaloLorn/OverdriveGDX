@@ -1,11 +1,13 @@
 package com.ftloverdrive.blueprint.ship;
 
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Pools;
 import com.ftloverdrive.core.OverdriveContext;
 import com.ftloverdrive.event.ship.ShipCreationEvent;
 import com.ftloverdrive.event.ship.ShipCrewAddEvent;
 import com.ftloverdrive.event.ship.ShipCrewCreationEvent;
 import com.ftloverdrive.event.ship.ShipDoorCreationEvent;
+import com.ftloverdrive.event.ship.ShipLayoutConnectTeleportPadsEvent;
 import com.ftloverdrive.event.ship.ShipLayoutCrewPlacementEvent;
 import com.ftloverdrive.event.ship.ShipLayoutDoorAddEvent;
 import com.ftloverdrive.event.ship.ShipLayoutRoomAddEvent;
@@ -114,6 +116,9 @@ public class TestShipBlueprint extends ShipBlueprint {
 
 		// The Y-offset is 1 higher than the original FTL's layout.txt.
 		int doorsXYLRH[][] = new int[][] {
+				// Overdrive doesn't use the left and right ids that FTL needed.
+				// Connection is decided based on the door's position.
+				// TODO: Remove them, or find a use for them.
 				new int[] { 14, 4, 0, 1, 1 },
 				new int[] { 12, 4, 1, 3, 1 },
 				new int[] { 12, 3, 1, 2, 1 },
@@ -165,15 +170,17 @@ public class TestShipBlueprint extends ShipBlueprint {
 		int tpadRefId = -1;
 		ShipCoordinate tpadCoords = null;
 
-		int tpadsXY[][] = new int[][] {
-				new int[] { 13, 3 },
-				new int[] { 10, 2 }
+		int tpadsXYI[][] = new int[][] {
+				new int[] { 13, 3, 1 },
+				new int[] { 10, 2, 0 }
 		};
 
-		for ( int i = 0; i < tpadsXY.length; i++ ) {
-			int[] xy = tpadsXY[i];
+		Array<Integer> tpadRefIds = new Array<Integer>();
+		for ( int i = 0; i < tpadsXYI.length; i++ ) {
+			int[] xyi = tpadsXYI[i];
 			tpadRefId = context.getNetManager().requestNewRefId();
-			tpadCoords = ShipCoordinate.teleportPad( xy[0], xy[1] )[0];
+			tpadRefIds.add( tpadRefId );
+			tpadCoords = ShipCoordinate.teleportPad( xyi[0], xyi[1] )[0];
 
 			ShipTeleportPadCreationEvent tpadCreateE = Pools.get( ShipTeleportPadCreationEvent.class ).obtain();
 			tpadCreateE.init( tpadRefId );
@@ -183,6 +190,13 @@ public class TestShipBlueprint extends ShipBlueprint {
 			tpadAddE.init( shipRefId, tpadRefId, tpadCoords );
 			context.getScreenEventManager().postDelayedEvent( tpadAddE );
 		}
+
+		for ( int i = 0; i < tpadsXYI.length; ++i ) {
+			ShipLayoutConnectTeleportPadsEvent tpadConnectE = Pools.get( ShipLayoutConnectTeleportPadsEvent.class ).obtain();
+			tpadConnectE.init( tpadRefIds.get( i ), tpadRefIds.get( tpadsXYI[i][2] ) );
+			context.getScreenEventManager().postDelayedEvent( tpadConnectE );
+		}
+		tpadRefIds.clear();
 
 		// TODO Test crew code
 		int crewRefId = context.getNetManager().requestNewRefId();

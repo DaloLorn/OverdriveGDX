@@ -29,6 +29,7 @@ import com.ftloverdrive.event.ship.ShipCreationEvent;
 import com.ftloverdrive.event.ship.ShipCrewAddEvent;
 import com.ftloverdrive.event.ship.ShipCrewCreationEvent;
 import com.ftloverdrive.event.ship.ShipDoorCreationEvent;
+import com.ftloverdrive.event.ship.ShipLayoutConnectTeleportPadsEvent;
 import com.ftloverdrive.event.ship.ShipLayoutCrewPlacementEvent;
 import com.ftloverdrive.event.ship.ShipLayoutDoorAddEvent;
 import com.ftloverdrive.event.ship.ShipLayoutRoomAddEvent;
@@ -235,6 +236,7 @@ public class OVDNetManager {
 		kryo.register( ShipRoomCreationEvent.class );
 		kryo.register( ShipLayoutCrewPlacementEvent.class );
 		kryo.register( ShipLayoutTeleportPadAddEvent.class );
+		kryo.register( ShipLayoutConnectTeleportPadsEvent.class );
 		kryo.register( ShipLayoutDoorAddEvent.class );
 		kryo.register( ShipLayoutRoomAddEvent.class );
 		kryo.register( ShipPropertyEvent.class );

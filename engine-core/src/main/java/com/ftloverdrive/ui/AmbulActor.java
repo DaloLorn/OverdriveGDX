@@ -69,10 +69,12 @@ public abstract class AmbulActor extends ModelActor implements EventListener {
 					velocity.set( 0, 0 );
 				}
 				else {
+					boolean teleport = prevWaypoint != null && prevWaypoint.v == ShipCoordinate.TYPE_TPAD &&
+							nextWaypoint.v == ShipCoordinate.TYPE_TPAD;
 					// Compute the distance between current position and the target waypoint
 					Vector2 v = new Vector2( nextWaypoint.x * 35 - getX(), getParent().getHeight() - nextWaypoint.y * 35 - getY() );
 					float speed = amb.getAmbulationSpeed() * delta;
-					if ( v.len2() <= speed * speed ) {
+					if ( teleport || v.len2() <= speed * speed ) {
 						// If the actor is close enough that it will complete the move this update, go grab the next waypoint
 						setPosition( nextWaypoint.x * 35, getParent().getHeight() - nextWaypoint.y * 35 );
 						prevWaypoint = nextWaypoint;

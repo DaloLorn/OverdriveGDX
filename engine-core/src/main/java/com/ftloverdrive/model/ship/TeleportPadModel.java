@@ -16,4 +16,8 @@ public interface TeleportPadModel extends OVDModel {
 	public void setAnimSpec( ImageSpec spec );
 
 	public ImageSpec getAnimSpec();
+
+	public void setConnectedTPadRefId( int tpadRefId );
+
+	public int getConnectedTPadRefId();
 }

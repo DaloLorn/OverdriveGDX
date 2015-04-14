@@ -5,7 +5,9 @@ import com.ftloverdrive.event.AbstractOVDEvent;
 
 
 public class ShipTeleportPadCreationEvent extends AbstractOVDEvent implements Poolable {
+
 	protected int tpadRefId = -1;
+
 
 	public ShipTeleportPadCreationEvent() {
 	}
@@ -16,7 +18,7 @@ public class ShipTeleportPadCreationEvent extends AbstractOVDEvent implements Po
 	 * @param tpadRefId
 	 *            a reserved reference id for the new teleport pad
 	 */
-	public void init(int tpadRefId) {
+	public void init( int tpadRefId ) {
 		this.tpadRefId = tpadRefId;
 	}
 
