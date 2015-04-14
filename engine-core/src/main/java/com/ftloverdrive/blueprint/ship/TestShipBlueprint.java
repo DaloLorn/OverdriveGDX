@@ -9,8 +9,10 @@ import com.ftloverdrive.event.ship.ShipDoorCreationEvent;
 import com.ftloverdrive.event.ship.ShipLayoutCrewPlacementEvent;
 import com.ftloverdrive.event.ship.ShipLayoutDoorAddEvent;
 import com.ftloverdrive.event.ship.ShipLayoutRoomAddEvent;
+import com.ftloverdrive.event.ship.ShipLayoutTeleportPadAddEvent;
 import com.ftloverdrive.event.ship.ShipRoomCreationEvent;
 import com.ftloverdrive.event.ship.ShipRoomImageChangeEvent;
+import com.ftloverdrive.event.ship.ShipTeleportPadCreationEvent;
 import com.ftloverdrive.io.ImageSpec;
 import com.ftloverdrive.model.ship.ShipCoordinate;
 import com.ftloverdrive.model.ship.ShipLayout;
@@ -32,7 +34,7 @@ public class TestShipBlueprint extends ShipBlueprint {
 		ShipCreationEvent shipCreateEvent = Pools.get( ShipCreationEvent.class ).obtain();
 		shipCreateEvent.init( shipRefId, getProperty( OVDConstants.BLUEPRINT_NAME, String.class ) );
 		context.getScreenEventManager().postDelayedEvent( shipCreateEvent );
-		
+
 		// TODO: Events to copy properties from the blueprint to the model.
 
 		int roomRefId = -1;
@@ -40,25 +42,25 @@ public class TestShipBlueprint extends ShipBlueprint {
 
 		// The Y-offset is 1 higher than the original FTL's layout.txt.
 		int[][] roomsXYWH = new int[][] {
-			new int[] { 14, 3, 1, 2 },
-			new int[] { 12, 3, 2, 2 },
-			new int[] { 10, 3, 2, 1 },
-			new int[] { 10, 4, 2, 1 },
-			new int[] { 8, 2, 2, 2 },
-			new int[] { 8, 4, 2, 2 },
-			new int[] { 6, 1, 2, 1 },
-			new int[] { 6, 2, 2, 2 },
-			new int[] { 6, 4, 2, 2 },
-			new int[] { 6, 6, 2, 1 },
-			new int[] { 4, 3, 2, 2 },
-			new int[] { 3, 2, 2, 1 },
-			new int[] { 3, 5, 2, 1 },
-			new int[] { 1, 2, 2, 1 },
-			new int[] { 1, 3, 2, 2 },
-			new int[] { 1, 5, 2, 1 },
-			new int[] { 0, 3, 1, 2 }
+				new int[] { 14, 3, 1, 2 },
+				new int[] { 12, 3, 2, 2 },
+				new int[] { 10, 3, 2, 1 },
+				new int[] { 10, 4, 2, 1 },
+				new int[] { 8, 2, 2, 2 },
+				new int[] { 8, 4, 2, 2 },
+				new int[] { 6, 1, 2, 1 },
+				new int[] { 6, 2, 2, 2 },
+				new int[] { 6, 4, 2, 2 },
+				new int[] { 6, 6, 2, 1 },
+				new int[] { 4, 3, 2, 2 },
+				new int[] { 3, 2, 2, 1 },
+				new int[] { 3, 5, 2, 1 },
+				new int[] { 1, 2, 2, 1 },
+				new int[] { 1, 3, 2, 2 },
+				new int[] { 1, 5, 2, 1 },
+				new int[] { 0, 3, 1, 2 }
 		};
-		ImageSpec[] roomsDecor = new ImageSpec[ roomsXYWH.length ];
+		ImageSpec[] roomsDecor = new ImageSpec[roomsXYWH.length];
 		roomsDecor[0] = new ImageSpec( OVDConstants.SHIP_INTERIOR_ATLAS, "room-pilot" );
 		roomsDecor[2] = new ImageSpec( OVDConstants.SHIP_INTERIOR_ATLAS, "room-doors" );
 		roomsDecor[3] = new ImageSpec( OVDConstants.SHIP_INTERIOR_ATLAS, "room-sensors" );
@@ -68,7 +70,7 @@ public class TestShipBlueprint extends ShipBlueprint {
 		roomsDecor[14] = new ImageSpec( OVDConstants.SHIP_INTERIOR_ATLAS, "room-engines" );
 		roomsDecor[10] = new ImageSpec( OVDConstants.SHIP_INTERIOR_ATLAS, "room-weapons" );
 
-		for ( int i=0; i < roomsXYWH.length; i++ ) {
+		for ( int i = 0; i < roomsXYWH.length; i++ ) {
 			int[] xywh = roomsXYWH[i];
 			roomRefId = context.getNetManager().requestNewRefId();
 			roomCoords = ShipLayout.createRoomCoords( xywh[0], xywh[1], xywh[2], xywh[3] );
@@ -93,8 +95,8 @@ public class TestShipBlueprint extends ShipBlueprint {
 		roomRefId = context.getNetManager().requestNewRefId();
 		String roomLayout =
 				"d=w" + "\n" +
-				"  c";
-		roomCoords = ShipLayout.createRoomCoords(8, 1, roomLayout);
+						"  c";
+		roomCoords = ShipLayout.createRoomCoords( 8, 1, roomLayout );
 
 		ShipRoomCreationEvent roomCreateEvent = Pools.get( ShipRoomCreationEvent.class ).obtain();
 		roomCreateEvent.init( roomRefId );
@@ -112,32 +114,32 @@ public class TestShipBlueprint extends ShipBlueprint {
 
 		// The Y-offset is 1 higher than the original FTL's layout.txt.
 		int doorsXYLRH[][] = new int[][] {
-			new int[] { 14,  4,  0,  1, 1 },
-			new int[] { 12,  4,  1,  3, 1 },
-			new int[] { 12,  3,  1,  2, 1 },
-			new int[] { 10,  3,  2,  4, 1 },
-			new int[] { 10,  4,  3,  5, 1 },
-			new int[] {  8,  4,  4,  5, 0 },
-			new int[] {  8,  2,  4,  7, 1 },
-			new int[] {  8,  5,  5,  8, 1 },
-			new int[] {  7,  6,  8,  9, 0 },
-			new int[] {  7,  2,  6,  7, 0 },
-			new int[] {  6,  3,  7, 10, 1 },
-			new int[] {  6,  4,  8, 10, 1 },
-			new int[] {  4,  5, 10, 12, 0 },
-			new int[] {  4,  3, 10, 11, 0 },
-			new int[] {  3,  2, 11, 13, 1 },
-			new int[] {  2,  3, 13, 14, 0 },
-			new int[] {  2,  5, 14, 15, 0 },
-			new int[] {  3,  5, 12, 15, 1 },
-			new int[] {  1,  4, 14, 16, 1 },
-			new int[] {  1,  3, 14, 16, 1 },
-			new int[] {  0,  3, 16, -1, 1 },
-			new int[] {  0,  4, 16, -1, 1 },
-			new int[] {  6,  7,  9, -1, 0 },
-			new int[] {  7,  7,  9, -1, 0 },
-			new int[] {  6,  1,  6, -1, 0 },
-			new int[] {  7,  1,  6, -1, 0 }
+				new int[] { 14, 4, 0, 1, 1 },
+				new int[] { 12, 4, 1, 3, 1 },
+				new int[] { 12, 3, 1, 2, 1 },
+				new int[] { 10, 3, 2, 4, 1 },
+				new int[] { 10, 4, 3, 5, 1 },
+				new int[] { 8, 4, 4, 5, 0 },
+				new int[] { 8, 2, 4, 7, 1 },
+				new int[] { 8, 5, 5, 8, 1 },
+				new int[] { 7, 6, 8, 9, 0 },
+				new int[] { 7, 2, 6, 7, 0 },
+				new int[] { 6, 3, 7, 10, 1 },
+				new int[] { 6, 4, 8, 10, 1 },
+				new int[] { 4, 5, 10, 12, 0 },
+				new int[] { 4, 3, 10, 11, 0 },
+				new int[] { 3, 2, 11, 13, 1 },
+				new int[] { 2, 3, 13, 14, 0 },
+				new int[] { 2, 5, 14, 15, 0 },
+				new int[] { 3, 5, 12, 15, 1 },
+				new int[] { 1, 4, 14, 16, 1 },
+				new int[] { 1, 3, 14, 16, 1 },
+				new int[] { 0, 3, 16, -1, 1 },
+				new int[] { 0, 4, 16, -1, 1 },
+				new int[] { 6, 7, 9, -1, 0 },
+				new int[] { 7, 7, 9, -1, 0 },
+				new int[] { 6, 1, 6, -1, 0 },
+				new int[] { 7, 1, 6, -1, 0 }
 		};
 
 		for ( int i = 0; i < doorsXYLRH.length; i++ ) {
@@ -155,6 +157,31 @@ public class TestShipBlueprint extends ShipBlueprint {
 			ShipLayoutDoorAddEvent doorAddEvent = Pools.get( ShipLayoutDoorAddEvent.class ).obtain();
 			doorAddEvent.init( shipRefId, doorRefId, doorCoords );
 			context.getScreenEventManager().postDelayedEvent( doorAddEvent );
+		}
+
+		// =============
+		// Teleport pads
+
+		int tpadRefId = -1;
+		ShipCoordinate tpadCoords = null;
+
+		int tpadsXY[][] = new int[][] {
+				new int[] { 13, 3 },
+				new int[] { 10, 2 }
+		};
+
+		for ( int i = 0; i < tpadsXY.length; i++ ) {
+			int[] xy = tpadsXY[i];
+			tpadRefId = context.getNetManager().requestNewRefId();
+			tpadCoords = ShipCoordinate.teleportPad( xy[0], xy[1] )[0];
+
+			ShipTeleportPadCreationEvent tpadCreateE = Pools.get( ShipTeleportPadCreationEvent.class ).obtain();
+			tpadCreateE.init( tpadRefId );
+			context.getScreenEventManager().postDelayedEvent( tpadCreateE );
+
+			ShipLayoutTeleportPadAddEvent tpadAddE = Pools.get( ShipLayoutTeleportPadAddEvent.class ).obtain();
+			tpadAddE.init( shipRefId, tpadRefId, tpadCoords );
+			context.getScreenEventManager().postDelayedEvent( tpadAddE );
 		}
 
 		// TODO Test crew code

@@ -14,19 +14,23 @@ import com.ftloverdrive.event.ship.ShipLayoutCrewPlacementEvent;
 import com.ftloverdrive.event.ship.ShipLayoutDoorAddEvent;
 import com.ftloverdrive.event.ship.ShipLayoutListener;
 import com.ftloverdrive.event.ship.ShipLayoutRoomAddEvent;
+import com.ftloverdrive.event.ship.ShipLayoutTeleportPadAddEvent;
 import com.ftloverdrive.event.ship.ShipPropertyEvent;
 import com.ftloverdrive.event.ship.ShipPropertyListener;
 import com.ftloverdrive.event.ship.ShipRoomCreationEvent;
 import com.ftloverdrive.event.ship.ShipRoomImageChangeEvent;
+import com.ftloverdrive.event.ship.ShipTeleportPadCreationEvent;
 import com.ftloverdrive.io.ImageSpec;
 import com.ftloverdrive.model.ship.CrewModel;
 import com.ftloverdrive.model.ship.DefaultCrewModel;
 import com.ftloverdrive.model.ship.DefaultDoorModel;
 import com.ftloverdrive.model.ship.DefaultRoomModel;
+import com.ftloverdrive.model.ship.DefaultTeleportPadModel;
 import com.ftloverdrive.model.ship.DoorModel;
 import com.ftloverdrive.model.ship.RoomModel;
 import com.ftloverdrive.model.ship.ShipCoordinate;
 import com.ftloverdrive.model.ship.ShipModel;
+import com.ftloverdrive.model.ship.TeleportPadModel;
 import com.ftloverdrive.model.ship.TestShipModel;
 
 
@@ -45,6 +49,8 @@ public class ShipEventHandler implements OVDEventHandler {
 				ShipRoomImageChangeEvent.class,
 				ShipLayoutDoorAddEvent.class,
 				ShipDoorCreationEvent.class,
+				ShipLayoutTeleportPadAddEvent.class,
+				ShipTeleportPadCreationEvent.class,
 				ShipCrewCreationEvent.class,
 				ShipCrewAddEvent.class,
 				ShipLayoutCrewPlacementEvent.class,
@@ -160,6 +166,28 @@ public class ShipEventHandler implements OVDEventHandler {
 			}
 		}
 
+		else if ( e instanceof ShipTeleportPadCreationEvent ) {
+			ShipTeleportPadCreationEvent event = (ShipTeleportPadCreationEvent)e;
+
+			int tpadRefId = event.getTeleportPadRefId();
+			TeleportPadModel tpadModel = new DefaultTeleportPadModel();
+			context.getReferenceManager().addObject( tpadModel, tpadRefId );
+		}
+		else if ( e instanceof ShipLayoutTeleportPadAddEvent ) {
+			ShipLayoutTeleportPadAddEvent event = (ShipLayoutTeleportPadAddEvent)e;
+
+			int shipRefId = event.getShipRefId();
+			ShipModel shipModel = context.getReferenceManager().getObject( shipRefId, ShipModel.class );
+			int tpadRefId = event.getTeleportPadRefId();
+
+			shipModel.getLayout().addTeleportPad( tpadRefId, event.getTeleportPadCoords() );
+
+			for ( int i = listeners.length - 2; i >= 0; i -= 2 ) {
+				if ( listeners[i] == ShipLayoutListener.class )
+					( (ShipLayoutListener)listeners[i + 1] ).shipLayoutTeleportPadAdded( context, event );
+			}
+		}
+
 		else if ( e instanceof ShipCrewCreationEvent ) {
 			ShipCrewCreationEvent event = (ShipCrewCreationEvent)e;
 
@@ -217,6 +245,12 @@ public class ShipEventHandler implements OVDEventHandler {
 		}
 		else if ( e.getClass() == ShipLayoutDoorAddEvent.class ) {
 			Pools.get( ShipLayoutDoorAddEvent.class ).free( (ShipLayoutDoorAddEvent)e );
+		}
+		else if ( e.getClass() == ShipTeleportPadCreationEvent.class ) {
+			Pools.get( ShipTeleportPadCreationEvent.class ).free( (ShipTeleportPadCreationEvent)e );
+		}
+		else if ( e.getClass() == ShipLayoutTeleportPadAddEvent.class ) {
+			Pools.get( ShipLayoutTeleportPadAddEvent.class ).free( (ShipLayoutTeleportPadAddEvent)e );
 		}
 		else if ( e.getClass() == ShipCrewCreationEvent.class ) {
 			Pools.get( ShipCrewCreationEvent.class ).free( (ShipCrewCreationEvent)e );

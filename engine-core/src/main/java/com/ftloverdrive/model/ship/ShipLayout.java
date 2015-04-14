@@ -23,6 +23,8 @@ public class ShipLayout {
 	protected IntMap<ShipCoordinate[]> roomRefIdToCoordsMap;
 	protected ObjectIntMap<ShipCoordinate> coordToDoorRefIdMap;
 	protected IntMap<ShipCoordinate> doorRefIdToCoordsMap;
+	protected ObjectIntMap<ShipCoordinate> coordToTpadRefIdMap;
+	protected IntMap<ShipCoordinate> tpadRefIdToCoordsMap;
 	protected ObjectIntMap<ShipCoordinate> coordToCrewRefIdMap;
 	protected IntMap<ShipCoordinate> crewRefIdToCoordsMap;
 
@@ -33,6 +35,8 @@ public class ShipLayout {
 		roomRefIdToCoordsMap = new IntMap<ShipCoordinate[]>();
 		coordToDoorRefIdMap = new ObjectIntMap<ShipCoordinate>();
 		doorRefIdToCoordsMap = new IntMap<ShipCoordinate>();
+		coordToTpadRefIdMap = new ObjectIntMap<ShipCoordinate>();
+		tpadRefIdToCoordsMap = new IntMap<ShipCoordinate>();
 		coordToCrewRefIdMap = new ObjectIntMap<ShipCoordinate>();
 		crewRefIdToCoordsMap = new IntMap<ShipCoordinate>();
 	}
@@ -55,6 +59,12 @@ public class ShipLayout {
 		coordToDoorRefIdMap.put( doorCoords, doorModelRefId );
 	}
 
+	public void addTeleportPad( int tpadModelRefId, ShipCoordinate tpadCoords ) {
+		allShipCoords.add( tpadCoords );
+		tpadRefIdToCoordsMap.put( tpadModelRefId, tpadCoords );
+		coordToTpadRefIdMap.put( tpadCoords, tpadModelRefId );
+	}
+
 	public void placeCrew( int crewModelRefId, ShipCoordinate crewCoords ) {
 		crewRefIdToCoordsMap.put( crewModelRefId, crewCoords );
 		coordToCrewRefIdMap.put( crewCoords, crewModelRefId );
@@ -75,6 +85,16 @@ public class ShipLayout {
 		return doorRefIdToCoordsMap.get( doorModelRefId );
 	}
 
+	/**
+	 * Returns the ShipCoordinate for the teleport pad.
+	 */
+	public ShipCoordinate getTeleportPadCoords( int tpadModelRefId ) {
+		return tpadRefIdToCoordsMap.get( tpadModelRefId );
+	}
+
+	/**
+	 * Returns the ShipCoordinate for the crew member.
+	 */
 	public ShipCoordinate getCrewCoords( int crewModelRefId ) {
 		return crewRefIdToCoordsMap.get( crewModelRefId );
 	}
@@ -95,6 +115,13 @@ public class ShipLayout {
 	 */
 	public int getDoorRefIdOfCoords( ShipCoordinate coord ) {
 		return coordToDoorRefIdMap.get( coord, -1 );
+	}
+
+	/**
+	 * Returns a reference id for the teleport pad placed at the ShipCoordinate, or -1.
+	 */
+	public int getTeleportPadRefIdOfCoords( ShipCoordinate coord ) {
+		return coordToTpadRefIdMap.get( coord, -1 );
 	}
 
 	/**
@@ -129,8 +156,20 @@ public class ShipLayout {
 		return doorRefIdToCoordsMap.keys();
 	}
 
+	public IntMap.Keys tpadRefIds() {
+		return tpadRefIdToCoordsMap.keys();
+	}
+
 	public IntMap.Keys crewRefIds() {
 		return crewRefIdToCoordsMap.keys();
+	}
+
+	/**
+	 * Returns true if this layout contains the specified room model.
+	 * Useful when determining the "owner" of the room.
+	 */
+	public boolean hasRoom( int roomRefId ) {
+		return roomRefIdToCoordsMap.containsKey( roomRefId );
 	}
 
 	/**
@@ -142,11 +181,11 @@ public class ShipLayout {
 	}
 
 	/**
-	 * Returns true if this layout contains the specified room model.
-	 * Useful when determining the "owner" of the room.
+	 * Returns true if this layout contains the specified teleport pad model.
+	 * Useful when determining the "owner" of the teleport pad.
 	 */
-	public boolean hasRoom( int roomRefId ) {
-		return roomRefIdToCoordsMap.containsKey( roomRefId );
+	public boolean hasTeleportPad( int tpadRefId ) {
+		return tpadRefIdToCoordsMap.containsKey( tpadRefId );
 	}
 
 	/**

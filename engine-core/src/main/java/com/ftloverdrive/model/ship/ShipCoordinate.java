@@ -17,11 +17,13 @@ import com.badlogic.gdx.utils.Pool.Poolable;
  * Similarly, don't free() an instance unless you're sure it's unused.
  */
 public class ShipCoordinate implements Poolable {
+
 	public static final int TYPE_SQUARE = 0;
 	public static final int TYPE_WALL_H = 1;
 	public static final int TYPE_WALL_V = 2;
 	public static final int TYPE_DOOR_H = 3;
 	public static final int TYPE_DOOR_V = 4;
+	public static final int TYPE_TPAD = 5;
 
 	public int x = 0;
 	public int y = 0;
@@ -34,12 +36,15 @@ public class ShipCoordinate implements Poolable {
 	/**
 	 * Pseudo constructor.
 	 *
-	 * @param x 0-based index from the left
-	 * @param y 0-based index from the top
-	 * @param v 0=square, 1=horizontal wall, 2=vertical wall
+	 * @param x
+	 *            0-based index from the left
+	 * @param y
+	 *            0-based index from the top
+	 * @param v
+	 *            0=square, 1=horizontal wall, 2=vertical wall
 	 */
 	public void init( int x, int y, int v ) {
-		checkType(v);
+		checkType( v );
 		this.x = x;
 		this.y = y;
 		this.v = v;
@@ -54,24 +59,47 @@ public class ShipCoordinate implements Poolable {
 		this.v = srcCoord.v;
 	}
 
-	private void checkType(int type) {
-		if ( type != TYPE_SQUARE && type != TYPE_WALL_H && type != TYPE_WALL_V
-				&& type != TYPE_DOOR_H && type != TYPE_DOOR_V )
-			throw new IllegalArgumentException( "Invalid coord type" );
+	private void checkType( int type ) {
+		switch ( type ) {
+			case TYPE_SQUARE:
+			case TYPE_WALL_H:
+			case TYPE_WALL_V:
+			case TYPE_DOOR_H:
+			case TYPE_DOOR_V:
+			case TYPE_TPAD:
+				return;
+			default:
+				throw new IllegalArgumentException( "Invalid coord type: " + type );
+		}
 	}
 
-
+	/**
+	 * A horizontal door cell, that snaps to the top wall of the cell.
+	 */
 	public static ShipCoordinate[] doorHorizontal( int x, int y ) {
 		ShipCoordinate[] result = new ShipCoordinate[1];
 		result[0] = Pools.get( ShipCoordinate.class ).obtain();
 		result[0].init( x, y, TYPE_DOOR_H );
 		return result;
 	}
-	
+
+	/**
+	 * A vertical door cell, that snaps to the left wall of the cell.
+	 */
 	public static ShipCoordinate[] doorVertical( int x, int y ) {
 		ShipCoordinate[] result = new ShipCoordinate[1];
 		result[0] = Pools.get( ShipCoordinate.class ).obtain();
 		result[0].init( x, y, TYPE_DOOR_V );
+		return result;
+	}
+
+	/**
+	 * A teleport pad cell.
+	 */
+	public static ShipCoordinate[] teleportPad( int x, int y ) {
+		ShipCoordinate[] result = new ShipCoordinate[1];
+		result[0] = Pools.get( ShipCoordinate.class ).obtain();
+		result[0].init( x, y, TYPE_TPAD );
 		return result;
 	}
 
@@ -283,14 +311,14 @@ public class ShipCoordinate implements Poolable {
 
 	@Override
 	public boolean equals( Object o ) {
-		if ( !(o instanceof ShipCoordinate) ) return false;
+		if ( !( o instanceof ShipCoordinate ) ) return false;
 		ShipCoordinate other = (ShipCoordinate)o;
 		return ( x == other.x && y == other.y && v == other.v );
 	}
 
 	@Override
 	public int hashCode() {
-		return mangle(x) | (mangle(y) << 1) | (mangle(v) << 2);
+		return mangle( x ) | ( mangle( y ) << 1 ) | ( mangle( v ) << 2 );
 	}
 
 	// Use Z-Order Curve to interleve coords' bits for uniqueness.
@@ -298,10 +326,10 @@ public class ShipCoordinate implements Poolable {
 	// http://www.opensourcescripts.com/info/interleave-bits--aka-morton-ize-aka-z-order-curve-.html
 	private int mangle( int n ) {
 		n &= 0x000003ff;
-		n = (n ^ (n << 16)) & 0xff0000ff;
-		n = (n ^ (n <<  8)) & 0x0300f00f;
-		n = (n ^ (n <<  4)) & 0x030c30c3;
-		n = (n ^ (n <<  2)) & 0x09249249;
+		n = ( n ^ ( n << 16 ) ) & 0xff0000ff;
+		n = ( n ^ ( n << 8 ) ) & 0x0300f00f;
+		n = ( n ^ ( n << 4 ) ) & 0x030c30c3;
+		n = ( n ^ ( n << 2 ) ) & 0x09249249;
 		return n;
 	}
 
@@ -312,7 +340,7 @@ public class ShipCoordinate implements Poolable {
 		y = 0;
 		v = 0;
 	}
-	
+
 	public String toString() {
 		String s = "ShipCoord { ";
 		s += x;

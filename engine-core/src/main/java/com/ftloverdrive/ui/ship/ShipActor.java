@@ -11,6 +11,7 @@ import com.badlogic.gdx.scenes.scene2d.EventListener;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
+import com.badlogic.gdx.scenes.scene2d.utils.Align;
 import com.badlogic.gdx.scenes.scene2d.utils.SpriteDrawable;
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.IntMap;
@@ -25,7 +26,6 @@ import com.ftloverdrive.event.player.OrderListener;
 import com.ftloverdrive.event.ship.ShipPropertyEvent;
 import com.ftloverdrive.event.ship.ShipPropertyListener;
 import com.ftloverdrive.io.ImageSpec;
-import com.ftloverdrive.model.GameModel;
 import com.ftloverdrive.model.ship.RoomModel;
 import com.ftloverdrive.model.ship.ShipCoordinate;
 import com.ftloverdrive.model.ship.ShipModel;
@@ -53,6 +53,7 @@ public class ShipActor extends ModelActor
 	protected ShipRoomDecorsActor roomDecors;
 	protected ShipWallLinesActor wallLines;
 	protected ShipDoorsActor doorGroup;
+	protected Group tpadGroup;
 	protected Group crewGroup;
 
 	protected int shipModelRefId = -1;
@@ -121,6 +122,10 @@ public class ShipActor extends ModelActor
 		doorGroup = new ShipDoorsActor( context );
 		doorGroup.setTouchable( Touchable.childrenOnly );
 		shipFloorplanGroup.addActor( doorGroup );
+
+		tpadGroup = new Group();
+		tpadGroup.setTouchable( Touchable.childrenOnly );
+		shipFloorplanGroup.addActor( tpadGroup );
 
 		// TODO: Where to draw crew layer?
 		// Needs to be drawn above door layer for sure
@@ -350,6 +355,22 @@ public class ShipActor extends ModelActor
 			for ( IntMap.Keys it = shipModel.getLayout().doorRefIds(); it.hasNext; ) {
 				int doorRefId = it.next();
 				doorGroup.addTile( context, shipModel.getLayout().getDoorCoords( doorRefId ), doorRefId );
+			}
+
+			tpadGroup.clear();
+			tpadGroup.setSize( shipModel.getHullWidth(), shipModel.getHullHeight() );
+			for ( IntMap.Keys it = shipModel.getLayout().tpadRefIds(); it.hasNext; ) {
+				int tpadRefId = it.next();
+				ShipCoordinate coord = shipModel.getLayout().getTeleportPadCoords( tpadRefId );
+
+				TeleportPadActor tpadActor = new TeleportPadActor( context );
+				tpadActor.setModelRefId( tpadRefId );
+
+				tpadGroup.addActor( tpadActor );
+				tpadActor.setPosition( ( coord.x + 0.5f ) * 35 - 1,
+						tpadGroup.getHeight() - ( coord.y - 0.5f ) * 35 - 1, Align.center );
+
+				context.getScreenEventManager().addEventListener( tpadActor, LocalActorClickedListener.class );
 			}
 
 			crewGroup.clear();
