@@ -7,10 +7,7 @@ import com.badlogic.gdx.graphics.g2d.NinePatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.Actor;
-import com.badlogic.gdx.scenes.scene2d.Event;
 import com.badlogic.gdx.scenes.scene2d.EventListener;
-import com.badlogic.gdx.scenes.scene2d.Group;
-import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.utils.NinePatchDrawable;
 import com.badlogic.gdx.utils.Disposable;
@@ -20,6 +17,7 @@ import com.ftloverdrive.core.OverdriveContext;
 import com.ftloverdrive.event.local.LocalActorClickedEvent;
 import com.ftloverdrive.event.local.LocalActorClickedListener;
 import com.ftloverdrive.model.ship.ShipCoordinate;
+import com.ftloverdrive.ui.LocalActor;
 import com.ftloverdrive.util.OVDConstants;
 
 
@@ -29,18 +27,16 @@ import com.ftloverdrive.util.OVDConstants;
  * After construction, set the height, then call addTile() for all
  * ShipCoordinates.
  */
-public class ShipFloorTilesActor extends Group
+public class ShipFloorTilesActor extends LocalActor
 		implements Disposable, EventListener, LocalActorClickedListener {
 
 	protected float tileSize = 35;
 
 	protected AssetManager assetManager;
-	protected OverdriveContext context;
 
 
 	public ShipFloorTilesActor( OverdriveContext context ) {
-		super();
-		this.context = context;
+		super( context );
 		assetManager = context.getAssetManager();
 
 		assetManager.load( OVDConstants.FLOORPLAN_ATLAS, TextureAtlas.class );
@@ -105,22 +101,6 @@ public class ShipFloorTilesActor extends Group
 	public void dispose() {
 		assetManager.unload( OVDConstants.FLOORPLAN_ATLAS );
 	}
-
-
-	@Override
-	public boolean handle( Event event ) {
-		if ( event instanceof InputEvent ) {
-			InputEvent e = (InputEvent)event;
-
-			if ( e.getType() == InputEvent.Type.touchDown ) {
-				LocalActorClickedEvent le = Pools.get( LocalActorClickedEvent.class ).obtain();
-				le.init( e );
-				context.getScreenEventManager().postDelayedEvent( le );
-			}
-		}
-		return false;
-	}
-
 
 	@Override
 	public void actorClicked( OverdriveContext context, LocalActorClickedEvent e ) {

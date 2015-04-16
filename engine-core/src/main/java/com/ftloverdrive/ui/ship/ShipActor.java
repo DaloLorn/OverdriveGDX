@@ -5,9 +5,6 @@ import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.scenes.scene2d.Actor;
-import com.badlogic.gdx.scenes.scene2d.Event;
-import com.badlogic.gdx.scenes.scene2d.EventListener;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
@@ -34,7 +31,7 @@ import com.ftloverdrive.util.OVDConstants;
 
 
 public class ShipActor extends ModelActor
-		implements Disposable, GamePlayerShipChangeListener, ShipPropertyListener, EventListener, TickListener {
+		implements Disposable, GamePlayerShipChangeListener, ShipPropertyListener, TickListener {
 
 	protected AssetManager assetManager;
 
@@ -142,20 +139,13 @@ public class ShipActor extends ModelActor
 		}
 	}
 
-
-	public void setShipModel( OverdriveContext context, int shipModelRefId ) {
-		this.shipModelRefId = shipModelRefId;
-		updateInfo( context );
-	}
-
-
 	@Override
 	public void gamePlayerShipChanged( OverdriveContext context, GamePlayerShipChangeEvent e ) {
 		if ( e.getPlayerRefId() != context.getNetManager().getLocalPlayerRefId() ) {
 			return;
 		}
 
-		setShipModel( context, e.getShipRefId() );
+		setModelRefId( e.getShipRefId() );
 		setPosition( 350, context.getScreen().getScreenHeight() - getHeight() - 170 );
 	}
 
@@ -408,15 +398,6 @@ public class ShipActor extends ModelActor
 		roomDecors.dispose();
 		assetManager.unload( OVDConstants.SHIP_ATLAS );
 		assetManager.unload( OVDConstants.ROOT_ATLAS );
-	}
-
-	public boolean handle( Event e ) {
-		Actor target = e.getTarget();
-		if ( target instanceof EventListener ) {
-			return ( (EventListener)target ).handle( e );
-		}
-
-		return false;
 	}
 
 	@Override

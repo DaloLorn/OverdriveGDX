@@ -1,6 +1,5 @@
 package com.ftloverdrive.ui;
 
-import com.badlogic.gdx.scenes.scene2d.EventListener;
 import com.ftloverdrive.core.OverdriveContext;
 
 
@@ -8,7 +7,7 @@ import com.ftloverdrive.core.OverdriveContext;
  * An actor that represents a Model it is associated with.
  *
  */
-public abstract class ModelActor extends LocalActor implements EventListener {
+public abstract class ModelActor extends LocalActor {
 
 	protected int modelRefId = -1;
 
