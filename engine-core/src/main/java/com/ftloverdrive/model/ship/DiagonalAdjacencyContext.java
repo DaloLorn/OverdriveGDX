@@ -1,6 +1,8 @@
 package com.ftloverdrive.model.ship;
 
 import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 
 import com.badlogic.gdx.utils.Pools;
 
@@ -33,6 +35,9 @@ public class DiagonalAdjacencyContext implements AdjacencyContext {
 
 			int roomModelRefId = layout.getRoomRefIdOfCoords( coord );
 			ShipCoordinate[] roomSquareCoords = layout.getRoomCoords( roomModelRefId );
+			Set<ShipCoordinate> roomCoords = new HashSet<ShipCoordinate>();
+			for ( ShipCoordinate c : roomSquareCoords )
+				roomCoords.add( c );
 
 			for ( i = 0; i < roomSquareCoords.length; i++ ) {
 				ShipCoordinate square = roomSquareCoords[i];
@@ -41,28 +46,45 @@ public class DiagonalAdjacencyContext implements AdjacencyContext {
 				// Orthogonal
 				tmpCoord.init( coord.x - 1, coord.y - 1, 0 );
 				if ( square.equals( tmpCoord ) ) {
-					results.add( square );
+					if ( contains( roomCoords, coord.x - 1, coord.y ) &&
+							contains( roomCoords, coord.x, coord.y - 1 ) ) {
+						results.add( square );
+					}
 					continue;
 				}
 
 				tmpCoord.init( coord.x - 1, coord.y + 1, 0 );
 				if ( square.equals( tmpCoord ) ) {
-					results.add( square );
+					if ( contains( roomCoords, coord.x - 1, coord.y ) &&
+							contains( roomCoords, coord.x, coord.y + 1 ) ) {
+						results.add( square );
+					}
 					continue;
 				}
 
 				tmpCoord.init( coord.x + 1, coord.y - 1, 0 );
 				if ( square.equals( tmpCoord ) ) {
-					results.add( square );
+					if ( contains( roomCoords, coord.x + 1, coord.y ) &&
+							contains( roomCoords, coord.x, coord.y - 1 ) ) {
+						results.add( square );
+					}
 					continue;
 				}
 
 				tmpCoord.init( coord.x + 1, coord.y + 1, 0 );
 				if ( square.equals( tmpCoord ) ) {
-					results.add( square );
+					if ( contains( roomCoords, coord.x + 1, coord.y ) &&
+							contains( roomCoords, coord.x, coord.y + 1 ) ) {
+						results.add( square );
+					}
 					continue;
 				}
 			}
 		}
+	}
+
+	private boolean contains( Set<ShipCoordinate> roomCoords, int x, int y ) {
+		tmpCoord.init( x, y, 0 );
+		return roomCoords.contains( tmpCoord );
 	}
 }
