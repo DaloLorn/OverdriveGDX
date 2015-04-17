@@ -53,7 +53,6 @@ public class ShipActor extends ModelActor
 	protected Group tpadGroup;
 	protected Group crewGroup;
 
-	protected int shipModelRefId = -1;
 	protected ImageSpec shieldImgSpec = null;
 	protected ImageSpec baseImgSpec = null;
 	protected ImageSpec cloakImgSpec = null;
@@ -134,7 +133,7 @@ public class ShipActor extends ModelActor
 
 	@Override
 	public void draw( Batch batch, float parentAlpha ) {
-		if ( shipModelRefId != -1 ) {
+		if ( modelRefId != -1 ) {
 			super.draw( batch, parentAlpha );
 		}
 	}
@@ -151,9 +150,9 @@ public class ShipActor extends ModelActor
 
 	@Override
 	public void shipPropertyChanged( OverdriveContext context, ShipPropertyEvent e ) {
-		if ( e.getShipRefId() != shipModelRefId ) return;
+		if ( e.getShipRefId() != modelRefId ) return;
 
-		ShipModel shipModel = context.getReferenceManager().getObject( shipModelRefId, ShipModel.class );
+		ShipModel shipModel = context.getReferenceManager().getObject( modelRefId, ShipModel.class );
 		if ( e.getPropertyType() == ShipPropertyEvent.INT_TYPE ) {
 			if ( OVDConstants.SHIELD.equals( e.getPropertyKey() ) || OVDConstants.SHIELD_MAX.equals( e.getPropertyKey() ) ) {
 				if ( e.getIntValue() > 0 ) {
@@ -161,7 +160,7 @@ public class ShipActor extends ModelActor
 					int shieldMax = shipModel.getProperties().getInt( OVDConstants.SHIELD_MAX );
 					if ( shield < shieldMax ) {
 						ShipPropertyEvent event = Pools.get( ShipPropertyEvent.class ).obtain();
-						event.init( shipModelRefId, ShipPropertyEvent.INT_TYPE, ShipPropertyEvent.INCREMENT_ACTION, OVDConstants.SHIELD, 1 );
+						event.init( modelRefId, ShipPropertyEvent.INT_TYPE, ShipPropertyEvent.INCREMENT_ACTION, OVDConstants.SHIELD, 1 );
 						context.getScreenEventManager().postDelayedEvent( event, 3 );
 					}
 				}
@@ -173,9 +172,10 @@ public class ShipActor extends ModelActor
 	/**
 	 * Updates the everything to match the current ShipModel.
 	 */
+	@Override
 	protected void updateInfo( OverdriveContext context ) {
 
-		if ( shipModelRefId == -1 ) {
+		if ( modelRefId == -1 ) {
 			shipFudgeGroup.setPosition( 0, 0 );
 			shipHullGroup.setPosition( 0, 0 );
 
@@ -220,7 +220,7 @@ public class ShipActor extends ModelActor
 			this.setSize( 0, 0 );
 		}
 		else {
-			ShipModel shipModel = context.getReferenceManager().getObject( shipModelRefId, ShipModel.class );
+			ShipModel shipModel = context.getReferenceManager().getObject( modelRefId, ShipModel.class );
 			TextureAtlas shipAtlas = assetManager.get( OVDConstants.SHIP_ATLAS, TextureAtlas.class );
 
 			shipFudgeGroup.setPosition( shipModel.getShipOffsetX(), -shipModel.getShipOffsetY() );
