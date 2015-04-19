@@ -176,6 +176,10 @@ public class OverdriveGame implements ApplicationListener {
 		return address == null ? null : address.getAddress().getHostAddress();
 	}
 
+	public boolean isServer() {
+		return getServerAddress().equals( "127.0.0.1" );
+	}
+
 	public int getConnectionId() {
 		return kryoClient.getID();
 	}
@@ -205,7 +209,7 @@ public class OverdriveGame implements ApplicationListener {
 		}
 		else {
 			// TODO Actual error handling
-			log.error( "Client not connected!" );
+			log.error( "Failed to send " + o + ", because the client is not connected to any server." );
 		}
 	}
 

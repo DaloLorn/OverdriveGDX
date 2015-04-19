@@ -36,6 +36,7 @@ public abstract class LocalActor extends Group implements EventListener {
 				LocalActorClickedEvent le = Pools.get( LocalActorClickedEvent.class ).obtain();
 				le.init( e );
 				context.getScreenEventManager().postDelayedEvent( le );
+				return true;
 			}
 		}
 		return false;

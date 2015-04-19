@@ -93,6 +93,9 @@ public class OverdriveServer implements Disposable, FetchRefIdRange {
 	public void start( int tcpPort, int udpPort ) {
 		try {
 			// TODO: Use constants instead of magic numbers and strings
+			// TODO: This exports the entire OverdriveServer instance. Might be possible to cast it
+			// back on the client's end, and possibly abuse? If so, fix by exporting a smaller class
+			// with just the required method.
 			FetchRefIdRange stub = (FetchRefIdRange)UnicastRemoteObject.exportObject( this, 0 );
 			Registry registry = LocateRegistry.createRegistry( 54556 );
 			registry.rebind( "FetchRefIdRange", stub );
@@ -103,6 +106,7 @@ public class OverdriveServer implements Disposable, FetchRefIdRange {
 		catch ( IOException e ) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+			dispose();
 		}
 	}
 

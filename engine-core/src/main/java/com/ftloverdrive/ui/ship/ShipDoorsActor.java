@@ -24,9 +24,9 @@ public class ShipDoorsActor extends Group
 	protected AssetManager assetManager;
 
 	protected float tileSize;
-	private TextureRegion floorTileRegion;
-
 	protected int shipModelRefId = -1;
+
+	private TextureRegion floorTileRegion;
 
 
 	public ShipDoorsActor( OverdriveContext context ) {
@@ -59,22 +59,20 @@ public class ShipDoorsActor extends Group
 		super.draw( batch, parentAlpha );
 	}
 
-	protected float calcTileX( ShipCoordinate coord ) {
-		// TODO: use the actor's frame size
-		float frameSize = tileSize;
+	protected float calcTileX( Actor a, ShipCoordinate coord ) {
+		float frameSize = a.getWidth();
 		if ( coord.v == ShipCoordinate.TYPE_DOOR_H )
 			return coord.x * tileSize + frameSize;
 		else if ( coord.v == ShipCoordinate.TYPE_DOOR_V )
-			return Math.round( coord.x * tileSize - frameSize / 2 );
+			return Math.round( coord.x * tileSize - frameSize * 0.5f );
 		else
 			return 0;
 	}
 
-	protected float calcTileY( ShipCoordinate coord ) {
-		// TODO: use the actor's frame size
-		float frameSize = tileSize;
+	protected float calcTileY( Actor a, ShipCoordinate coord ) {
+		float frameSize = a.getHeight();
 		if ( coord.v == ShipCoordinate.TYPE_DOOR_H )
-			return Math.round( getHeight() - ( coord.y * tileSize ) + frameSize / 2 );
+			return Math.round( getHeight() - ( coord.y * tileSize ) + frameSize * 0.5f );
 		else if ( coord.v == ShipCoordinate.TYPE_DOOR_V )
 			return getHeight() - ( coord.y * tileSize );
 		else
@@ -93,7 +91,7 @@ public class ShipDoorsActor extends Group
 
 		DoorActor doorActor = new DoorActor( context, floorTileRegion, horizontal );
 		doorActor.setModelRefId( doorRefId );
-		doorActor.setPosition( calcTileX( coord ), calcTileY( coord ) );
+		doorActor.setPosition( calcTileX( doorActor, coord ), calcTileY( doorActor, coord ) );
 		doorActor.setRotation( horizontal ? 90 : 0 );
 		doorActor.setAppearanceClosed();
 		addActor( doorActor );

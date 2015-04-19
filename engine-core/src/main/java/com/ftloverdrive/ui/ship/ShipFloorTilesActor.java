@@ -7,7 +7,7 @@ import com.badlogic.gdx.graphics.g2d.NinePatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.Actor;
-import com.badlogic.gdx.scenes.scene2d.EventListener;
+import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.utils.NinePatchDrawable;
 import com.badlogic.gdx.utils.Disposable;
@@ -17,7 +17,6 @@ import com.ftloverdrive.core.OverdriveContext;
 import com.ftloverdrive.event.local.LocalActorClickedEvent;
 import com.ftloverdrive.event.local.LocalActorClickedListener;
 import com.ftloverdrive.model.ship.ShipCoordinate;
-import com.ftloverdrive.ui.LocalActor;
 import com.ftloverdrive.util.OVDConstants;
 
 
@@ -27,8 +26,8 @@ import com.ftloverdrive.util.OVDConstants;
  * After construction, set the height, then call addTile() for all
  * ShipCoordinates.
  */
-public class ShipFloorTilesActor extends LocalActor
-		implements Disposable, EventListener, LocalActorClickedListener {
+public class ShipFloorTilesActor extends Group
+		implements Disposable, LocalActorClickedListener {
 
 	protected float tileSize = 35;
 
@@ -36,7 +35,6 @@ public class ShipFloorTilesActor extends LocalActor
 
 
 	public ShipFloorTilesActor( OverdriveContext context ) {
-		super( context );
 		assetManager = context.getAssetManager();
 
 		assetManager.load( OVDConstants.FLOORPLAN_ATLAS, TextureAtlas.class );
@@ -88,9 +86,7 @@ public class ShipFloorTilesActor extends LocalActor
 		Image tileImage = new Image( tileDrawable );
 		tileImage.setPosition( calcTileX( coord ), calcTileY( coord ) );
 		tileImage.setSize( tileSize, tileSize );
-		this.addActor( tileImage );
-
-		tileImage.addListener( this );
+		addActor( tileImage );
 
 		// These are different floats which can cause gaps when mixed.
 		// (x * size + size) != ((x+1) * size)
@@ -104,11 +100,17 @@ public class ShipFloorTilesActor extends LocalActor
 
 	@Override
 	public void actorClicked( OverdriveContext context, LocalActorClickedEvent e ) {
-		if ( e.getTarget() instanceof Image ) {
-			Actor target = e.getTarget();
-
+		Actor t = e.getTarget();
+		// TODO: Currently, all actors are clickable and not discriminated. This means
+		// that sometimes when you click frantically, you'll end up clicking on the crew
+		// actor, instead of a tile, which will cause this check to fail.
+		// In FTL, various types of "actors" become unclickable when another type of actor
+		// is selected. This allows to eg. click through doors when crew is selected.
+		// Alternatively, have CrewActors pass the event directly here, if they are right clicked.
+		if ( t instanceof Image ) {
 			if ( e.getButton() == Buttons.RIGHT ) {
-				ShipCoordinate coord = calcCoord( target.getX(), target.getY() );
+				ShipCoordinate coord = calcCoord( t.getX(), t.getY() );
+				// TODO: Check if the tile is free
 
 				// Issue a move command for the local player's current selection
 				// At the moment it affects any Actor that implements OrderListener

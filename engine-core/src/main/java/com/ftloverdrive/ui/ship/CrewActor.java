@@ -197,6 +197,9 @@ public class CrewActor extends AmbulActor
 						crewModel.setAmbulationGoal( end );
 					}
 				}
+				else {
+					System.out.printf( "Already moving towards %s; order ignored.%n", end );
+				}
 			}
 			else {
 				// If the crew is not currently aboard the ship (ie. is boarding), then there's no way they can get there,

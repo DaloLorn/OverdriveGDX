@@ -15,9 +15,8 @@ public class LocalActorClickedEvent extends AbstractLocalEvent implements Poolab
 	protected Actor targetActor = null;
 	protected int button = -1;
 	protected int pointer = -1;
+	protected boolean released = false; // differentiate between click / release
 
-
-	// protected boolean release = false; // differentiate between click / release
 
 	public LocalActorClickedEvent() {
 		super();
@@ -28,10 +27,10 @@ public class LocalActorClickedEvent extends AbstractLocalEvent implements Poolab
 			targetActor = e.getTarget();
 			button = e.getButton();
 			pointer = e.getPointer();
-			// release = e.getType() == Type.touchUp;
+			released = e.getType() == Type.touchUp;
 		}
 		else {
-			throw new IllegalArgumentException( "Tried to construct LocalActorClickedEvent from non-click event." );
+			throw new IllegalArgumentException( "Tried to construct " + getClass().getSimpleName() + "from non-click event." );
 		}
 	}
 
@@ -47,6 +46,14 @@ public class LocalActorClickedEvent extends AbstractLocalEvent implements Poolab
 		return pointer;
 	}
 
+	public boolean isPressed() {
+		return !released;
+	}
+
+	public boolean isReleased() {
+		return released;
+	}
+
 	@Override
 	public void reset() {
 		super.reset();
@@ -54,6 +61,6 @@ public class LocalActorClickedEvent extends AbstractLocalEvent implements Poolab
 		targetActor = null;
 		button = -1;
 		pointer = -1;
-		// release = false;
+		released = false;
 	}
 }

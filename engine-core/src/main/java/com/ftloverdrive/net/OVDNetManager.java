@@ -100,11 +100,6 @@ public class OVDNetManager {
 	 * Reserves and returns the next available reference id.
 	 * If there are any ids in the reusable pool, then the a refId from that pool
 	 * will be returned instead.
-	 *
-	 * TODO: Have the server pre-assign each player a different large range
-	 * of ids. When this is called, get the next id from the range; if that's
-	 * been exhausted, make a synchronous RMI call to fetch a new range of
-	 * ids.
 	 */
 	public int requestNewRefId() {
 		if ( returnedIds.size > 0 ) {
@@ -114,7 +109,6 @@ public class OVDNetManager {
 			idRanges.removeIndex( 0 );
 		}
 		if ( !hasIdRange() ) {
-			// TODO: Make a synchronous RMI call to fetch a new range.
 			fetchNewRefIdRange();
 		}
 		return nextId++;
@@ -142,7 +136,6 @@ public class OVDNetManager {
 	public void fetchNewRefIdRange() {
 		try {
 			// TODO: Use constants instead of magic numbers and strings
-			// TODO: Need a way to get IP address of the server we're connected to
 
 			Registry registry = LocateRegistry.getRegistry( game.getServerAddress(), 54556 );
 			FetchRefIdRange stub = (FetchRefIdRange)registry.lookup( "FetchRefIdRange" );
@@ -171,6 +164,8 @@ public class OVDNetManager {
 
 	/**
 	 * Sets the reference id for the enemy PlayerModel.
+	 * TODO: Allow several enemy players? Or hold an array of all players in the game model, and only
+	 * set the local player here / set the current opponent when in combat?
 	 */
 	public void setEnemyPlayerRefId( int playerRefId ) {
 		enemyPlayerModelRefId = playerRefId;

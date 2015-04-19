@@ -193,7 +193,7 @@ public class TestScreen extends BaseScreen {
 		context.getReferenceManager().addObject( playerModel, playerRefId );
 		context.getNetManager().setLocalPlayerRefId( playerRefId );
 
-		if ( context.getGame().getServerAddress().equals( "127.0.0.1" ) )
+		if ( context.getGame().isServer() )
 			serverSetup();
 
 		// Create a test ship.
@@ -284,7 +284,7 @@ public class TestScreen extends BaseScreen {
 		incBlueprint.addPlotBranch( branchBlueprint );
 		context.getBlueprintManager().storeBlueprint( "TEST_INCIDENT_3", incBlueprint );
 
-		if ( context.getGame().getServerAddress().equals( "127.0.0.1" ) ) {
+		if ( context.getGame().isServer() ) {
 			IncidentSelectionEvent incSelectionE = Pools.get( IncidentSelectionEvent.class ).obtain();
 			incSelectionE.init( context, incRefId );
 			context.getScreenEventManager().postDelayedEvent( incSelectionE );
