@@ -451,7 +451,8 @@ public class ShipLayout {
 
 		final float orthogonalWeight = 1.0f;
 		final float diagonalWeight = 1.4f; // ~sqrt(2)
-		final float tpadWeight = 1.4f;
+		// Half of the intended weight (1.4), since teleport pads go in pairs.
+		final float tpadWeight = 0.7f;
 		// Give doors 0 weight so that they're not ignored, but don't affect the resulting
 		// path in any way
 		final float doorWeight = 0f;

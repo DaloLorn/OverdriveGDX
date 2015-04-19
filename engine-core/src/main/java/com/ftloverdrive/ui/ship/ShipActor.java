@@ -107,6 +107,10 @@ public class ShipActor extends ModelActor
 		floorLines.setTouchable( Touchable.disabled );
 		shipFloorplanGroup.addActor( floorLines );
 
+		tpadGroup = new Group();
+		tpadGroup.setTouchable( Touchable.childrenOnly );
+		shipFloorplanGroup.addActor( tpadGroup );
+
 		roomDecors = new ShipRoomDecorsActor( context );
 		roomDecors.setTouchable( Touchable.disabled );
 		shipFloorplanGroup.addActor( roomDecors );
@@ -118,10 +122,6 @@ public class ShipActor extends ModelActor
 		doorGroup = new ShipDoorsActor( context );
 		doorGroup.setTouchable( Touchable.childrenOnly );
 		shipFloorplanGroup.addActor( doorGroup );
-
-		tpadGroup = new Group();
-		tpadGroup.setTouchable( Touchable.childrenOnly );
-		shipFloorplanGroup.addActor( tpadGroup );
 
 		// TODO: Where to draw crew layer?
 		// Needs to be drawn above door layer for sure

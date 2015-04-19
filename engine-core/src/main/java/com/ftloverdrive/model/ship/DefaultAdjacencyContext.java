@@ -19,6 +19,8 @@ public class DefaultAdjacencyContext implements AdjacencyContext {
 	 */
 	protected ShipCoordinate tmpCoord;
 	private int i;
+	// Need a context to be able to grab a handle to TeleportPad models, and figure out
+	// where they connect to
 	private OverdriveContext context;
 
 
@@ -75,8 +77,7 @@ public class DefaultAdjacencyContext implements AdjacencyContext {
 			Set<ShipCoordinate> allCoords = layout.getAllShipCoords();
 
 			for ( ShipCoordinate c : allCoords ) {
-				if ( c.v != ShipCoordinate.TYPE_DOOR_H && c.v != ShipCoordinate.TYPE_DOOR_V &&
-						c.v != ShipCoordinate.TYPE_TPAD ) {
+				if ( !c.isDoor() && !c.isTeleportPad() ) {
 					continue;
 				}
 
