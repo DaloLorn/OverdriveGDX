@@ -193,7 +193,10 @@ public class TestShipBlueprint extends ShipBlueprint {
 
 		for ( int i = 0; i < tpadsXYI.length; ++i ) {
 			ShipLayoutConnectTeleportPadsEvent tpadConnectE = Pools.get( ShipLayoutConnectTeleportPadsEvent.class ).obtain();
-			tpadConnectE.init( tpadRefIds.get( i ), tpadRefIds.get( tpadsXYI[i][2] ) );
+			int index = tpadsXYI[i][2];
+			if ( index != -1 )
+				index = tpadRefIds.get( index );
+			tpadConnectE.init( tpadRefIds.get( i ), index );
 			context.getScreenEventManager().postDelayedEvent( tpadConnectE );
 		}
 		tpadRefIds.clear();

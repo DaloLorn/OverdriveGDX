@@ -41,9 +41,7 @@ public class TeleportPadActor extends ModelActor
 		}
 		else {
 			TeleportPadModel tpadModel = context.getReferenceManager().getObject( modelRefId, TeleportPadModel.class );
-			ImageSpec spec = null;
-
-			spec = tpadModel.getAnimSpec();
+			ImageSpec spec = tpadModel.getAnimSpec();
 
 			TextureAtlas atlas = context.getAssetManager().get( spec.getAtlasPath(), TextureAtlas.class );
 			tpadSprite = atlas.findRegion( spec.getRegionName() );

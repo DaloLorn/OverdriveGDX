@@ -11,6 +11,7 @@ public class DefaultTeleportPadModel implements TeleportPadModel {
 
 
 	public DefaultTeleportPadModel() {
+		// TODO: Load the image specs from a skin file?
 		setAnimSpec( new ImageSpec( OVDConstants.SHIP_INTERIOR_ATLAS, "teleporter-on" ) );
 	}
 
@@ -27,6 +28,12 @@ public class DefaultTeleportPadModel implements TeleportPadModel {
 	@Override
 	public void setConnectedTPadRefId( int tpadRefId ) {
 		connectedTpadRefId = tpadRefId;
+		if ( tpadRefId == -1 ) {
+			setAnimSpec( new ImageSpec( OVDConstants.SHIP_INTERIOR_ATLAS, "teleporter-off" ) );
+		}
+		else {
+			setAnimSpec( new ImageSpec( OVDConstants.SHIP_INTERIOR_ATLAS, "teleporter-on" ) );
+		}
 	}
 
 	@Override

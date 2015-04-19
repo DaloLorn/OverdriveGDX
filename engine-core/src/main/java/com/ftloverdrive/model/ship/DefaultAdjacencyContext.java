@@ -180,12 +180,14 @@ public class DefaultAdjacencyContext implements AdjacencyContext {
 
 			int tpadRefId = layout.getTeleportPadRefIdOfCoords( coord );
 			TeleportPadModel tpadModel = context.getReferenceManager().getObject( tpadRefId, TeleportPadModel.class );
-			coord = layout.getTeleportPadCoords( tpadModel.getConnectedTPadRefId() );
+			if ( tpadModel.getConnectedTPadRefId() != -1 ) {
+				coord = layout.getTeleportPadCoords( tpadModel.getConnectedTPadRefId() );
 
-			tmpCoord.init( coord );
-			if ( allCoords.contains( tmpCoord ) ) {
-				results.add( tmpCoord );
-				tmpCoord = Pools.get( ShipCoordinate.class ).obtain();
+				tmpCoord.init( coord );
+				if ( allCoords.contains( tmpCoord ) ) {
+					results.add( tmpCoord );
+					tmpCoord = Pools.get( ShipCoordinate.class ).obtain();
+				}
 			}
 		}
 	}
