@@ -1,12 +1,12 @@
 package com.ftloverdrive.event.engine;
 
-import com.ftloverdrive.event.AbstractQueryEvent;
+import com.ftloverdrive.event.QueryEvent;
 
 
 /**
  * Signal the server that this client is ready to proceed.
  */
-public class SignalReadyEvent extends AbstractQueryEvent {
+public class SignalReadyEvent extends QueryEvent {
 
 	private boolean abort = false;
 

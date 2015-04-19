@@ -3,7 +3,7 @@ package com.ftloverdrive.event;
 import com.badlogic.gdx.utils.Pool.Poolable;
 
 
-public abstract class AbstractPropertyEvent extends AbstractOVDEvent implements Poolable {
+public abstract class PropertyEvent extends AbstractOVDEvent implements Poolable {
 	public static final int INT_TYPE = 0;
 	public static final int BOOL_TYPE = 1;
 
@@ -18,7 +18,7 @@ public abstract class AbstractPropertyEvent extends AbstractOVDEvent implements 
 	protected int intValue = 0;
 	protected boolean boolValue = false;
 
-	public AbstractPropertyEvent() {
+	public PropertyEvent() {
 	}
 
 	public int getPropertyType() {

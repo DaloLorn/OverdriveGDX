@@ -11,7 +11,7 @@ import com.ftloverdrive.core.OverdriveGame;
  * having the event needlessly redistributed to other connected clients,
  * for example when requesting a new range of refIds for the NetworkManager.
  */
-public abstract class AbstractQueryEvent extends AbstractOVDEvent {
+public abstract class QueryEvent extends AbstractOVDEvent {
 
 	protected int recipientId = -1;
 

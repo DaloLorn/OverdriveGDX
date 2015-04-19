@@ -2,7 +2,7 @@ package com.ftloverdrive.event.handler;
 
 import com.badlogic.gdx.utils.Pools;
 import com.ftloverdrive.core.OverdriveContext;
-import com.ftloverdrive.event.AbstractPropertyEvent;
+import com.ftloverdrive.event.PropertyEvent;
 import com.ftloverdrive.event.OVDEvent;
 import com.ftloverdrive.event.OVDEventHandler;
 import com.ftloverdrive.event.ship.DoorPropertyEvent;
@@ -46,24 +46,24 @@ public class DoorEventHandler implements OVDEventHandler {
 
 			int doorRefId = event.getDoorRefId();
 			DoorModel doorModel = context.getReferenceManager().getObject( doorRefId, DoorModel.class );
-			if ( event.getPropertyType() == AbstractPropertyEvent.BOOL_TYPE ) {
-				if ( event.getAction() == AbstractPropertyEvent.SET_ACTION ) {
+			if ( event.getPropertyType() == PropertyEvent.BOOL_TYPE ) {
+				if ( event.getAction() == PropertyEvent.SET_ACTION ) {
 					boolean value = event.getBoolValue();
 					String key = event.getPropertyKey();
 					doorModel.getProperties().setBool( key, value );
 				}
-				else if ( event.getAction() == AbstractPropertyEvent.TOGGLE_ACTION ) {
+				else if ( event.getAction() == PropertyEvent.TOGGLE_ACTION ) {
 					String key = event.getPropertyKey();
 					doorModel.getProperties().toggleBool( key );
 				}
 			}
-			else if ( event.getPropertyType() == AbstractPropertyEvent.INT_TYPE ) {
-				if ( event.getAction() == AbstractPropertyEvent.SET_ACTION ) {
+			else if ( event.getPropertyType() == PropertyEvent.INT_TYPE ) {
+				if ( event.getAction() == PropertyEvent.SET_ACTION ) {
 					int value = event.getIntValue();
 					String key = event.getPropertyKey();
 					doorModel.getProperties().setInt( key, value );
 				}
-				else if ( event.getAction() == AbstractPropertyEvent.INCREMENT_ACTION ) {
+				else if ( event.getAction() == PropertyEvent.INCREMENT_ACTION ) {
 					int value = event.getIntValue();
 					String key = event.getPropertyKey();
 					doorModel.getProperties().incrementInt( key, value );
@@ -89,11 +89,11 @@ public class DoorEventHandler implements OVDEventHandler {
 		if ( e instanceof DoorPropertyEvent ) {
 			DoorPropertyEvent event = (DoorPropertyEvent)e;
 
-			if ( event.getPropertyType() == AbstractPropertyEvent.INT_TYPE ) {
+			if ( event.getPropertyType() == PropertyEvent.INT_TYPE ) {
 				if ( event.getPropertyKey().equals( OVDConstants.DOOR_HEALTH ) ) {
-					if ( event.getAction() == AbstractPropertyEvent.SET_ACTION ) {
+					if ( event.getAction() == PropertyEvent.SET_ACTION ) {
 					}
-					else if ( event.getAction() == AbstractPropertyEvent.INCREMENT_ACTION ) {
+					else if ( event.getAction() == PropertyEvent.INCREMENT_ACTION ) {
 						DoorModel doorModel = context.getReferenceManager().getObject( event.getDoorRefId(), DoorModel.class );
 						int max = doorModel.getProperties().getInt( OVDConstants.DOOR_HEALTH_MAX );
 						int cur = doorModel.getProperties().getInt( OVDConstants.DOOR_HEALTH );

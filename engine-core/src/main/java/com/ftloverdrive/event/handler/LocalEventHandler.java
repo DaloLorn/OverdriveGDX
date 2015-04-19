@@ -9,7 +9,7 @@ import com.ftloverdrive.event.local.LocalActorClickedListener;
 
 
 /**
- * @see {@link com.ftloverdrive.event.AbstractLocalEvent}
+ * @see {@link com.ftloverdrive.event.LocalEvent}
  */
 public class LocalEventHandler implements OVDEventHandler {
 

@@ -63,14 +63,14 @@ public class OVDEventManager {
 			if ( event.isCancelled() )
 				continue; // TODO: Dispose the event?
 
-			if ( event instanceof AbstractLocalEvent ) {
+			if ( event instanceof LocalEvent ) {
 				// Local events are not sent to the server.
 				postDelayedInboundEvent( event );
 			}
 			else {
 				if ( serverMode ) {
-					if ( event instanceof AbstractQueryEvent )
-						context.getGame().getServer().sendTCP( ( (AbstractQueryEvent)event ).getConnectionId(), event );
+					if ( event instanceof QueryEvent )
+						context.getGame().getServer().sendTCP( ( (QueryEvent)event ).getConnectionId(), event );
 					else
 						context.getGame().getServer().sendAllTCP( event );
 				}

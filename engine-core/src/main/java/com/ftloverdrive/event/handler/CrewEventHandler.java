@@ -2,7 +2,7 @@ package com.ftloverdrive.event.handler;
 
 import com.badlogic.gdx.utils.Pools;
 import com.ftloverdrive.core.OverdriveContext;
-import com.ftloverdrive.event.AbstractPropertyEvent;
+import com.ftloverdrive.event.PropertyEvent;
 import com.ftloverdrive.event.OVDEvent;
 import com.ftloverdrive.event.OVDEventHandler;
 import com.ftloverdrive.event.ship.CrewPropertyEvent;
@@ -39,24 +39,24 @@ public class CrewEventHandler implements OVDEventHandler {
 
 			int crewRefId = event.getCrewRefId();
 			CrewModel crewModel = context.getReferenceManager().getObject( crewRefId, CrewModel.class );
-			if ( event.getPropertyType() == AbstractPropertyEvent.BOOL_TYPE ) {
-				if ( event.getAction() == AbstractPropertyEvent.SET_ACTION ) {
+			if ( event.getPropertyType() == PropertyEvent.BOOL_TYPE ) {
+				if ( event.getAction() == PropertyEvent.SET_ACTION ) {
 					boolean value = event.getBoolValue();
 					String key = event.getPropertyKey();
 					crewModel.getProperties().setBool( key, value );
 				}
-				else if ( event.getAction() == AbstractPropertyEvent.TOGGLE_ACTION ) {
+				else if ( event.getAction() == PropertyEvent.TOGGLE_ACTION ) {
 					String key = event.getPropertyKey();
 					crewModel.getProperties().toggleBool( key );
 				}
 			}
-			else if ( event.getPropertyType() == AbstractPropertyEvent.INT_TYPE ) {
-				if ( event.getAction() == AbstractPropertyEvent.SET_ACTION ) {
+			else if ( event.getPropertyType() == PropertyEvent.INT_TYPE ) {
+				if ( event.getAction() == PropertyEvent.SET_ACTION ) {
 					int value = event.getIntValue();
 					String key = event.getPropertyKey();
 					crewModel.getProperties().setInt( key, value );
 				}
-				else if ( event.getAction() == AbstractPropertyEvent.INCREMENT_ACTION ) {
+				else if ( event.getAction() == PropertyEvent.INCREMENT_ACTION ) {
 					int value = event.getIntValue();
 					String key = event.getPropertyKey();
 					crewModel.getProperties().incrementInt( key, value );

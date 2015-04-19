@@ -4,13 +4,13 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputEvent.Type;
 import com.badlogic.gdx.utils.Pool.Poolable;
-import com.ftloverdrive.event.AbstractLocalEvent;
+import com.ftloverdrive.event.LocalEvent;
 
 
 /**
  * OVD wrapper event for GDX touchDown/touchUp events.
  */
-public class LocalActorClickedEvent extends AbstractLocalEvent implements Poolable {
+public class LocalActorClickedEvent extends LocalEvent implements Poolable {
 
 	protected Actor targetActor = null;
 	protected int button = -1;

@@ -1,10 +1,10 @@
 package com.ftloverdrive.event.ship;
 
 import com.badlogic.gdx.utils.Pool.Poolable;
-import com.ftloverdrive.event.AbstractPropertyEvent;
+import com.ftloverdrive.event.PropertyEvent;
 
 
-public class CrewPropertyEvent extends AbstractPropertyEvent implements Poolable {
+public class CrewPropertyEvent extends PropertyEvent implements Poolable {
 	protected int crewRefId = -1;
 
 

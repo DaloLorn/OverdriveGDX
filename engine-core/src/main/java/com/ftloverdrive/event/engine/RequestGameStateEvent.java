@@ -1,6 +1,6 @@
 package com.ftloverdrive.event.engine;
 
-import com.ftloverdrive.event.AbstractQueryEvent;
+import com.ftloverdrive.event.QueryEvent;
 import com.ftloverdrive.model.DefaultGameModel;
 
 
@@ -10,7 +10,7 @@ import com.ftloverdrive.model.DefaultGameModel;
  * 
  * TODO: Improve this.
  */
-public class RequestGameStateEvent extends AbstractQueryEvent {
+public class RequestGameStateEvent extends QueryEvent {
 
 	private int gameModelRefId = -1;
 	private DefaultGameModel gameModel = null;

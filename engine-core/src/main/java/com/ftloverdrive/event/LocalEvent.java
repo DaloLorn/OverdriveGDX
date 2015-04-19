@@ -10,5 +10,5 @@ package com.ftloverdrive.event;
  * the other player (eg. an input wrapper event, or an event telling
  * an actor to play an animation)
  */
-public abstract class AbstractLocalEvent extends AbstractOVDEvent {
+public abstract class LocalEvent extends AbstractOVDEvent {
 }

@@ -1,7 +1,7 @@
 package com.ftloverdrive.event.incident;
 
 import com.ftloverdrive.core.OverdriveContext;
-import com.ftloverdrive.event.AbstractQueryEvent;
+import com.ftloverdrive.event.QueryEvent;
 
 
 // This event is basically a method execution that has to be delayed
@@ -12,7 +12,7 @@ import com.ftloverdrive.event.AbstractQueryEvent;
 // is only sent back to the client it originated from.
 // This also has the nice property that it allows the server to
 // scrutinize the selection event, possibly disallowing the selection.
-public class IncidentSelectionEvent extends AbstractQueryEvent {
+public class IncidentSelectionEvent extends QueryEvent {
 
 	protected int incidentRefId = -1;
 
