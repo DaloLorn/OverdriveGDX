@@ -119,6 +119,7 @@ public class OVDConstants {
 	public static final String EFFECTS_ATLAS = "img/effects/.atlas.atlas";
 	public static final String ICONS_ATLAS = "img/icons/.atlas.atlas";
 	public static final String MISC_ATLAS = "img/misc/.atlas.atlas";
+	public static final String MOUSE_ATLAS = "img/mouse/.atlas.atlas";
 	public static final String PEOPLE_ATLAS = "img/people/.atlas.atlas";
 	public static final String SHIP_ATLAS = "img/ship/.atlas.atlas";
 	public static final String SHIP_INTERIOR_ATLAS = "img/ship/interior/.atlas.atlas";

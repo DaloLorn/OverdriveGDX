@@ -9,7 +9,11 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.Pixmap;
+import com.badlogic.gdx.graphics.Pixmap.Format;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
@@ -28,6 +32,7 @@ import com.ftloverdrive.util.OVDConstants;
 
 
 public class LoadingScreen implements Disposable, OVDScreen {
+
 	private Logger log;
 
 	private AssetManager loadingAssetManager;
@@ -65,40 +70,56 @@ public class LoadingScreen implements Disposable, OVDScreen {
 		scriptManager = new OVDScriptManager();
 
 
-		mainStage = new Stage(new ScreenViewport());
+		mainStage = new Stage( new ScreenViewport() );
 		stageManager.putStage( "Main", mainStage );
 
 		loadingAssetManager = new AssetManager();
 		loadingAssetManager.load( "overdrive-assets/images/loading.atlas", TextureAtlas.class );
-		loadingAssetManager.finishLoading();  // Block until loaded completely.
+		loadingAssetManager.finishLoading(); // Block until loaded completely.
 
 		atlas = loadingAssetManager.get( "overdrive-assets/images/loading.atlas", TextureAtlas.class );
-		logo = new Image( atlas.findRegion("libgdx-logo") );
-		loadingFrame = new Image( atlas.findRegion("loading-frame") );
-		loadingBarHidden = new Image( atlas.findRegion("loading-bar-hidden") );
-		screenBg = new Image( atlas.findRegion("screen-bg") );
-		loadingBg = new Image( atlas.findRegion("loading-frame-bg") );
-		
+		logo = new Image( atlas.findRegion( "libgdx-logo" ) );
+		loadingFrame = new Image( atlas.findRegion( "loading-frame" ) );
+		loadingBarHidden = new Image( atlas.findRegion( "loading-bar-hidden" ) );
+		screenBg = new Image( atlas.findRegion( "screen-bg" ) );
+		loadingBg = new Image( atlas.findRegion( "loading-frame-bg" ) );
+
 		screenBg.setFillParent( true );
 
 		// Animated bar.
-		//Animation anim = new Animation( 0.05f, atlas.findRegions("loading-bar-anim") );
-		//anim.setPlayMode(Animation.LOOP_REVERSED);
-		//loadingBar = new LoadingBar(anim);
+		// Animation anim = new Animation( 0.05f, atlas.findRegions("loading-bar-anim") );
+		// anim.setPlayMode(Animation.LOOP_REVERSED);
+		// loadingBar = new LoadingBar(anim);
 
 		// Static bar.
-		loadingBar = new Image( atlas.findRegion("loading-bar1") );
+		loadingBar = new Image( atlas.findRegion( "loading-bar1" ) );
 
 		mainStage.addActor( screenBg );
 		mainStage.addActor( loadingBar );
 		mainStage.addActor( loadingBg );
 		mainStage.addActor( loadingBarHidden );
 		mainStage.addActor( loadingFrame );
-		//mainStage.addActor( logo );
+		// mainStage.addActor( logo );
+
+		// Set hardware cursor.
+		// TODO: With libGDX, setting hardware cursor is clumsy -- requires pixmaps, and pixmaps
+		// can't be conveniently created, they need to be transcribed pixel by pixel.
+		// TODO: Will probably need some sort of cental Cursor class that stores loaded pixmaps, and
+		// exposes methods to change the cursor's appearance, since in FTL the cursor changes depending
+		// on the actor currently being hoevered over.
+		// TODO: Will probably need to use a software cursor anyway, since FTL had an animated
+		// cursor when opening doors.
+		context.getAssetManager().load( OVDConstants.MOUSE_ATLAS, TextureAtlas.class );
+		context.getAssetManager().finishLoading();
+		TextureAtlas mouseAtlas = context.getAssetManager().get( OVDConstants.MOUSE_ATLAS, TextureAtlas.class );
+		// It appears that the cursor is positioned wrong -- buttons don't detect it properly near
+		// their bottom/right edge. Fix by drawing the pixels at an offset.
+		Pixmap pointerInvalid = loadPixmap( mouseAtlas.findRegion( "pointerInvalid" ), 0, 3 );
+		Gdx.input.setCursorImage( pointerInvalid, 0, 0 );
 
 		// Uncomment to preload textures.
-		//context.getAssetManager().load( OVDConstants.BUTTONS_FTL_ATLAS, TextureAtlas.class );
-		//context.getAssetManager().load( OVDConstants.COMBATUI_ATLAS, TextureAtlas.class );
+		// context.getAssetManager().load( OVDConstants.BUTTONS_FTL_ATLAS, TextureAtlas.class );
+		// context.getAssetManager().load( OVDConstants.COMBATUI_ATLAS, TextureAtlas.class );
 		context.getAssetManager().load( OVDConstants.EFFECTS_ATLAS, TextureAtlas.class );
 		context.getAssetManager().load( OVDConstants.ICONS_ATLAS, TextureAtlas.class );
 		context.getAssetManager().load( OVDConstants.PEOPLE_ATLAS, TextureAtlas.class );
@@ -110,16 +131,17 @@ public class LoadingScreen implements Disposable, OVDScreen {
 		context.getAssetManager().load( OVDConstants.ROOT_ATLAS, TextureAtlas.class );
 		context.getAssetManager().load( OVDConstants.MISC_ATLAS, TextureAtlas.class );
 		context.getAssetManager().load( OVDConstants.MENU_ATLAS, TextureAtlas.class );
-		//context.getAssetManager().load( OVDConstants.WEAPONS_ATLAS, TextureAtlas.class );
+		// context.getAssetManager().load( OVDConstants.WEAPONS_ATLAS, TextureAtlas.class );
 
 		// XXX: Re-enable once scripts are actually needed for something
-		/*
 		// Preload scripts.
-		FileHandle scriptsFolder = context.getFileHandleResolver().resolve("overdrive-assets/scripts");
+		/*
+		FileHandle scriptsFolder = context.getFileHandleResolver().resolve( "overdrive-assets/scripts" );
 		FilenameFilter scriptFilter = new FilenameFilter() {
+
 			@Override
 			public boolean accept( File dir, String name ) {
-				return name.endsWith(".java") || name.endsWith(".bsh");
+				return name.endsWith( ".java" ) || name.endsWith( ".bsh" );
 			}
 		};
 		Array<FileHandle> scriptHandles = new Array<FileHandle>();
@@ -139,50 +161,68 @@ public class LoadingScreen implements Disposable, OVDScreen {
 	 * Note: folders located within the .jar show up as having 0 children.
 	 */
 	private void getHandles( FileHandle begin, Array<FileHandle> handles ) {
-	    FileHandle[] newHandles = begin.list();
-	    for ( FileHandle fh : newHandles ) {
-	        if ( fh.isDirectory() ) {
-	            getHandles( fh, handles );
-	        } else {
-	            handles.add( fh );
-	        }
-	    }
+		FileHandle[] newHandles = begin.list();
+		for ( FileHandle fh : newHandles ) {
+			if ( fh.isDirectory() ) {
+				getHandles( fh, handles );
+			}
+			else {
+				handles.add( fh );
+			}
+		}
 	}
 
+	private Pixmap loadPixmap( TextureRegion region, int ox, int oy ) {
+		Texture texture = region.getTexture();
+		if ( !texture.getTextureData().isPrepared() )
+			texture.getTextureData().prepare();
+		Pixmap pixmap = texture.getTextureData().consumePixmap();
+		Pixmap result = new Pixmap( region.getRegionWidth(), region.getRegionHeight(), Format.RGBA8888 );
+		for ( int x = 0; x < region.getRegionWidth(); x++ ) {
+			for ( int y = 0; y < region.getRegionHeight(); y++ ) {
+				int colorInt = pixmap.getPixel( region.getRegionX() + x, region.getRegionY() + y );
+				result.setColor( colorInt );
+				result.drawPixel( x + ox, y + oy );
+			}
+		}
+		pixmap.dispose();
+
+		return result;
+	}
 
 	@Override
 	public void resize( int width, int height ) {
 		Vector2 scaledView = Scaling.stretch.apply( 800, 400, width, height );
-		mainStage.getViewport().update( (int) scaledView.x, (int) scaledView.y, true );
+		mainStage.getViewport().update( (int)scaledView.x, (int)scaledView.y, true );
 
 		// Make the background fill the screen.
-		//screenBg.setSize(scaledView.x, scaledView.y);
-		//screenBg.setX( 0 );
-		//screenBg.setY( 0 );
+		// screenBg.setSize(scaledView.x, scaledView.y);
+		// screenBg.setX( 0 );
+		// screenBg.setY( 0 );
 
 		// Place the logo in the middle of the screen and 100 px up.
-		logo.setX((scaledView.x - logo.getWidth()) / 2);
-		logo.setY((scaledView.y - logo.getHeight()) / 2 + 100);
+		logo.setX( ( scaledView.x - logo.getWidth() ) / 2 );
+		logo.setY( ( scaledView.y - logo.getHeight() ) / 2 + 100 );
 
 		// Place the loading frame in the middle of the screen.
-		loadingFrame.setX((mainStage.getWidth() - loadingFrame.getWidth()) / 2);
-		loadingFrame.setY((mainStage.getHeight() - loadingFrame.getHeight()) / 2);
+		loadingFrame.setX( ( mainStage.getWidth() - loadingFrame.getWidth() ) / 2 );
+		loadingFrame.setY( ( mainStage.getHeight() - loadingFrame.getHeight() ) / 2 );
 
 		// Place the loading bar at the same spot as the frame, adjusted a few px.
-		loadingBar.setX(loadingFrame.getX() + 15);
-		loadingBar.setY(loadingFrame.getY() + 5);
+		loadingBar.setX( loadingFrame.getX() + 15 );
+		loadingBar.setY( loadingFrame.getY() + 5 );
 
 		// Place the image that will hide the bar on top of the bar, adjusted a few px.
-		loadingBarHidden.setX(loadingBar.getX() + 35);
-		loadingBarHidden.setY(loadingBar.getY() - 3);
+		loadingBarHidden.setX( loadingBar.getX() + 35 );
+		loadingBarHidden.setY( loadingBar.getY() - 3 );
 		// The start position and how far to move the hidden loading bar.
 		startX = loadingBarHidden.getX();
 		endX = 440;
 
 		// The rest of the hidden bar.
-		loadingBg.setSize(450, 50);
-		loadingBg.setX(loadingBarHidden.getX() + 30);
-		loadingBg.setY(loadingBarHidden.getY() + 3);
+		loadingBg.setSize( 450, 50 );
+		loadingBg.setX( loadingBarHidden.getX() + 30 );
+		loadingBg.setY( loadingBarHidden.getY() + 3 );
 	}
 
 	@Override
@@ -204,8 +244,8 @@ public class LoadingScreen implements Disposable, OVDScreen {
 
 		// Incrementally load assets until completely done.
 		if ( context.getAssetManager().update() ) {
-			//if ( Gdx.input.isTouched() )
-				context.getScreenManager().continueToNextScreen();
+			// if ( Gdx.input.isTouched() )
+			context.getScreenManager().continueToNextScreen();
 		}
 
 		// Interpolate the percentage to make it more smooth.
