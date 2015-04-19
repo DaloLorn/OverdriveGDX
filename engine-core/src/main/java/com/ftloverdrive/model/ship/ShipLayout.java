@@ -397,36 +397,39 @@ public class ShipLayout {
 	 * Return a collection of waypoints that an ambulator has to follow in order to get
 	 * from start point to end point, or null if no path exists between the two points.
 	 * 
-	 * TODO: Could possibly extract this function, and have it take ShipLayout as argument
+	 * TODO: Could possibly extract this function to a pathfinding manager (or something), and
+	 * have it take ShipLayout as argument.
+	 * 
+	 * @param start
+	 *            the starting coordinate, the one the crew currently stands on.
+	 * @param end
+	 *            the end coordinate, the one the crew has been ordered to move to.
+	 * @param comingFrom
+	 *            the previous waypoint. Null, except when interrupting an earlier move order.
+	 * @param movingTo
+	 *            the current waypoint. Null, except when interrupting an earlier move order.
 	 */
-	public Stack<ShipCoordinate> findPath( OverdriveContext context, ShipCoordinate start, ShipCoordinate end, ShipCoordinate comingFrom,
-			ShipCoordinate movingTo ) {
+	public Stack<ShipCoordinate> findPath( OverdriveContext context, ShipCoordinate start, ShipCoordinate end,
+			ShipCoordinate comingFrom, ShipCoordinate movingTo ) {
 		Stack<ShipCoordinate> path = findPathDijkstra( context, start, end );
 		if ( path == null ) return null;
-		streamlinePath( path );
 
-		// We need to include the start node in the path if we're currently crossing a doorway,
-		// so that the crew member will finish their movement properly when issued a new move order.
-		// Otherwise the actor can start moving to the next waypoint from the middle of the door,
-		// instead of finishing the move to the nearest square tile.
-		if ( comingFrom != null && movingTo != null && !path.contains( start ) ) {
-			// Check if there's a doorway between the two tiles
-			AdjacencyContext doorAdj = new DoorAdjacencyContext();
-			List<ShipCoordinate> fromNeighbours = new ArrayList<ShipCoordinate>();
-			List<ShipCoordinate> toNeighbours = new ArrayList<ShipCoordinate>();
-			doorAdj.getAdjacentCoords( this, comingFrom, fromNeighbours );
-			doorAdj.getAdjacentCoords( this, movingTo, toNeighbours );
+		// Remove the waypoints equal to the starting position if the crew was already moving towards
+		// the second waypoint.
+		// Doing so prevents double-backing to the tile the actor is currently standing on, when it
+		// could've just kept going the way it was.
+		// However, we don't want to remove the first waypoint if we're going to be moving through
+		// a door or a teleport pad, since doing so would cause the crew to ghost through walls / doors.
+		while ( path.size() > 1 ) {
+			ShipCoordinate first = path.peek();
+			ShipCoordinate second = path.get( path.size() - 2 );
 
-			fromNeighbours.retainAll( toNeighbours );
-			if ( fromNeighbours.size() > 0 ) {
-				path.push( start );
-			}
-		}
+			// TODO: Fix all edge cases and bugs....
+			boolean remove = first.equalsLocation( comingFrom ) || second.equalsLocation( movingTo );
+			boolean keep = ( first.isDoor() && !first.equals( comingFrom ) ) || !second.equalsLocation( movingTo );
 
-		// Remove the first waypoint if the crew was already moving towards the second waypoint.
-		// Prevents double-backing to the tile the actor is currently standing on, when it could've
-		// just kept going the way it was
-		if ( path.size() > 1 && path.get( path.size() - 2 ).equals( movingTo ) ) {
+			if ( !remove )
+				break;
 			path.pop();
 		}
 
@@ -435,7 +438,8 @@ public class ShipLayout {
 		// for ( int i = path.size() - 1; i >= 0; --i ) {
 		// System.out.println( "   " + path.get( i ) );
 		// }
-		// System.out.println( "( Moving to " + movingTo + " )" );
+		// System.out.println( "( Coming from " + comingFrom + " )" );
+		// System.out.println( "( Moving to   " + movingTo + " )" );
 
 		return path;
 	}
@@ -445,15 +449,18 @@ public class ShipLayout {
 		Map<ShipCoordinate, ShipCoordinate> prevMap = new HashMap<ShipCoordinate, ShipCoordinate>();
 		List<ShipCoordinate> pending = new ArrayList<ShipCoordinate>();
 
-		// TODO: Right now includes doors in the path, although they don't change anything.
-		// Remove them or keep them, in case they're useful later?
+		final float orthogonalWeight = 1.0f;
+		final float diagonalWeight = 1.4f; // ~sqrt(2)
+		final float tpadWeight = 1.4f;
+		// Give doors 0 weight so that they're not ignored, but don't affect the resulting
+		// path in any way
+		final float doorWeight = 0f;
 
 		// TODO: Rewrite as a series of non-user Orders, so that crew will automatically try
 		// to break down locked doors / crystal lockdowns?
 
 		for ( ShipCoordinate v : allShipCoords ) {
-			if ( v.v == ShipCoordinate.TYPE_SQUARE || v.v == ShipCoordinate.TYPE_TPAD ||
-					v.v == ShipCoordinate.TYPE_DOOR_H || v.v == ShipCoordinate.TYPE_DOOR_V ) {
+			if ( !v.isWall() ) {
 				distMap.put( v, Float.MAX_VALUE );
 				prevMap.put( v, null );
 				pending.add( v );
@@ -487,12 +494,12 @@ public class ShipLayout {
 			// Compute distances and predecessors for neighbours of current node,
 			// and update them if we've found a shorter path
 
-			// Favor diagonal movement
+			// Diagonal movement
 			neighbours.clear();
 			diagonalAdj.getAdjacentCoords( this, current, neighbours );
 			for ( ShipCoordinate neigh : neighbours ) {
-				if ( pending.contains( neigh ) ) {
-					dist = distMap.get( current ) + 1.4f; // ~sqrt(2)
+				if ( pending.contains( neigh ) && neigh.isSquare() ) {
+					dist = distMap.get( current ) + diagonalWeight;
 
 					if ( dist < distMap.get( neigh ) ) {
 						distMap.put( neigh, dist );
@@ -501,21 +508,20 @@ public class ShipLayout {
 				}
 			}
 
+			// Orthogonal movement
 			neighbours.clear();
 			defaultAdj.getAdjacentCoords( this, current, neighbours );
 			for ( ShipCoordinate neigh : neighbours ) {
 				if ( pending.contains( neigh ) ) {
-					if ( neigh.v == ShipCoordinate.TYPE_SQUARE ) {
-						dist = distMap.get( current ) + 1;
+					if ( neigh.isSquare() ) {
+						dist = distMap.get( current ) + orthogonalWeight;
 					}
-					else if ( neigh.v == ShipCoordinate.TYPE_TPAD ) {
-						dist = distMap.get( current ) + 1.4f;
+					else if ( neigh.isTeleportPad() ) {
+						dist = distMap.get( current ) + tpadWeight;
 					}
 					else {
 						// Door, either H or V
-						// Give it 0 weight so that it's not ignored, but doesn't
-						// affect the resulting path in any way
-						dist = distMap.get( current );
+						dist = distMap.get( current ) + doorWeight;
 					}
 
 					if ( dist < distMap.get( neigh ) ) {
@@ -542,32 +548,5 @@ public class ShipLayout {
 		}
 
 		return path;
-	}
-
-	/**
-	 * Simplifies the path by removing all square nodes that do not border with a door or a teleport pad
-	 * along the path.
-	 * 
-	 * Only has noticeable effect in rooms bigger than 2x2.
-	 */
-	private void streamlinePath( Stack<ShipCoordinate> path ) {
-		Set<ShipCoordinate> keyNodes = new HashSet<ShipCoordinate>();
-		keyNodes.add( path.get( 0 ) );
-		for ( int i = 0; i < path.size(); ++i ) {
-			// TODO: Obstacle-aware streamlining. Right now just beelines from door to door,
-			// and doesn't account for non-rectangular rooms
-			if ( path.get( i ).v == ShipCoordinate.TYPE_DOOR_H || path.get( i ).v == ShipCoordinate.TYPE_DOOR_V ) {
-				keyNodes.add( path.get( i - 1 ) );
-				if ( i + 1 < path.size() ) {
-					keyNodes.add( path.get( i + 1 ) );
-				}
-			}
-			else if ( path.get( i ).v == ShipCoordinate.TYPE_TPAD ) {
-				keyNodes.add( path.get( i - 1 ) );
-				keyNodes.add( path.get( i ) );
-			}
-		}
-
-		path.retainAll( keyNodes );
 	}
 }

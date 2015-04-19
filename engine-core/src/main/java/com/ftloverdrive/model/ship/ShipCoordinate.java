@@ -316,6 +316,29 @@ public class ShipCoordinate implements Poolable {
 		return ( x == other.x && y == other.y && v == other.v );
 	}
 
+	/**
+	 * Ignores the type of the coordinate, comparing only spatial location of the two coordinates.
+	 */
+	public boolean equalsLocation( ShipCoordinate other ) {
+		return other != null && x == other.x && y == other.y;
+	}
+
+	public boolean isSquare() {
+		return v == ShipCoordinate.TYPE_SQUARE;
+	}
+
+	public boolean isWall() {
+		return v == ShipCoordinate.TYPE_WALL_H || v == ShipCoordinate.TYPE_WALL_V;
+	}
+
+	public boolean isDoor() {
+		return v == ShipCoordinate.TYPE_DOOR_H || v == ShipCoordinate.TYPE_DOOR_V;
+	}
+
+	public boolean isTeleportPad() {
+		return v == ShipCoordinate.TYPE_TPAD;
+	}
+
 	@Override
 	public int hashCode() {
 		return mangle( x ) | ( mangle( y ) << 1 ) | ( mangle( v ) << 2 );
