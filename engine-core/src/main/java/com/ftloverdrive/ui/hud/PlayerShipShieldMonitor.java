@@ -92,7 +92,7 @@ public class PlayerShipShieldMonitor extends Actor implements Disposable, GamePl
 
 	@Override
 	public void shipPropertyChanged( OverdriveContext context, ShipPropertyEvent e ) {
-		if ( e.getShipRefId() != shipModelRefId ) return;
+		if ( e.getModelRefId() != shipModelRefId ) return;
 
 		if ( e.getPropertyType() == ShipPropertyEvent.INT_TYPE ) {
 			if ( OVDConstants.SHIELD.equals( e.getPropertyKey() ) || OVDConstants.SHIELD_MAX.equals( e.getPropertyKey() ) ) {

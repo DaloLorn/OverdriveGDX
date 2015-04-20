@@ -140,7 +140,7 @@ public class CrewActor extends AmbulActor
 
 	@Override
 	public void crewPropertyChanged( OverdriveContext context, CrewPropertyEvent e ) {
-		if ( e.getCrewRefId() != modelRefId ) return;
+		if ( e.getModelRefId() != modelRefId ) return;
 
 		updateInfo( context );
 	}

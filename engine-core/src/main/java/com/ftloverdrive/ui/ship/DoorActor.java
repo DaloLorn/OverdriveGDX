@@ -133,7 +133,7 @@ public class DoorActor extends ModelActor
 
 	@Override
 	public void doorPropertyChanged( OverdriveContext context, DoorPropertyEvent e ) {
-		if ( e.getDoorRefId() != modelRefId ) return;
+		if ( e.getModelRefId() != modelRefId ) return;
 
 		if ( e.getPropertyKey().equals( OVDConstants.DOOR_OPEN ) ) {
 			updateInfo( context );

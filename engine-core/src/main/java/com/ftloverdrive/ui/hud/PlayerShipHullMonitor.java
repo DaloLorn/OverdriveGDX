@@ -94,7 +94,7 @@ public class PlayerShipHullMonitor extends Actor implements Disposable, GamePlay
 
 	@Override
 	public void shipPropertyChanged( OverdriveContext context, ShipPropertyEvent e ) {
-		if ( e.getShipRefId() != shipModelRefId ) return;
+		if ( e.getModelRefId() != shipModelRefId ) return;
 
 		if ( e.getPropertyType() == ShipPropertyEvent.INT_TYPE ) {
 			if ( OVDConstants.HULL.equals( e.getPropertyKey() ) || OVDConstants.HULL_MAX.equals( e.getPropertyKey() ) ) {

@@ -81,7 +81,7 @@ public class PlayerScrapMonitor extends Group implements Disposable, GamePlayerS
 
 	@Override
 	public void shipPropertyChanged( OverdriveContext context, ShipPropertyEvent e ) {
-		if ( e.getShipRefId() != shipModelRefId ) return;
+		if ( e.getModelRefId() != shipModelRefId ) return;
 
 		if ( e.getPropertyType() == ShipPropertyEvent.INT_TYPE ) {
 			if ( OVDConstants.SCRAP.equals( e.getPropertyKey() ) ) {

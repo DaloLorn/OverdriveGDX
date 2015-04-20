@@ -150,7 +150,7 @@ public class ShipActor extends ModelActor
 
 	@Override
 	public void shipPropertyChanged( OverdriveContext context, ShipPropertyEvent e ) {
-		if ( e.getShipRefId() != modelRefId ) return;
+		if ( e.getModelRefId() != modelRefId ) return;
 
 		ShipModel shipModel = context.getReferenceManager().getObject( modelRefId, ShipModel.class );
 		if ( e.getPropertyType() == ShipPropertyEvent.INT_TYPE ) {

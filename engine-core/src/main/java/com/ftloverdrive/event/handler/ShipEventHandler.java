@@ -91,7 +91,7 @@ public class ShipEventHandler implements OVDEventHandler {
 		else if ( e instanceof ShipPropertyEvent ) {
 			ShipPropertyEvent event = (ShipPropertyEvent)e;
 
-			int shipRefId = event.getShipRefId();
+			int shipRefId = event.getModelRefId();
 			ShipModel shipModel = context.getReferenceManager().getObject( shipRefId, ShipModel.class );
 			if ( event.getPropertyType() == ShipPropertyEvent.INT_TYPE ) {
 				if ( event.getAction() == ShipPropertyEvent.SET_ACTION ) {

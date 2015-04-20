@@ -2,24 +2,26 @@ package com.ftloverdrive.event.handler;
 
 import com.badlogic.gdx.utils.Pools;
 import com.ftloverdrive.core.OverdriveContext;
-import com.ftloverdrive.event.PropertyEvent;
 import com.ftloverdrive.event.OVDEvent;
 import com.ftloverdrive.event.OVDEventHandler;
+import com.ftloverdrive.event.PropertyEvent;
 import com.ftloverdrive.event.ship.DoorPropertyEvent;
 import com.ftloverdrive.event.ship.DoorPropertyListener;
 import com.ftloverdrive.model.ship.DoorModel;
 import com.ftloverdrive.util.OVDConstants;
 
+
 public class DoorEventHandler implements OVDEventHandler {
 	private Class[] eventClasses;
 	private Class[] listenerClasses;
 
+
 	public DoorEventHandler() {
 		eventClasses = new Class[] {
-			DoorPropertyEvent.class
+				DoorPropertyEvent.class
 		};
 		listenerClasses = new Class[] {
-			DoorPropertyListener.class,
+				DoorPropertyListener.class,
 		};
 	}
 
@@ -44,7 +46,7 @@ public class DoorEventHandler implements OVDEventHandler {
 		if ( e instanceof DoorPropertyEvent ) {
 			DoorPropertyEvent event = (DoorPropertyEvent)e;
 
-			int doorRefId = event.getDoorRefId();
+			int doorRefId = event.getModelRefId();
 			DoorModel doorModel = context.getReferenceManager().getObject( doorRefId, DoorModel.class );
 			if ( event.getPropertyType() == PropertyEvent.BOOL_TYPE ) {
 				if ( event.getAction() == PropertyEvent.SET_ACTION ) {
@@ -70,9 +72,9 @@ public class DoorEventHandler implements OVDEventHandler {
 				}
 			}
 
-			for ( int i = listeners.length-2; i >= 0; i-=2 ) {
+			for ( int i = listeners.length - 2; i >= 0; i -= 2 ) {
 				if ( listeners[i] == DoorPropertyListener.class ) {
-					((DoorPropertyListener)listeners[i+1]).doorPropertyChanged( context, event );
+					( (DoorPropertyListener)listeners[i + 1] ).doorPropertyChanged( context, event );
 				}
 			}
 		}
@@ -94,7 +96,7 @@ public class DoorEventHandler implements OVDEventHandler {
 					if ( event.getAction() == PropertyEvent.SET_ACTION ) {
 					}
 					else if ( event.getAction() == PropertyEvent.INCREMENT_ACTION ) {
-						DoorModel doorModel = context.getReferenceManager().getObject( event.getDoorRefId(), DoorModel.class );
+						DoorModel doorModel = context.getReferenceManager().getObject( event.getModelRefId(), DoorModel.class );
 						int max = doorModel.getProperties().getInt( OVDConstants.DOOR_HEALTH_MAX );
 						int cur = doorModel.getProperties().getInt( OVDConstants.DOOR_HEALTH );
 						int delta = event.getIntValue();

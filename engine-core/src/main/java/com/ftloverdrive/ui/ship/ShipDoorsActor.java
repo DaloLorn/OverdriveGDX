@@ -101,7 +101,7 @@ public class ShipDoorsActor extends Group
 	}
 
 	public void shipPropertyChanged( OverdriveContext context, ShipPropertyEvent e ) {
-		if ( e.getShipRefId() != shipModelRefId ) return;
+		if ( e.getModelRefId() != shipModelRefId ) return;
 
 		if ( e.getPropertyType() == ShipPropertyEvent.INT_TYPE ) {
 			if ( OVDConstants.DOOR_LEVEL.equals( e.getPropertyKey() ) ) {

@@ -1,45 +1,10 @@
 package com.ftloverdrive.event.ship;
 
-import com.badlogic.gdx.utils.Pool.Poolable;
 import com.ftloverdrive.event.PropertyEvent;
 
 
-public class DoorPropertyEvent extends PropertyEvent implements Poolable {
-	protected int doorRefId = -1;
-
+public class DoorPropertyEvent extends PropertyEvent {
 
 	public DoorPropertyEvent() {
-	}
-
-	/**
-	 * Pseudo-constructor for an integer property change.
-	 */
-	public void init( int doorRefId, int propertyType, int action, String propertyKey, int intValue ) {
-		this.doorRefId = doorRefId;
-		this.propertyType = propertyType;
-		this.action = action;
-		this.propertyKey = propertyKey;
-		this.intValue = intValue;
-	}
-
-	/**
-	 * Pseudo-constructor for a boolean property change.
-	 */
-	public void init( int doorRefId, int propertyType, int action, String propertyKey, boolean boolValue ) {
-		this.doorRefId = doorRefId;
-		this.propertyType = propertyType;
-		this.action = action;
-		this.propertyKey = propertyKey;
-		this.boolValue = boolValue;
-	}
-
-	public int getDoorRefId() {
-		return doorRefId;
-	}
-
-	@Override
-	public void reset() {
-		super.reset();
-		doorRefId = -1;
 	}
 }

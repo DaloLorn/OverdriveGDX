@@ -37,7 +37,7 @@ public class CrewEventHandler implements OVDEventHandler {
 		if ( e instanceof CrewPropertyEvent ) {
 			CrewPropertyEvent event = (CrewPropertyEvent)e;
 
-			int crewRefId = event.getCrewRefId();
+			int crewRefId = event.getModelRefId();
 			CrewModel crewModel = context.getReferenceManager().getObject( crewRefId, CrewModel.class );
 			if ( event.getPropertyType() == PropertyEvent.BOOL_TYPE ) {
 				if ( event.getAction() == PropertyEvent.SET_ACTION ) {
