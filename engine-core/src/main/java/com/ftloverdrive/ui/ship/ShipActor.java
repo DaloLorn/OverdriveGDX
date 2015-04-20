@@ -14,6 +14,7 @@ import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.IntMap;
 import com.badlogic.gdx.utils.Pools;
 import com.ftloverdrive.core.OverdriveContext;
+import com.ftloverdrive.event.PropertyEvent;
 import com.ftloverdrive.event.engine.TickEvent;
 import com.ftloverdrive.event.engine.TickListener;
 import com.ftloverdrive.event.game.GamePlayerShipChangeEvent;
@@ -153,14 +154,14 @@ public class ShipActor extends ModelActor
 		if ( e.getModelRefId() != modelRefId ) return;
 
 		ShipModel shipModel = context.getReferenceManager().getObject( modelRefId, ShipModel.class );
-		if ( e.getPropertyType() == ShipPropertyEvent.INT_TYPE ) {
+		if ( e.getPropertyType() == PropertyEvent.INT_TYPE ) {
 			if ( OVDConstants.SHIELD.equals( e.getPropertyKey() ) || OVDConstants.SHIELD_MAX.equals( e.getPropertyKey() ) ) {
 				if ( e.getIntValue() > 0 ) {
 					int shield = shipModel.getProperties().getInt( OVDConstants.SHIELD );
 					int shieldMax = shipModel.getProperties().getInt( OVDConstants.SHIELD_MAX );
 					if ( shield < shieldMax ) {
 						ShipPropertyEvent event = Pools.get( ShipPropertyEvent.class ).obtain();
-						event.init( modelRefId, ShipPropertyEvent.INT_TYPE, ShipPropertyEvent.INCREMENT_ACTION, OVDConstants.SHIELD, 1 );
+						event.init( modelRefId, PropertyEvent.INCREMENT_ACTION, OVDConstants.SHIELD, 1 );
 						context.getScreenEventManager().postDelayedEvent( event, 3 );
 					}
 				}

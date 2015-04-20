@@ -9,6 +9,7 @@ import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.IntMap;
 import com.ftloverdrive.core.OverdriveContext;
+import com.ftloverdrive.event.PropertyEvent;
 import com.ftloverdrive.event.local.LocalActorClickedListener;
 import com.ftloverdrive.event.ship.DoorPropertyListener;
 import com.ftloverdrive.event.ship.ShipPropertyEvent;
@@ -103,7 +104,7 @@ public class ShipDoorsActor extends Group
 	public void shipPropertyChanged( OverdriveContext context, ShipPropertyEvent e ) {
 		if ( e.getModelRefId() != shipModelRefId ) return;
 
-		if ( e.getPropertyType() == ShipPropertyEvent.INT_TYPE ) {
+		if ( e.getPropertyType() == PropertyEvent.INT_TYPE ) {
 			if ( OVDConstants.DOOR_LEVEL.equals( e.getPropertyKey() ) ) {
 				updateDoorsInfo( context );
 			}

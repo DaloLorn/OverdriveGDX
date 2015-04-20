@@ -60,32 +60,32 @@ public abstract class PropertyEvent extends AbstractOVDEvent implements Poolable
 	/**
 	 * Pseudo-constructor for an integer property change.
 	 */
-	public void init( int modelRefId, int propertyType, int action, String propertyKey, int intValue ) {
-		init( modelRefId, propertyType, action, propertyKey );
+	public void init( int modelRefId, int action, String propertyKey, int intValue ) {
+		init( modelRefId, INT_TYPE, action, propertyKey );
 		this.intValue = intValue;
 	}
 
 	/**
 	 * Pseudo-constructor for a float property change.
 	 */
-	public void init( int modelRefId, int propertyType, int action, String propertyKey, float floatValue ) {
-		init( modelRefId, propertyType, action, propertyKey );
+	public void init( int modelRefId, int action, String propertyKey, float floatValue ) {
+		init( modelRefId, FLOAT_TYPE, action, propertyKey );
 		this.floatValue = floatValue;
 	}
 
 	/**
 	 * Pseudo-constructor for a boolean property change.
 	 */
-	public void init( int modelRefId, int propertyType, int action, String propertyKey, boolean boolValue ) {
-		init( modelRefId, propertyType, action, propertyKey );
+	public void init( int modelRefId, int action, String propertyKey, boolean boolValue ) {
+		init( modelRefId, BOOL_TYPE, action, propertyKey );
 		this.boolValue = boolValue;
 	}
 
 	/**
 	 * Pseudo-constructor for a string property change.
 	 */
-	public void init( int modelRefId, int propertyType, int action, String propertyKey, String stringValue ) {
-		init( modelRefId, propertyType, action, propertyKey );
+	public void init( int modelRefId, int action, String propertyKey, String stringValue ) {
+		init( modelRefId, STRING_TYPE, action, propertyKey );
 		this.stringValue = stringValue;
 	}
 

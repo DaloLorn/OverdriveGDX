@@ -13,6 +13,7 @@ import com.badlogic.gdx.utils.Pools;
 import com.ftloverdrive.command.DoorToggleCommand;
 import com.ftloverdrive.command.ModelCommand;
 import com.ftloverdrive.core.OverdriveContext;
+import com.ftloverdrive.event.PropertyEvent;
 import com.ftloverdrive.event.local.LocalActorClickedEvent;
 import com.ftloverdrive.event.local.LocalActorClickedListener;
 import com.ftloverdrive.event.ship.DoorPropertyEvent;
@@ -144,13 +145,13 @@ public class DoorActor extends ModelActor
 			if ( curHealth <= 0 ) {
 				// Open the door
 				DoorPropertyEvent ev = Pools.get( DoorPropertyEvent.class ).obtain();
-				ev.init( modelRefId, DoorPropertyEvent.BOOL_TYPE, DoorPropertyEvent.SET_ACTION, OVDConstants.DOOR_OPEN, true );
+				ev.init( modelRefId, PropertyEvent.SET_ACTION, OVDConstants.DOOR_OPEN, true );
 				ev.setSource( context.getNetManager().getLocalPlayerRefId() );
 				context.getScreenEventManager().postDelayedEvent( ev );
 
 				// Lock it in that state
 				ev = Pools.get( DoorPropertyEvent.class ).obtain();
-				ev.init( modelRefId, DoorPropertyEvent.BOOL_TYPE, DoorPropertyEvent.SET_ACTION, OVDConstants.DOOR_LOCKED, true );
+				ev.init( modelRefId, PropertyEvent.SET_ACTION, OVDConstants.DOOR_LOCKED, true );
 				ev.setSource( context.getNetManager().getLocalPlayerRefId() );
 				context.getScreenEventManager().postDelayedEvent( ev );
 			}
@@ -158,7 +159,7 @@ public class DoorActor extends ModelActor
 					doorModel.getProperties().getBool( OVDConstants.DOOR_LOCKED ) ) {
 				// Unlock the door
 				DoorPropertyEvent ev = Pools.get( DoorPropertyEvent.class ).obtain();
-				ev.init( modelRefId, DoorPropertyEvent.BOOL_TYPE, DoorPropertyEvent.SET_ACTION, OVDConstants.DOOR_LOCKED, false );
+				ev.init( modelRefId, PropertyEvent.SET_ACTION, OVDConstants.DOOR_LOCKED, false );
 				ev.setSource( context.getNetManager().getLocalPlayerRefId() );
 				context.getScreenEventManager().postDelayedEvent( ev );
 			}
@@ -192,7 +193,7 @@ public class DoorActor extends ModelActor
 				// TODO: Remove this entire if case, used only for testing
 				DoorPropertyEvent ev = Pools.get( DoorPropertyEvent.class ).obtain();
 				// ev.init( target.getDoorModel(), DoorPropertyEvent.INT_TYPE, DoorPropertyEvent.INCREMENT_ACTION, OVDConstants.DOOR_HEALTH, -50 );
-				ev.init( target.getModelRefId(), DoorPropertyEvent.INT_TYPE, DoorPropertyEvent.INCREMENT_ACTION, OVDConstants.DOOR_ANIM_SPEC, 0 );
+				ev.init( target.getModelRefId(), PropertyEvent.INCREMENT_ACTION, OVDConstants.DOOR_ANIM_SPEC, 0 );
 				context.getScreenEventManager().postDelayedEvent( ev );
 			}
 		}

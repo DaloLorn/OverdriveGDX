@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.utils.Disposable;
 import com.ftloverdrive.core.OverdriveContext;
+import com.ftloverdrive.event.PropertyEvent;
 import com.ftloverdrive.event.game.GamePlayerShipChangeEvent;
 import com.ftloverdrive.event.game.GamePlayerShipChangeListener;
 import com.ftloverdrive.event.ship.ShipPropertyEvent;
@@ -96,7 +97,7 @@ public class PlayerShipHullMonitor extends Actor implements Disposable, GamePlay
 	public void shipPropertyChanged( OverdriveContext context, ShipPropertyEvent e ) {
 		if ( e.getModelRefId() != shipModelRefId ) return;
 
-		if ( e.getPropertyType() == ShipPropertyEvent.INT_TYPE ) {
+		if ( e.getPropertyType() == PropertyEvent.INT_TYPE ) {
 			if ( OVDConstants.HULL.equals( e.getPropertyKey() ) || OVDConstants.HULL_MAX.equals( e.getPropertyKey() ) ) {
 				updateShipInfo( context );
 			}

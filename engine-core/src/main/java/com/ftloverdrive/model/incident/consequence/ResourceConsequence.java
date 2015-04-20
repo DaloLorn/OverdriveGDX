@@ -7,6 +7,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.Pools;
 import com.ftloverdrive.core.OverdriveContext;
+import com.ftloverdrive.event.PropertyEvent;
 import com.ftloverdrive.event.ship.ShipPropertyEvent;
 import com.ftloverdrive.model.AbstractOVDModel;
 import com.ftloverdrive.model.GameModel;
@@ -90,7 +91,7 @@ public class ResourceConsequence extends AbstractOVDModel implements Consequence
 		int shipRefId = game.getPlayerShip( targetPlayerRefId );
 
 		ShipPropertyEvent event = Pools.get( ShipPropertyEvent.class ).obtain();
-		event.init( shipRefId, ShipPropertyEvent.INT_TYPE, ShipPropertyEvent.INCREMENT_ACTION, resourceId, amount );
+		event.init( shipRefId, PropertyEvent.INCREMENT_ACTION, resourceId, amount );
 		context.getScreenEventManager().postDelayedEvent( event );
 	}
 

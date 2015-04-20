@@ -4,6 +4,7 @@ import com.badlogic.gdx.utils.Pools;
 import com.ftloverdrive.core.OverdriveContext;
 import com.ftloverdrive.event.OVDEvent;
 import com.ftloverdrive.event.OVDEventHandler;
+import com.ftloverdrive.event.PropertyEvent;
 import com.ftloverdrive.event.player.CrewMoveOrderEvent;
 import com.ftloverdrive.event.player.OrderListener;
 import com.ftloverdrive.event.ship.ShipCreationEvent;
@@ -93,13 +94,13 @@ public class ShipEventHandler implements OVDEventHandler {
 
 			int shipRefId = event.getModelRefId();
 			ShipModel shipModel = context.getReferenceManager().getObject( shipRefId, ShipModel.class );
-			if ( event.getPropertyType() == ShipPropertyEvent.INT_TYPE ) {
-				if ( event.getAction() == ShipPropertyEvent.SET_ACTION ) {
+			if ( event.getPropertyType() == PropertyEvent.INT_TYPE ) {
+				if ( event.getAction() == PropertyEvent.SET_ACTION ) {
 					int value = event.getIntValue();
 					String key = event.getPropertyKey();
 					shipModel.getProperties().setInt( key, value );
 				}
-				else if ( event.getAction() == ShipPropertyEvent.INCREMENT_ACTION ) {
+				else if ( event.getAction() == PropertyEvent.INCREMENT_ACTION ) {
 					int value = event.getIntValue();
 					String key = event.getPropertyKey();
 					shipModel.getProperties().incrementInt( key, value );

@@ -13,6 +13,7 @@ import com.ftloverdrive.blueprint.incident.IncidentBlueprint;
 import com.ftloverdrive.blueprint.incident.PlotBranchBlueprint;
 import com.ftloverdrive.blueprint.ship.TestShipBlueprint;
 import com.ftloverdrive.core.OverdriveContext;
+import com.ftloverdrive.event.PropertyEvent;
 import com.ftloverdrive.event.engine.TickEvent;
 import com.ftloverdrive.event.engine.TickListener;
 import com.ftloverdrive.event.game.GamePlayerShipChangeEvent;
@@ -229,7 +230,7 @@ public class TestScreen extends BaseScreen {
 						int hullMax = shipModel.getProperties().getInt( OVDConstants.HULL_MAX );
 						if ( hull < hullMax ) {
 							ShipPropertyEvent event = Pools.get( ShipPropertyEvent.class ).obtain();
-							event.init( shipRefId, ShipPropertyEvent.INT_TYPE, ShipPropertyEvent.INCREMENT_ACTION, OVDConstants.HULL, 1 );
+							event.init( shipRefId, PropertyEvent.INCREMENT_ACTION, OVDConstants.HULL, 1 );
 							context.getScreenEventManager().postDelayedEvent( event );
 						}
 					}

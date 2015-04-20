@@ -2,13 +2,16 @@ package com.ftloverdrive.command;
 
 import com.badlogic.gdx.utils.Pools;
 import com.ftloverdrive.core.OverdriveContext;
+import com.ftloverdrive.event.PropertyEvent;
 import com.ftloverdrive.event.ship.DoorPropertyEvent;
 import com.ftloverdrive.model.GameModel;
 import com.ftloverdrive.model.ship.DoorModel;
 import com.ftloverdrive.model.ship.ShipModel;
 import com.ftloverdrive.util.OVDConstants;
 
+
 public class DoorToggleCommand implements ModelCommand {
+
 	private int targetRefId = -1;
 	private int sourceRefId = -1;
 
@@ -25,10 +28,9 @@ public class DoorToggleCommand implements ModelCommand {
 		// TODO: Verification should be performed by the server
 		if ( !verify( context ) )
 			return;
-	
+
 		DoorPropertyEvent ev = Pools.get( DoorPropertyEvent.class ).obtain();
-		ev.init( targetRefId, DoorPropertyEvent.BOOL_TYPE,
-				DoorPropertyEvent.TOGGLE_ACTION, OVDConstants.DOOR_OPEN, false );
+		ev.init( targetRefId, PropertyEvent.TOGGLE_ACTION, OVDConstants.DOOR_OPEN, false );
 		ev.setSource( sourceRefId );
 		context.getScreenEventManager().postDelayedEvent( ev );
 	}

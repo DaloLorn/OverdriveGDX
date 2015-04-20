@@ -3,6 +3,7 @@ package com.ftloverdrive.model.ship;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Pools;
 import com.ftloverdrive.core.OverdriveContext;
+import com.ftloverdrive.event.PropertyEvent;
 import com.ftloverdrive.event.ship.ShipPropertyEvent;
 import com.ftloverdrive.io.ImageSpec;
 import com.ftloverdrive.model.AbstractOVDModel;
@@ -260,17 +261,17 @@ public class AbstractShipModel extends AbstractOVDModel implements ShipModel {
 		if ( shields > 0 ) {
 			if ( shields == getProperties().getInt( OVDConstants.SHIELD_MAX ) ) {
 				ShipPropertyEvent event = Pools.get( ShipPropertyEvent.class ).obtain();
-				event.init( selfRefId, ShipPropertyEvent.INT_TYPE, ShipPropertyEvent.INCREMENT_ACTION, OVDConstants.SHIELD, 1 );
+				event.init( selfRefId, PropertyEvent.INCREMENT_ACTION, OVDConstants.SHIELD, 1 );
 				context.getScreenEventManager().postDelayedEvent( event, 3 );
 			}
 
 			ShipPropertyEvent event = Pools.get( ShipPropertyEvent.class ).obtain();
-			event.init( selfRefId, ShipPropertyEvent.INT_TYPE, ShipPropertyEvent.INCREMENT_ACTION, OVDConstants.SHIELD, -1 );
+			event.init( selfRefId, PropertyEvent.INCREMENT_ACTION, OVDConstants.SHIELD, -1 );
 			context.getScreenEventManager().postDelayedEvent( event );
 		}
 		else {
 			ShipPropertyEvent event = Pools.get( ShipPropertyEvent.class ).obtain();
-			event.init( selfRefId, ShipPropertyEvent.INT_TYPE, ShipPropertyEvent.INCREMENT_ACTION, OVDConstants.HULL, -value );
+			event.init( selfRefId, PropertyEvent.INCREMENT_ACTION, OVDConstants.HULL, -value );
 			context.getScreenEventManager().postDelayedEvent( event );
 		}
 	}

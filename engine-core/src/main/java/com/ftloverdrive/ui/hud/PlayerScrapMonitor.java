@@ -7,6 +7,7 @@ import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.utils.Align;
 import com.badlogic.gdx.utils.Disposable;
 import com.ftloverdrive.core.OverdriveContext;
+import com.ftloverdrive.event.PropertyEvent;
 import com.ftloverdrive.event.game.GamePlayerShipChangeEvent;
 import com.ftloverdrive.event.game.GamePlayerShipChangeListener;
 import com.ftloverdrive.event.ship.ShipPropertyEvent;
@@ -83,7 +84,7 @@ public class PlayerScrapMonitor extends Group implements Disposable, GamePlayerS
 	public void shipPropertyChanged( OverdriveContext context, ShipPropertyEvent e ) {
 		if ( e.getModelRefId() != shipModelRefId ) return;
 
-		if ( e.getPropertyType() == ShipPropertyEvent.INT_TYPE ) {
+		if ( e.getPropertyType() == PropertyEvent.INT_TYPE ) {
 			if ( OVDConstants.SCRAP.equals( e.getPropertyKey() ) ) {
 				updateShipInfo( context );
 			}
