@@ -2,7 +2,6 @@ package com.ftloverdrive.ui.ship;
 
 import com.badlogic.gdx.Input.Buttons;
 import com.badlogic.gdx.assets.AssetManager;
-import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.NinePatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
@@ -41,7 +40,6 @@ public class ShipFloorTilesActor extends Group
 		assetManager.finishLoading();
 	}
 
-
 	/**
 	 * Sets a new tile size (default: 35).
 	 *
@@ -50,13 +48,6 @@ public class ShipFloorTilesActor extends Group
 	public void setTileSize( float n ) {
 		tileSize = n;
 	}
-
-
-	@Override
-	public void draw( Batch batch, float parentAlpha ) {
-		super.draw( batch, parentAlpha );
-	}
-
 
 	protected float calcTileX( ShipCoordinate coord ) {
 		return ( coord.x * tileSize );
@@ -77,7 +68,7 @@ public class ShipFloorTilesActor extends Group
 	 * Adds a tile to represent a ShipCoordinate.
 	 */
 	public void addTile( ShipCoordinate coord ) {
-		if ( coord.v != ShipCoordinate.TYPE_SQUARE ) return;
+		if ( !coord.isSquare() ) return;
 
 		TextureAtlas floorAtlas = assetManager.get( OVDConstants.FLOORPLAN_ATLAS, TextureAtlas.class );
 

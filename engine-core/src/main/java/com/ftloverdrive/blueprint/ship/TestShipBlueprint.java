@@ -95,9 +95,10 @@ public class TestShipBlueprint extends ShipBlueprint {
 
 		// Non-rectangular room test
 		roomRefId = context.getNetManager().requestNewRefId();
-		String roomLayout =
+		String roomLayout = "" +
 				"d=w" + "\n" +
-						"  c";
+				"  c";
+
 		roomCoords = ShipLayout.createRoomCoords( 8, 1, roomLayout );
 
 		ShipRoomCreationEvent roomCreateEvent = Pools.get( ShipRoomCreationEvent.class ).obtain();
@@ -107,6 +108,11 @@ public class TestShipBlueprint extends ShipBlueprint {
 		ShipLayoutRoomAddEvent roomAddEvent = Pools.get( ShipLayoutRoomAddEvent.class ).obtain();
 		roomAddEvent.init( shipRefId, roomRefId, roomCoords );
 		context.getScreenEventManager().postDelayedEvent( roomAddEvent );
+
+		// =======
+		// Systems
+
+		// TODO
 
 		// =====
 		// Doors
@@ -201,7 +207,9 @@ public class TestShipBlueprint extends ShipBlueprint {
 		}
 		tpadRefIds.clear();
 
-		// TODO Test crew code
+		// ====
+		// Crew
+
 		int crewRefId = context.getNetManager().requestNewRefId();
 		ShipCrewCreationEvent crewCreateEvent = Pools.get( ShipCrewCreationEvent.class ).obtain();
 		crewCreateEvent.init( crewRefId );

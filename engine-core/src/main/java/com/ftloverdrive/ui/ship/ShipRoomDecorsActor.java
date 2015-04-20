@@ -1,7 +1,6 @@
 package com.ftloverdrive.ui.ship;
 
 import com.badlogic.gdx.assets.AssetManager;
-import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.math.Rectangle;
@@ -45,13 +44,6 @@ public class ShipRoomDecorsActor extends Group implements Disposable {
 		tileSize = n;
 	}
 
-
-	@Override
-	public void draw( Batch batch, float parentAlpha ) {
-		super.draw( batch, parentAlpha );
-	}
-
-
 	protected float calcTileX( ShipCoordinate coord ) {
 		return ( coord.x * tileSize );
 	}
@@ -75,7 +67,8 @@ public class ShipRoomDecorsActor extends Group implements Disposable {
 			Rectangle tmpRect = new Rectangle( calcTileX( coord ), calcTileY( coord ), tileSize, tileSize );
 			if ( decorBounds == null ) {
 				decorBounds = tmpRect;
-			} else {
+			}
+			else {
 				decorBounds.merge( tmpRect );
 			}
 		}
