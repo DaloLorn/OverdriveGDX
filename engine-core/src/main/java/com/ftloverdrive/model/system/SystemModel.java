@@ -1,9 +1,12 @@
 package com.ftloverdrive.model.system;
 
+import com.ftloverdrive.model.Damagable;
+import com.ftloverdrive.model.NamedProperties;
+import com.ftloverdrive.model.OVDModel;
 import com.ftloverdrive.model.Powerable;
 
 
-public interface SystemModel extends Powerable {
+public interface SystemModel extends OVDModel, Powerable, Damagable {
 	/*
 	 * KF:
 	 * - multiple systems of the same type (eg. pilot) assigned to different rooms,
@@ -29,4 +32,11 @@ public interface SystemModel extends Powerable {
 	 */
 
 	//TODO: Getters for upgrade costs/descriptions/limits.
+
+	public NamedProperties getProperties();
+	
+	/**
+	 * Could instead return ImageSpec?
+	 */
+	public String getIconName();
 }

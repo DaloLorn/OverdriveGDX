@@ -27,6 +27,7 @@ import com.ftloverdrive.io.ImageSpec;
 import com.ftloverdrive.model.ship.RoomModel;
 import com.ftloverdrive.model.ship.ShipCoordinate;
 import com.ftloverdrive.model.ship.ShipModel;
+import com.ftloverdrive.model.system.SystemModel;
 import com.ftloverdrive.ui.ModelActor;
 import com.ftloverdrive.util.OVDConstants;
 
@@ -51,6 +52,7 @@ public class ShipActor extends ModelActor
 	protected ShipRoomDecorsActor roomDecors;
 	protected ShipWallLinesActor wallLines;
 	protected ShipDoorsActor doorGroup;
+	protected ShipSystemIconsActor systemIcons;
 	protected Group tpadGroup;
 	protected Group crewGroup;
 
@@ -129,6 +131,10 @@ public class ShipActor extends ModelActor
 		crewGroup = new Group();
 		crewGroup.setTouchable( Touchable.childrenOnly );
 		shipFloorplanGroup.addActor( crewGroup );
+
+		systemIcons = new ShipSystemIconsActor( context );
+		systemIcons.setTouchable( Touchable.disabled );
+		shipFloorplanGroup.addActor( systemIcons );
 	}
 
 
@@ -217,6 +223,9 @@ public class ShipActor extends ModelActor
 
 			crewGroup.clear();
 			crewGroup.setSize( 0, 0 );
+
+			systemIcons.clear();
+			systemIcons.setSize( 0, 0 );
 
 			this.setSize( 0, 0 );
 		}
@@ -378,6 +387,18 @@ public class ShipActor extends ModelActor
 
 				context.getScreenEventManager().addEventListener( crewActor, LocalActorClickedListener.class );
 				context.getScreenEventManager().addEventListener( crewActor, OrderListener.class );
+			}
+
+			systemIcons.clear();
+			systemIcons.setSize( shipModel.getHullWidth(), shipModel.getHullHeight() );
+			systemIcons.setTileSize( 35 );
+			for ( IntMap.Keys it = shipModel.getLayout().systemRefIds(); it.hasNext; ) {
+				int systemRefId = it.next();
+				SystemModel systemModel = context.getReferenceManager().getObject( systemRefId, SystemModel.class );
+				String iconName = systemModel.getIconName();
+				if ( iconName == null ) continue;
+
+				systemIcons.addSystemIcon( shipModel.getLayout().getSystemCoords( systemRefId ), 0, 0, iconName );
 			}
 		}
 	}

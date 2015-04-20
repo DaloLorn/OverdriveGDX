@@ -1,12 +1,14 @@
 package com.ftloverdrive.model;
 
+import com.ftloverdrive.core.OverdriveContext;
+
 
 public interface Powerable {
 
 	/**
 	 * Sets the number of power bars this is currently using.
 	 */
-	public void setCurrentPower( int n );
+	public void setCurrentPower( OverdriveContext context, int n );
 
 	public int getCurrentPower();
 

@@ -20,28 +20,43 @@ import com.ftloverdrive.core.OverdriveContext;
 public class ShipLayout {
 
 	protected Set<ShipCoordinate> allShipCoords;
+
 	protected ObjectIntMap<ShipCoordinate> coordToRoomRefIdMap;
 	protected IntMap<ShipCoordinate[]> roomRefIdToCoordsMap;
+	protected IntMap<ShipCoordinate> roomRefIdToIconCoordsMap;
+
 	protected ObjectIntMap<ShipCoordinate> coordToDoorRefIdMap;
 	protected IntMap<ShipCoordinate> doorRefIdToCoordsMap;
+
 	protected ObjectIntMap<ShipCoordinate> coordToTpadRefIdMap;
 	protected IntMap<ShipCoordinate> tpadRefIdToCoordsMap;
+
 	protected ObjectIntMap<ShipCoordinate> coordToCrewRefIdMap;
 	protected IntMap<ShipCoordinate> crewRefIdToCoordsMap;
+
+	protected ObjectIntMap<ShipCoordinate> coordToSystemRefIdMap;
+	protected IntMap<ShipCoordinate> systemRefIdToCoordsMap;
 
 
 	public ShipLayout() {
 		allShipCoords = new HashSet<ShipCoordinate>();
+
 		coordToRoomRefIdMap = new ObjectIntMap<ShipCoordinate>();
 		roomRefIdToCoordsMap = new IntMap<ShipCoordinate[]>();
+		roomRefIdToIconCoordsMap = new IntMap<ShipCoordinate>();
+
 		coordToDoorRefIdMap = new ObjectIntMap<ShipCoordinate>();
 		doorRefIdToCoordsMap = new IntMap<ShipCoordinate>();
+
 		coordToTpadRefIdMap = new ObjectIntMap<ShipCoordinate>();
 		tpadRefIdToCoordsMap = new IntMap<ShipCoordinate>();
+
 		coordToCrewRefIdMap = new ObjectIntMap<ShipCoordinate>();
 		crewRefIdToCoordsMap = new IntMap<ShipCoordinate>();
-	}
 
+		coordToSystemRefIdMap = new ObjectIntMap<ShipCoordinate>();
+		systemRefIdToCoordsMap = new IntMap<ShipCoordinate>();
+	}
 
 	/**
 	 * Associates a RoomModel with ShipCoordinates of squares and walls.
@@ -52,6 +67,29 @@ public class ShipLayout {
 			coordToRoomRefIdMap.put( tmpCoord, roomModelRefId );
 		}
 		roomRefIdToCoordsMap.put( roomModelRefId, roomCoords );
+	}
+
+	/**
+	 * Sets the ShipCoordinate as the location at which the system icon will be displayed.
+	 * The coord will then be used by any system that is assigned to this room.
+	 * 
+	 * TODO: Need a way to pass fractional values (since icons can be placed between two/four tiles)
+	 * 
+	 * @param roomModelRefId
+	 * @param iconCoord
+	 *            coord at which the icon will be placed. Has to be part of the room.
+	 */
+	public void addRoomSystemIcon( int roomModelRefId, ShipCoordinate iconCoord ) {
+		ShipCoordinate[] coords = getRoomCoords( roomModelRefId );
+		boolean found = false;
+		for ( ShipCoordinate coord : coords ) {
+			found = coord.equals( iconCoord );
+			if ( found )
+				break;
+		}
+		if ( !found )
+			throw new IllegalArgumentException();
+		roomRefIdToIconCoordsMap.put( roomModelRefId, iconCoord );
 	}
 
 	public void addDoor( int doorModelRefId, ShipCoordinate doorCoords ) {
@@ -66,11 +104,23 @@ public class ShipLayout {
 		coordToTpadRefIdMap.put( tpadCoords, tpadModelRefId );
 	}
 
+	/**
+	 * Places the CrewModel at the specified coords within the ship layout.
+	 * Useful when moving crew between ships, eg. when boarding.
+	 */
 	public void placeCrew( int crewModelRefId, ShipCoordinate crewCoords ) {
+		if ( !allShipCoords.contains( crewCoords ) )
+			throw new IllegalArgumentException(); // TODO
+		// Crew can only be placed on an existing tile, so don't add the tile to the set.
 		crewRefIdToCoordsMap.put( crewModelRefId, crewCoords );
 		coordToCrewRefIdMap.put( crewCoords, crewModelRefId );
 	}
 
+	public void addSystem( int roomModelRefId, int systemModelRefId ) {
+		ShipCoordinate iconCoord = roomRefIdToIconCoordsMap.get( roomModelRefId );
+		systemRefIdToCoordsMap.put( systemModelRefId, iconCoord );
+		coordToSystemRefIdMap.put( iconCoord, systemModelRefId );
+	}
 
 	/**
 	 * Returns the ShipCoordinates for squares and walls of a room.
@@ -98,6 +148,10 @@ public class ShipLayout {
 	 */
 	public ShipCoordinate getCrewCoords( int crewModelRefId ) {
 		return crewRefIdToCoordsMap.get( crewModelRefId );
+	}
+
+	public ShipCoordinate getSystemCoords( int sysModelRefId ) {
+		return systemRefIdToCoordsMap.get( sysModelRefId );
 	}
 
 	/**
@@ -163,6 +217,10 @@ public class ShipLayout {
 
 	public IntMap.Keys crewRefIds() {
 		return crewRefIdToCoordsMap.keys();
+	}
+
+	public IntMap.Keys systemRefIds() {
+		return systemRefIdToCoordsMap.keys();
 	}
 
 	/**
