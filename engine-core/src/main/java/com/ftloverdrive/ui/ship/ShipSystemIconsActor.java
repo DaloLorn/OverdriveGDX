@@ -37,18 +37,15 @@ public class ShipSystemIconsActor extends Group
 		tileSize = n;
 	}
 
-	protected float calcTileX( ShipCoordinate coord ) {
-		return coord.x * tileSize;
+	protected float calcTileX( int x ) {
+		return x * tileSize;
 	}
 
-	protected float calcTileY( ShipCoordinate coord ) {
-		return getHeight() - ( coord.y * tileSize );
+	protected float calcTileY( int y ) {
+		return getHeight() - ( y * tileSize );
 	}
 
 	/**
-	 * 
-	 * @param coord
-	 *            the coordinate above which the icon is to be placed
 	 * @param x
 	 *            x offset from the coordinate's top-left corner
 	 * @param y
@@ -56,13 +53,16 @@ public class ShipSystemIconsActor extends Group
 	 * @param iconName
 	 *            name of the texture region in the icons atlas
 	 */
-	public void addSystemIcon( ShipCoordinate coord, float x, float y, String iconName ) {
+	public void addSystemIcon( float x, float y, String iconName ) {
 		TextureAtlas iconAtlas = assetManager.get( OVDConstants.ICONS_ATLAS, TextureAtlas.class );
 		TextureRegion iconRegion = iconAtlas.findRegion( iconName );
 
 		Image iconImage = new Image( iconRegion );
-		iconImage.setPosition( calcTileX( coord ) + x, calcTileY( coord ) + y );
-		iconImage.setSize( iconImage.getMinWidth(), iconImage.getMinHeight() );
+		int xCoord = (int)x;
+		int yCoord = (int)y;
+		x -= xCoord;
+		y -= yCoord;
+		iconImage.setPosition( calcTileX( xCoord ) + x, calcTileY( yCoord ) + y );
 		addActor( iconImage );
 	}
 

@@ -1,5 +1,6 @@
 package com.ftloverdrive.event.handler;
 
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Pools;
 import com.ftloverdrive.core.OverdriveContext;
 import com.ftloverdrive.event.OVDEvent;
@@ -23,8 +24,8 @@ import com.ftloverdrive.event.ship.ShipPropertyListener;
 import com.ftloverdrive.event.ship.ShipRoomCreationEvent;
 import com.ftloverdrive.event.ship.ShipRoomImageChangeEvent;
 import com.ftloverdrive.event.ship.ShipSystemAddEvent;
-import com.ftloverdrive.event.ship.ShipSystemCreationEvent;
 import com.ftloverdrive.event.ship.ShipTeleportPadCreationEvent;
+import com.ftloverdrive.event.ship.ShipSystemCreationEvent;
 import com.ftloverdrive.io.ImageSpec;
 import com.ftloverdrive.model.ship.CrewModel;
 import com.ftloverdrive.model.ship.DefaultCrewModel;
@@ -37,6 +38,7 @@ import com.ftloverdrive.model.ship.ShipCoordinate;
 import com.ftloverdrive.model.ship.ShipModel;
 import com.ftloverdrive.model.ship.TeleportPadModel;
 import com.ftloverdrive.model.ship.TestShipModel;
+import com.ftloverdrive.model.system.ShieldSystemModel;
 import com.ftloverdrive.model.system.SystemModel;
 
 
@@ -154,7 +156,7 @@ public class ShipEventHandler implements OVDEventHandler {
 			shipModel.getLayout().addRoom( roomRefId, roomCoords );
 
 			ShipCoordinate defaultIconCoord = roomCoords[0];
-			shipModel.getLayout().addRoomSystemIcon( roomRefId, defaultIconCoord );
+			shipModel.getLayout().setRoomSystemIcon( roomRefId, new Vector2( defaultIconCoord.x, defaultIconCoord.y ) );
 
 			for ( int i = listeners.length - 2; i >= 0; i -= 2 ) {
 				if ( listeners[i] == ShipLayoutListener.class )
@@ -227,13 +229,13 @@ public class ShipEventHandler implements OVDEventHandler {
 
 			int shipRefId = event.getShipRefId();
 			ShipModel shipModel = context.getReferenceManager().getObject( shipRefId, ShipModel.class );
-			shipModel.getLayout().addRoomSystemIcon( event.getRoomRefId(), event.getIconCoords() );
+			shipModel.getLayout().setRoomSystemIcon( event.getRoomRefId(), event.getIconOffset() );
 		}
 		else if ( e instanceof ShipSystemCreationEvent ) {
 			ShipSystemCreationEvent event = (ShipSystemCreationEvent)e;
 
 			int systemRefId = event.getSystemRefId();
-			SystemModel sysModel = null; // TODO: Create the default model or something.
+			SystemModel sysModel = new ShieldSystemModel(); // TODO: Default system model, or something.
 			context.getReferenceManager().addObject( sysModel, systemRefId );
 		}
 		else if ( e instanceof ShipSystemAddEvent ) {
@@ -241,7 +243,7 @@ public class ShipEventHandler implements OVDEventHandler {
 
 			int shipRefId = event.getShipRefId();
 			ShipModel shipModel = context.getReferenceManager().getObject( shipRefId, ShipModel.class );
-			shipModel.getLayout().addSystem( event.getRoomRefId(), event.getSystemRefId() );
+			shipModel.getLayout().setSystemRoom( event.getSystemRefId(), event.getRoomRefId() );
 		}
 
 		// ==============================================================================================

@@ -11,9 +11,11 @@ import com.ftloverdrive.event.ship.ShipLayoutConnectTeleportPadsEvent;
 import com.ftloverdrive.event.ship.ShipLayoutCrewPlacementEvent;
 import com.ftloverdrive.event.ship.ShipLayoutDoorAddEvent;
 import com.ftloverdrive.event.ship.ShipLayoutRoomAddEvent;
+import com.ftloverdrive.event.ship.ShipLayoutSystemIconAddEvent;
 import com.ftloverdrive.event.ship.ShipLayoutTeleportPadAddEvent;
 import com.ftloverdrive.event.ship.ShipRoomCreationEvent;
 import com.ftloverdrive.event.ship.ShipRoomImageChangeEvent;
+import com.ftloverdrive.event.ship.ShipSystemAddEvent;
 import com.ftloverdrive.event.ship.ShipTeleportPadCreationEvent;
 import com.ftloverdrive.io.ImageSpec;
 import com.ftloverdrive.model.ship.ShipCoordinate;
@@ -91,6 +93,10 @@ public class TestShipBlueprint extends ShipBlueprint {
 			ShipLayoutRoomAddEvent roomAddEvent = Pools.get( ShipLayoutRoomAddEvent.class ).obtain();
 			roomAddEvent.init( shipRefId, roomRefId, roomCoords );
 			context.getScreenEventManager().postDelayedEvent( roomAddEvent );
+
+			ShipLayoutSystemIconAddEvent iconAddEvent = Pools.get( ShipLayoutSystemIconAddEvent.class ).obtain();
+			iconAddEvent.init( shipRefId, roomRefId, xywh[0] + xywh[2] * 0.5f, xywh[1] + xywh[3] * 0.5f );
+			context.getScreenEventManager().postDelayedEvent( iconAddEvent );
 		}
 
 		// Non-rectangular room test
@@ -109,10 +115,19 @@ public class TestShipBlueprint extends ShipBlueprint {
 		roomAddEvent.init( shipRefId, roomRefId, roomCoords );
 		context.getScreenEventManager().postDelayedEvent( roomAddEvent );
 
+		ShipLayoutSystemIconAddEvent iconAddEvent = Pools.get( ShipLayoutSystemIconAddEvent.class ).obtain();
+		iconAddEvent.init( shipRefId, roomRefId, 10, 1 );
+		context.getScreenEventManager().postDelayedEvent( iconAddEvent );
+
 		// =======
 		// Systems
 
-		// TODO
+		ShieldSystemBlueprint shieldSys = new ShieldSystemBlueprint();
+		int sysRefId = shieldSys.construct( context );
+
+		ShipSystemAddEvent sysAddE = Pools.get( ShipSystemAddEvent.class ).obtain();
+		sysAddE.init( shipRefId, roomRefId, sysRefId );
+		context.getScreenEventManager().postDelayedEvent( sysAddE );
 
 		// =====
 		// Doors

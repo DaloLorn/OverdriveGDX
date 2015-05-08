@@ -23,7 +23,9 @@ public class ShipLayout {
 
 	protected ObjectIntMap<ShipCoordinate> coordToRoomRefIdMap;
 	protected IntMap<ShipCoordinate[]> roomRefIdToCoordsMap;
-	protected IntMap<ShipCoordinate> roomRefIdToIconCoordsMap;
+
+	protected IntMap<Vector2> roomRefIdToIconOffsetMap;
+	protected IntMap<Integer> systemRefIdToRoomRefIdMap;
 
 	protected ObjectIntMap<ShipCoordinate> coordToDoorRefIdMap;
 	protected IntMap<ShipCoordinate> doorRefIdToCoordsMap;
@@ -34,16 +36,15 @@ public class ShipLayout {
 	protected ObjectIntMap<ShipCoordinate> coordToCrewRefIdMap;
 	protected IntMap<ShipCoordinate> crewRefIdToCoordsMap;
 
-	protected ObjectIntMap<ShipCoordinate> coordToSystemRefIdMap;
-	protected IntMap<ShipCoordinate> systemRefIdToCoordsMap;
-
 
 	public ShipLayout() {
 		allShipCoords = new HashSet<ShipCoordinate>();
 
 		coordToRoomRefIdMap = new ObjectIntMap<ShipCoordinate>();
 		roomRefIdToCoordsMap = new IntMap<ShipCoordinate[]>();
-		roomRefIdToIconCoordsMap = new IntMap<ShipCoordinate>();
+
+		roomRefIdToIconOffsetMap = new IntMap<Vector2>();
+		systemRefIdToRoomRefIdMap = new IntMap<Integer>();
 
 		coordToDoorRefIdMap = new ObjectIntMap<ShipCoordinate>();
 		doorRefIdToCoordsMap = new IntMap<ShipCoordinate>();
@@ -53,9 +54,6 @@ public class ShipLayout {
 
 		coordToCrewRefIdMap = new ObjectIntMap<ShipCoordinate>();
 		crewRefIdToCoordsMap = new IntMap<ShipCoordinate>();
-
-		coordToSystemRefIdMap = new ObjectIntMap<ShipCoordinate>();
-		systemRefIdToCoordsMap = new IntMap<ShipCoordinate>();
 	}
 
 	/**
@@ -67,29 +65,6 @@ public class ShipLayout {
 			coordToRoomRefIdMap.put( tmpCoord, roomModelRefId );
 		}
 		roomRefIdToCoordsMap.put( roomModelRefId, roomCoords );
-	}
-
-	/**
-	 * Sets the ShipCoordinate as the location at which the system icon will be displayed.
-	 * The coord will then be used by any system that is assigned to this room.
-	 * 
-	 * TODO: Need a way to pass fractional values (since icons can be placed between two/four tiles)
-	 * 
-	 * @param roomModelRefId
-	 * @param iconCoord
-	 *            coord at which the icon will be placed. Has to be part of the room.
-	 */
-	public void addRoomSystemIcon( int roomModelRefId, ShipCoordinate iconCoord ) {
-		ShipCoordinate[] coords = getRoomCoords( roomModelRefId );
-		boolean found = false;
-		for ( ShipCoordinate coord : coords ) {
-			found = coord.equals( iconCoord );
-			if ( found )
-				break;
-		}
-		if ( !found )
-			throw new IllegalArgumentException();
-		roomRefIdToIconCoordsMap.put( roomModelRefId, iconCoord );
 	}
 
 	public void addDoor( int doorModelRefId, ShipCoordinate doorCoords ) {
@@ -116,10 +91,51 @@ public class ShipLayout {
 		coordToCrewRefIdMap.put( crewCoords, crewModelRefId );
 	}
 
-	public void addSystem( int roomModelRefId, int systemModelRefId ) {
-		ShipCoordinate iconCoord = roomRefIdToIconCoordsMap.get( roomModelRefId );
-		systemRefIdToCoordsMap.put( systemModelRefId, iconCoord );
-		coordToSystemRefIdMap.put( iconCoord, systemModelRefId );
+	/**
+	 * Associates a system model with a room model.
+	 * 
+	 * @param systemModelRefId
+	 *            the refId of the system
+	 * @param roomModelRefId
+	 *            the refId of the room to which the system is assigned.
+	 */
+	public void setSystemRoom( int systemModelRefId, int roomModelRefId ) {
+		systemRefIdToRoomRefIdMap.put( systemModelRefId, roomModelRefId );
+	}
+
+	public void removeSystem( int systemModelRefId ) {
+		systemRefIdToRoomRefIdMap.remove( systemModelRefId );
+	}
+
+	/**
+	 * Returns a set of all system refIds currently assigned to this ship.
+	 */
+	public IntMap.Keys systemRefIds() {
+		return systemRefIdToRoomRefIdMap.keys();
+	}
+
+	/**
+	 * Sets the location at which the system icon will be displayed.
+	 * The location will then be used by any system that is assigned to this room.
+	 * 
+	 * @param roomModelRefId
+	 * @param iconOffset
+	 *            location at which the icon will be placed, in tiles. Fractional values
+	 *            specify positions between tiles.
+	 */
+	public void setRoomSystemIcon( int roomModelRefId, Vector2 iconOffset ) {
+		roomRefIdToIconOffsetMap.put( roomModelRefId, iconOffset );
+	}
+
+	/**
+	 * Returns the location at which the system icon should be displayed.
+	 * Returns null if the system is not assigned to any room in the ship.
+	 */
+	public Vector2 getRoomSystemIcon( int systemModelRefId ) {
+		if ( !systemRefIdToRoomRefIdMap.containsKey( systemModelRefId ) )
+			return null;
+		int roomRefId = systemRefIdToRoomRefIdMap.get( systemModelRefId );
+		return roomRefIdToIconOffsetMap.get( roomRefId );
 	}
 
 	/**
@@ -148,10 +164,6 @@ public class ShipLayout {
 	 */
 	public ShipCoordinate getCrewCoords( int crewModelRefId ) {
 		return crewRefIdToCoordsMap.get( crewModelRefId );
-	}
-
-	public ShipCoordinate getSystemCoords( int sysModelRefId ) {
-		return systemRefIdToCoordsMap.get( sysModelRefId );
 	}
 
 	/**
@@ -217,10 +229,6 @@ public class ShipLayout {
 
 	public IntMap.Keys crewRefIds() {
 		return crewRefIdToCoordsMap.keys();
-	}
-
-	public IntMap.Keys systemRefIds() {
-		return systemRefIdToCoordsMap.keys();
 	}
 
 	/**

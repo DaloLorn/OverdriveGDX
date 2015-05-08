@@ -39,6 +39,7 @@ public class OverdriveServer implements Disposable, FetchRefIdRange {
 
 	private OverdriveContext context;
 
+	/** Determines whether or not the Clock is supposed to be ticking. */
 	private boolean paused = false;
 
 

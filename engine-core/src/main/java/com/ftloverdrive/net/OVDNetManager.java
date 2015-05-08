@@ -3,6 +3,7 @@ package com.ftloverdrive.net;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.IntIntMap;
 import com.esotericsoftware.kryo.Kryo;
@@ -33,11 +34,14 @@ import com.ftloverdrive.event.ship.ShipLayoutConnectTeleportPadsEvent;
 import com.ftloverdrive.event.ship.ShipLayoutCrewPlacementEvent;
 import com.ftloverdrive.event.ship.ShipLayoutDoorAddEvent;
 import com.ftloverdrive.event.ship.ShipLayoutRoomAddEvent;
+import com.ftloverdrive.event.ship.ShipLayoutSystemIconAddEvent;
 import com.ftloverdrive.event.ship.ShipLayoutTeleportPadAddEvent;
 import com.ftloverdrive.event.ship.ShipPropertyEvent;
 import com.ftloverdrive.event.ship.ShipRoomCreationEvent;
 import com.ftloverdrive.event.ship.ShipRoomImageChangeEvent;
+import com.ftloverdrive.event.ship.ShipSystemAddEvent;
 import com.ftloverdrive.event.ship.ShipTeleportPadCreationEvent;
+import com.ftloverdrive.event.ship.ShipSystemCreationEvent;
 import com.ftloverdrive.io.AnimSpec;
 import com.ftloverdrive.io.ImageSpec;
 import com.ftloverdrive.model.DefaultGameModel;
@@ -202,7 +206,11 @@ public class OVDNetManager {
 
 		kryo.register( DefaultGameModel.class );
 		kryo.register( NamedProperties.class );
+
+		// - GDX
 		kryo.register( IntIntMap.class );
+		kryo.register( Vector2.class );
+
 		// Event classes
 		kryo.register( RequestGameStateEvent.class );
 		kryo.register( SignalReadyEvent.class );
@@ -236,5 +244,8 @@ public class OVDNetManager {
 		kryo.register( ShipLayoutRoomAddEvent.class );
 		kryo.register( ShipPropertyEvent.class );
 		kryo.register( ShipRoomImageChangeEvent.class );
+		kryo.register( ShipSystemCreationEvent.class );
+		kryo.register( ShipSystemAddEvent.class );
+		kryo.register( ShipLayoutSystemIconAddEvent.class );
 	}
 }

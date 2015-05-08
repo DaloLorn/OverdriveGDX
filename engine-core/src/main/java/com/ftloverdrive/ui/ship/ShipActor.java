@@ -398,7 +398,8 @@ public class ShipActor extends ModelActor
 				String iconName = systemModel.getIconName();
 				if ( iconName == null ) continue;
 
-				systemIcons.addSystemIcon( shipModel.getLayout().getSystemCoords( systemRefId ), 0, 0, iconName );
+				Vector2 iconOffset = shipModel.getLayout().getRoomSystemIcon( systemRefId );
+				systemIcons.addSystemIcon( iconOffset.x, iconOffset.y, iconName );
 			}
 		}
 	}
