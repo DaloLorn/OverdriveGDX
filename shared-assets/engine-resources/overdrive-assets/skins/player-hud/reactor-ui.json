@@ -1,0 +1,38 @@
+{
+  com.badlogic.gdx.graphics.g2d.BitmapFont: {
+    plot-font-bold: { file: "fonts/JustinFont12Bold.ttf?size=14" }
+  },
+
+  com.badlogic.gdx.graphics.Color: {
+    white: { a: 1, r: 1, g: 1, b: 1 }
+  },
+
+  com.ftloverdrive.ui.DistanceFieldShader: {
+    bold: { smoothing: 0.3f }
+  },
+
+  // Fields the game is hardcoded to look for.
+  // Values can be changed freely, but entry names must remain the same.
+
+  com.ftloverdrive.ui.ShaderLabel$ShaderLabelStyle: {
+    power-text-style: { font: plot-font-bold, fontColor: white, shader: bold }
+  },
+
+  java.lang.Integer: {
+    reactor-max-bars-to-show: 25,
+    power-text-offset-x: -30,
+    power-text-offset-y: 5,
+    reactor-tile-align-y: 11,
+    reactor-tile-overlap-offset: -3,
+    bar-spacing-v: reactor-tile-align-y,
+    bar-align-x: -6,
+    bar-align-y: -2,
+    connector-system-offset-x: 15,
+    system-tile-align-x: 3,
+    system-tile-align-y: 8
+  },
+  
+  java.lang.Float: {
+    unpowered-alpha: 0.5
+  }
+}

@@ -37,6 +37,7 @@ import com.ftloverdrive.ui.ShatteredImage;
 import com.ftloverdrive.ui.hud.PlayerScrapMonitor;
 import com.ftloverdrive.ui.hud.PlayerShipDoorHighlighter;
 import com.ftloverdrive.ui.hud.PlayerShipHullMonitor;
+import com.ftloverdrive.ui.hud.PlayerShipReactorUI;
 import com.ftloverdrive.ui.hud.PlayerShipShieldMonitor;
 import com.ftloverdrive.ui.ship.ShipActor;
 import com.ftloverdrive.util.OVDConstants;
@@ -49,6 +50,7 @@ public class TestScreen extends BaseScreen {
 	private PlayerShipHullMonitor playerShipHullMonitor;
 	private PlayerShipShieldMonitor playerShipShieldMonitor;
 	private PlayerScrapMonitor playerScrapMonitor;
+	private PlayerShipReactorUI playerShipReactor;
 	private PlayerShipDoorHighlighter doorHighlighter;
 	private ShipActor shipActor;
 
@@ -135,6 +137,10 @@ public class TestScreen extends BaseScreen {
 				hudStage.getHeight() - playerScrapMonitor.getHeight() );
 		hudStage.addActor( playerScrapMonitor );
 
+		playerShipReactor = new PlayerShipReactorUI( context );
+		playerShipReactor.setPosition( 40, 5 );
+		hudStage.addActor( playerShipReactor );
+
 		doorHighlighter = new PlayerShipDoorHighlighter( context );
 		doorHighlighter.setVisible( false );
 		hudStage.addActor( doorHighlighter );
@@ -182,6 +188,8 @@ public class TestScreen extends BaseScreen {
 		eventManager.addEventListener( playerShipShieldMonitor, ShipPropertyListener.class );
 		eventManager.addEventListener( playerScrapMonitor, GamePlayerShipChangeListener.class );
 		eventManager.addEventListener( playerScrapMonitor, ShipPropertyListener.class );
+		eventManager.addEventListener( playerShipReactor, GamePlayerShipChangeListener.class );
+		eventManager.addEventListener( playerShipReactor, ShipPropertyListener.class );
 
 		eventManager.addEventListener( shipActor, GamePlayerShipChangeListener.class );
 		eventManager.addEventListener( shipActor, ShipPropertyListener.class );

@@ -25,7 +25,7 @@ import com.ftloverdrive.event.ship.ShipRoomCreationEvent;
 import com.ftloverdrive.event.ship.ShipRoomImageChangeEvent;
 import com.ftloverdrive.event.ship.ShipSystemAddEvent;
 import com.ftloverdrive.event.ship.ShipTeleportPadCreationEvent;
-import com.ftloverdrive.event.ship.ShipSystemCreationEvent;
+import com.ftloverdrive.event.ship.SystemCreationEvent;
 import com.ftloverdrive.io.ImageSpec;
 import com.ftloverdrive.model.ship.CrewModel;
 import com.ftloverdrive.model.ship.DefaultCrewModel;
@@ -65,7 +65,7 @@ public class ShipEventHandler implements OVDEventHandler {
 				ShipLayoutCrewPlacementEvent.class,
 				CrewMoveOrderEvent.class,
 				ShipLayoutSystemIconAddEvent.class,
-				ShipSystemCreationEvent.class,
+				SystemCreationEvent.class,
 				ShipSystemAddEvent.class
 		};
 		listenerClasses = new Class[] {
@@ -231,8 +231,8 @@ public class ShipEventHandler implements OVDEventHandler {
 			ShipModel shipModel = context.getReferenceManager().getObject( shipRefId, ShipModel.class );
 			shipModel.getLayout().setRoomSystemIcon( event.getRoomRefId(), event.getIconOffset() );
 		}
-		else if ( e instanceof ShipSystemCreationEvent ) {
-			ShipSystemCreationEvent event = (ShipSystemCreationEvent)e;
+		else if ( e instanceof SystemCreationEvent ) {
+			SystemCreationEvent event = (SystemCreationEvent)e;
 
 			int systemRefId = event.getSystemRefId();
 			SystemModel sysModel = new ShieldSystemModel(); // TODO: Default system model, or something.

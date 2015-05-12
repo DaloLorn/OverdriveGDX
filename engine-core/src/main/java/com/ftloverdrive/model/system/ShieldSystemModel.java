@@ -15,7 +15,7 @@ public class ShieldSystemModel extends AbstractSystemModel {
 
 	@Override
 	public String getIconName() {
-		return "s-shields-overlay";
+		return "s-shields";
 	}
 
 	@Override

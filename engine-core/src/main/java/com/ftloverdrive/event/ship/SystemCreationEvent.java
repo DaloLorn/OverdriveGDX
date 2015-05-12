@@ -4,12 +4,12 @@ import com.badlogic.gdx.utils.Pool.Poolable;
 import com.ftloverdrive.event.AbstractOVDEvent;
 
 
-public class ShipSystemCreationEvent extends AbstractOVDEvent implements Poolable {
+public class SystemCreationEvent extends AbstractOVDEvent implements Poolable {
 
 	protected int systemRefId = -1;
 
 
-	public ShipSystemCreationEvent() {
+	public SystemCreationEvent() {
 	}
 
 	/**

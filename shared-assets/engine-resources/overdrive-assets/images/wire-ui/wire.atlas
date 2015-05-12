@@ -1,0 +1,90 @@
+
+wire-ui.png
+size: 64,64
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+wire-tile
+  rotate: false
+  xy: 0, 0
+  size: 1, 14
+  orig: 1, 14
+  offset: 0, 0
+  index: -1
+connector
+  rotate: false
+  xy: 24, 46
+  size: 17, 17
+  orig: 17, 17
+  offset: 0, 0
+  index: -1
+bar-empty
+  rotate: true
+  xy: 67, 0
+  size: 28, 7
+  orig: 28, 7
+  offset: 0, 0
+  index: -1
+bar-full
+  rotate: true
+  xy: 74, 0
+  size: 28, 7
+  orig: 28, 7
+  offset: 0, 0
+  index: -1
+system-none-cap
+  rotate: false
+  xy: 1, 0
+  size: 7, 14
+  orig: 7, 14
+  offset: 0, 0
+  index: -1
+system-tile
+  rotate: false
+  xy: 24, 0
+  size: 16, 14
+  orig: 16, 14
+  offset: 0, 0
+  index: -1
+system-cap
+  rotate: false
+  xy: 40, 0
+  size: 15, 21
+  orig: 15, 21
+  offset: 0, 0
+  index: -1
+reactor-none-cap
+  rotate: false
+  xy: 8, 0
+  size: 15, 10
+  orig: 15, 10
+  offset: 0, 0
+  index: -1
+reactor-first-cap
+  rotate: false
+  xy: 19, 23
+  size: 21, 17
+  orig: 21, 17
+  offset: 0, 0
+  index: -1
+reactor-tile
+  rotate: false
+  xy: 0, 15
+  size: 20, 29
+  orig: 20, 29
+  offset: 0, 0
+  index: -1
+reactor-first
+  rotate: false
+  xy: 1, 47
+  size: 15, 15
+  orig: 15, 15
+  offset: 0, 0
+  index: -1
+reactor-cap
+  rotate: false
+  xy: 43, 23
+  size: 20, 28
+  orig: 20, 28
+  offset: 0, 0
+  index: -1

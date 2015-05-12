@@ -1,9 +1,11 @@
 package com.ftloverdrive.model.system;
 
+import com.ftloverdrive.core.OverdriveContext;
 import com.ftloverdrive.model.Damagable;
 import com.ftloverdrive.model.NamedProperties;
 import com.ftloverdrive.model.OVDModel;
 import com.ftloverdrive.model.Powerable;
+import com.ftloverdrive.ui.ship.SystemActor;
 
 
 public interface SystemModel extends OVDModel, Powerable, Damagable {
@@ -16,14 +18,16 @@ public interface SystemModel extends OVDModel, Powerable, Damagable {
 	 * - multiple systems of different types in a single room? stations assigned to
 	 *   system, not room?
 	 * 
+	 * somewhere in ship layout file:
+	 *  <icon pos="auto" /> // pos="auto" --> align the system icon at the center of the room
+	 *  <icon x="0" y="0"/> // allow manual alignment of the icon for oddly shaped rooms
+	 *  // assume pos="manual" by default if pos arg is missing, but pos="auto" if <icon> tag is missing
+	 * 
 	 * example XML data structure:
 	 *  <pilot room="1,2"> // assigned to rooms with ids 1 and 2, or multiple <pilot> tags
 	 *    <room id="1">
 	 *      <station slot=... dir=... /> // or x,y
 	 *      <roomDecor path=... />
-	 *      <icon pos="auto" /> // pos="auto" --> align the system icon at the center of the room
-	 *      <icon x="0" y="0"/> // allow manual alignment of the icon for oddly shaped rooms
-	 *      // assume pos="manual" by default if pos arg is missing, but pos="auto" if <icon> tag is missing
 	 *    </room>
 	 *    <room id="2">
 	 *      ....
@@ -31,12 +35,17 @@ public interface SystemModel extends OVDModel, Powerable, Damagable {
 	 *  </pilot>
 	 */
 
-	//TODO: Getters for upgrade costs/descriptions/limits.
+	// TODO: Getters for upgrade costs/descriptions/limits.
 
 	public NamedProperties getProperties();
-	
+
 	/**
 	 * Could instead return ImageSpec?
 	 */
 	public String getIconName();
+
+	/**
+	 * Creates and returns the representation of the system in the player's HUD.
+	 */
+	public SystemActor createActor( OverdriveContext context );
 }

@@ -55,7 +55,7 @@ public class ShipSystemIconsActor extends Group
 	 */
 	public void addSystemIcon( float x, float y, String iconName ) {
 		TextureAtlas iconAtlas = assetManager.get( OVDConstants.ICONS_ATLAS, TextureAtlas.class );
-		TextureRegion iconRegion = iconAtlas.findRegion( iconName );
+		TextureRegion iconRegion = iconAtlas.findRegion( iconName + "-overlay" );
 
 		Image iconImage = new Image( iconRegion );
 		int xCoord = (int)x;
