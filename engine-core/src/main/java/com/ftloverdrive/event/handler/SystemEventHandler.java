@@ -8,6 +8,7 @@ import com.ftloverdrive.event.PropertyEvent;
 import com.ftloverdrive.event.system.SystemPropertyEvent;
 import com.ftloverdrive.event.system.SystemPropertyListener;
 import com.ftloverdrive.model.system.SystemModel;
+import com.ftloverdrive.util.OVDConstants;
 
 
 public class SystemEventHandler implements OVDEventHandler {
@@ -62,6 +63,12 @@ public class SystemEventHandler implements OVDEventHandler {
 					int value = event.getIntValue();
 					String key = event.getPropertyKey();
 					systemModel.getProperties().incrementInt( key, value );
+				}
+
+				if ( event.getPropertyKey().equals( OVDConstants.LEVEL ) ) {
+					SystemPropertyEvent nEvent = Pools.get( SystemPropertyEvent.class ).obtain();
+					nEvent.init( event.getModelRefId(), event.getAction(), OVDConstants.POWER_MAX, event.getIntValue() );
+					context.getScreenEventManager().postDelayedEvent( nEvent );
 				}
 			}
 

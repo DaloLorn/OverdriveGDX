@@ -22,10 +22,10 @@ public class NamedProperties {
 	public static final int STRING_TYPE = 3;
 
 	/** Lazily initialized map of named properties. */
-	protected Map<String,MutableInt> namedIntMap = null;
-	protected Map<String,MutableBool> namedBoolMap = null;
-	protected Map<String,MutableFloat> namedFloatMap = null;
-	protected Map<String,MutableString> namedStringMap = null;
+	protected Map<String, MutableInt> namedIntMap = null;
+	protected Map<String, MutableBool> namedBoolMap = null;
+	protected Map<String, MutableFloat> namedFloatMap = null;
+	protected Map<String, MutableString> namedStringMap = null;
 
 	/** Lazily initialized map of named properties' keys. */
 	protected Set<String> namedIntKeysView = null;
@@ -33,7 +33,26 @@ public class NamedProperties {
 	protected Set<String> namedFloatKeysView = null;
 	protected Set<String> namedStringKeysView = null;
 
+
 	public NamedProperties() {
+	}
+
+	public void setAll( NamedProperties other ) {
+		if ( namedIntMap != null && other.namedIntMap != null )
+			for ( Map.Entry<String, MutableInt> entry : other.namedIntMap.entrySet() )
+				namedIntMap.put( entry.getKey(), entry.getValue() );
+
+		if ( namedFloatMap != null && other.namedFloatMap != null )
+			for ( Map.Entry<String, MutableFloat> entry : other.namedFloatMap.entrySet() )
+				namedFloatMap.put( entry.getKey(), entry.getValue() );
+
+		if ( namedBoolMap != null && other.namedBoolMap != null )
+			for ( Map.Entry<String, MutableBool> entry : other.namedBoolMap.entrySet() )
+				namedBoolMap.put( entry.getKey(), entry.getValue() );
+
+		if ( namedStringMap != null && other.namedStringMap != null )
+			for ( Map.Entry<String, MutableString> entry : other.namedStringMap.entrySet() )
+				namedStringMap.put( entry.getKey(), entry.getValue() );
 	}
 
 	/**
@@ -42,8 +61,9 @@ public class NamedProperties {
 	public void setInt( String key, int n ) {
 		MutableInt value = null;
 		if ( namedIntMap == null ) {
-			namedIntMap = new HashMap<String,MutableInt>();
-		} else {
+			namedIntMap = new HashMap<String, MutableInt>();
+		}
+		else {
 			value = namedIntMap.get( key );
 		}
 		if ( value == null ) {
@@ -60,8 +80,9 @@ public class NamedProperties {
 	public void setBool( String key, boolean b ) {
 		MutableBool value = null;
 		if ( namedBoolMap == null ) {
-			namedBoolMap = new HashMap<String,MutableBool>();
-		} else {
+			namedBoolMap = new HashMap<String, MutableBool>();
+		}
+		else {
 			value = namedBoolMap.get( key );
 		}
 		if ( value == null ) {
@@ -78,8 +99,9 @@ public class NamedProperties {
 	public void setFloat( String key, float f ) {
 		MutableFloat value = null;
 		if ( namedFloatMap == null ) {
-			namedFloatMap = new HashMap<String,MutableFloat>();
-		} else {
+			namedFloatMap = new HashMap<String, MutableFloat>();
+		}
+		else {
 			value = namedFloatMap.get( key );
 		}
 		if ( value == null ) {
@@ -96,8 +118,9 @@ public class NamedProperties {
 	public void setString( String key, String s ) {
 		MutableString value = null;
 		if ( namedStringMap == null ) {
-			namedStringMap = new HashMap<String,MutableString>();
-		} else {
+			namedStringMap = new HashMap<String, MutableString>();
+		}
+		else {
 			value = namedStringMap.get( key );
 		}
 		if ( value == null ) {
@@ -114,8 +137,9 @@ public class NamedProperties {
 	public void incrementInt( String key, int n ) {
 		MutableInt value = null;
 		if ( namedIntMap == null ) {
-			namedIntMap = new HashMap<String,MutableInt>();
-		} else {
+			namedIntMap = new HashMap<String, MutableInt>();
+		}
+		else {
 			value = namedIntMap.get( key );
 		}
 		if ( value == null ) {
@@ -132,8 +156,9 @@ public class NamedProperties {
 	public void incrementFloat( String key, float f ) {
 		MutableFloat value = null;
 		if ( namedFloatMap == null ) {
-			namedFloatMap = new HashMap<String,MutableFloat>();
-		} else {
+			namedFloatMap = new HashMap<String, MutableFloat>();
+		}
+		else {
 			value = namedFloatMap.get( key );
 		}
 		if ( value == null ) {
@@ -150,8 +175,9 @@ public class NamedProperties {
 	public void toggleBool( String key ) {
 		MutableBool value = null;
 		if ( namedBoolMap == null ) {
-			namedBoolMap = new HashMap<String,MutableBool>();
-		} else {
+			namedBoolMap = new HashMap<String, MutableBool>();
+		}
+		else {
 			value = namedBoolMap.get( key );
 		}
 		if ( value == null ) {

@@ -272,7 +272,7 @@ public class TestScreen extends BaseScreen {
 				"Go to event 2. Also a branch with a very long selection text that hopefully will wrap correctly." );
 		incBlueprint.addPlotBranch( branchBlueprint );
 		branchBlueprint = new PlotBranchBlueprint( "TEST_INCIDENT_3", "(Test Ship) Need moar scrap!" );
-		branchBlueprint.addRequirement( new ShipRequirement( "DEFAULT" ) );
+		branchBlueprint.addRequirement( new ShipRequirement( TestShipBlueprint.class.getSimpleName() ) );
 		incBlueprint.addPlotBranch( branchBlueprint );
 		incBlueprint.addPlotBranch( new PlotBranchBlueprint() );
 

@@ -11,6 +11,6 @@ public abstract class ShipBlueprint extends PropertyOVDBlueprint {
 	}
 
 	public String getBlueprintName() {
-		return (String)propertyMap.get( OVDConstants.BLUEPRINT_NAME );
+		return properties.getString( OVDConstants.BLUEPRINT_NAME );
 	}
 }

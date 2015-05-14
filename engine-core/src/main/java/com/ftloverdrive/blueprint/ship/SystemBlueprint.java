@@ -1,18 +1,16 @@
 package com.ftloverdrive.blueprint.ship;
 
 import com.ftloverdrive.blueprint.PropertyOVDBlueprint;
+import com.ftloverdrive.util.OVDConstants;
 
 
 public abstract class SystemBlueprint extends PropertyOVDBlueprint {
 
-	protected String systemIcon;
-
-
 	public SystemBlueprint( SystemBlueprint prototype ) {
 		super( prototype );
-	}
-
-	public String getSystemIcon() {
-		return systemIcon;
+		properties.setInt( OVDConstants.HEALTH_MAX, 0 );
+		properties.setInt( OVDConstants.HEALTH, 0 );
+		properties.setInt( OVDConstants.LEVEL_MAX, 0 );
+		properties.setInt( OVDConstants.LEVEL, 0 );
 	}
 }

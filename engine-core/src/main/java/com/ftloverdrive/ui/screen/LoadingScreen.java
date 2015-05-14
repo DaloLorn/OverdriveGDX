@@ -25,12 +25,8 @@ import com.badlogic.gdx.utils.Logger;
 import com.badlogic.gdx.utils.Pools;
 import com.badlogic.gdx.utils.Scaling;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
-import com.ftloverdrive.blueprint.ship.EngineSystemBlueprint;
-import com.ftloverdrive.blueprint.ship.ShieldSystemBlueprint;
 import com.ftloverdrive.core.OverdriveContext;
 import com.ftloverdrive.event.OVDEventManager;
-import com.ftloverdrive.model.system.EngineSystemModel;
-import com.ftloverdrive.model.system.ShieldSystemModel;
 import com.ftloverdrive.script.OVDScriptManager;
 import com.ftloverdrive.util.OVDConstants;
 
@@ -136,11 +132,6 @@ public class LoadingScreen implements Disposable, OVDScreen {
 		context.getAssetManager().load( OVDConstants.MISC_ATLAS, TextureAtlas.class );
 		context.getAssetManager().load( OVDConstants.MENU_ATLAS, TextureAtlas.class );
 		// context.getAssetManager().load( OVDConstants.WEAPONS_ATLAS, TextureAtlas.class );
-
-		context.getBlueprintManager().storeBlueprint( ShieldSystemBlueprint.class.getSimpleName(), new ShieldSystemBlueprint() );
-		context.getBlueprintManager().associateModel( ShieldSystemBlueprint.class.getSimpleName(), ShieldSystemModel.class );
-		context.getBlueprintManager().storeBlueprint( EngineSystemBlueprint.class.getSimpleName(), new EngineSystemBlueprint() );
-		context.getBlueprintManager().associateModel( EngineSystemBlueprint.class.getSimpleName(), EngineSystemModel.class );
 
 		// XXX: Re-enable once scripts are actually needed for something
 		// Preload scripts.

@@ -8,12 +8,12 @@ import com.ftloverdrive.model.NamedProperties;
 import com.ftloverdrive.util.OVDConstants;
 
 
-public abstract class AbstractSystemModel implements SystemModel {
+public class DefaultSystemModel implements SystemModel {
 
 	protected NamedProperties systemProperties = new NamedProperties();
 
 
-	public AbstractSystemModel() {
+	public DefaultSystemModel() {
 		super();
 		systemProperties.setInt( OVDConstants.HEALTH_MAX, 0 );
 		systemProperties.setInt( OVDConstants.HEALTH, 0 );
@@ -23,6 +23,8 @@ public abstract class AbstractSystemModel implements SystemModel {
 		systemProperties.setInt( OVDConstants.POWER_IONED, 0 );
 		systemProperties.setInt( OVDConstants.POWER_MAX, 0 );
 		systemProperties.setInt( OVDConstants.POWER, 0 );
+		systemProperties.setInt( OVDConstants.LEVEL_MAX, 0 );
+		systemProperties.setInt( OVDConstants.LEVEL, 0 );
 	}
 
 	@Override

@@ -128,6 +128,12 @@ public class OVDConstants {
 	/** System property. */
 	public static final String ICON_NAME = "SystemIconName";
 
+	/** System property. */
+	public static final String LEVEL_MAX = "LevelMax";
+
+	/** System property. */
+	public static final String LEVEL = "Level";
+
 	/*
 	 * ========================================
 	 * Atlas paths.

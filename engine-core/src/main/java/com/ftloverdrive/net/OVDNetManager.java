@@ -2,6 +2,7 @@ package com.ftloverdrive.net;
 
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
+import java.util.HashMap;
 
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
@@ -51,6 +52,10 @@ import com.ftloverdrive.model.incident.PlotBranchRequirement;
 import com.ftloverdrive.model.incident.requirement.ResourceRequirement;
 import com.ftloverdrive.model.incident.requirement.ShipRequirement;
 import com.ftloverdrive.model.ship.ShipCoordinate;
+import com.ftloverdrive.util.MutableBool;
+import com.ftloverdrive.util.MutableFloat;
+import com.ftloverdrive.util.MutableInt;
+import com.ftloverdrive.util.MutableString;
 
 
 public class OVDNetManager {
@@ -195,6 +200,7 @@ public class OVDNetManager {
 		kryo.register( Object[].class );
 		kryo.register( int[].class );
 		kryo.register( Integer[].class );
+		kryo.register( HashMap.class );
 		// - OVD
 		kryo.register( ImageSpec.class );
 		kryo.register( AnimSpec.class );
@@ -207,6 +213,10 @@ public class OVDNetManager {
 
 		kryo.register( DefaultGameModel.class );
 		kryo.register( NamedProperties.class );
+		kryo.register( MutableInt.class );
+		kryo.register( MutableFloat.class );
+		kryo.register( MutableBool.class );
+		kryo.register( MutableString.class );
 
 		// - GDX
 		kryo.register( IntIntMap.class );

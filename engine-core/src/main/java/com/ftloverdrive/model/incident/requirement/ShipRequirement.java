@@ -12,6 +12,7 @@ public class ShipRequirement implements PlotBranchRequirement {
 
 	private String shipId = null;
 
+
 	protected ShipRequirement() {
 	}
 

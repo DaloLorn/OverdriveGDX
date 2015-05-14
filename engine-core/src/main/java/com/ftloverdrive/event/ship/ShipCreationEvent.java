@@ -1,16 +1,15 @@
 package com.ftloverdrive.event.ship;
 
 import com.badlogic.gdx.utils.Pool.Poolable;
-
 import com.ftloverdrive.event.AbstractOVDEvent;
+import com.ftloverdrive.model.NamedProperties;
 
 
 public class ShipCreationEvent extends AbstractOVDEvent implements Poolable {
 
 	protected int shipRefId = -1;
 	protected String shipBlueprintId = null;
-	// TODO: This would mean sending an array of objects over net, probably not very smart...?
-	protected Object[] constructorArgs = null;
+	protected NamedProperties properties = null;
 
 
 	public ShipCreationEvent() {
@@ -27,10 +26,10 @@ public class ShipCreationEvent extends AbstractOVDEvent implements Poolable {
 	 * @param shipBlueprintId
 	 *            a string identifying what ship to make
 	 */
-	public void init( int shipRefId, String shipBlueprintId, Object... constructorArgs ) {
+	public void init( int shipRefId, String shipBlueprintId, NamedProperties properties ) {
 		this.shipRefId = shipRefId;
 		this.shipBlueprintId = shipBlueprintId;
-		this.constructorArgs = constructorArgs;
+		this.properties = properties;
 	}
 
 	public int getShipRefId() {
@@ -41,8 +40,8 @@ public class ShipCreationEvent extends AbstractOVDEvent implements Poolable {
 		return shipBlueprintId;
 	}
 
-	public Object[] getConstructorArgs() {
-		return constructorArgs;
+	public NamedProperties getProperties() {
+		return properties;
 	}
 
 	@Override
@@ -50,6 +49,6 @@ public class ShipCreationEvent extends AbstractOVDEvent implements Poolable {
 		super.reset();
 		shipRefId = -1;
 		shipBlueprintId = null;
-		constructorArgs = null;
+		properties = null;
 	}
 }

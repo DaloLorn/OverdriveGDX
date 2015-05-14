@@ -38,7 +38,7 @@ import com.ftloverdrive.model.ship.ShipCoordinate;
 import com.ftloverdrive.model.ship.ShipModel;
 import com.ftloverdrive.model.ship.TeleportPadModel;
 import com.ftloverdrive.model.ship.TestShipModel;
-import com.ftloverdrive.model.system.ShieldSystemModel;
+import com.ftloverdrive.model.system.DefaultSystemModel;
 import com.ftloverdrive.model.system.SystemModel;
 
 
@@ -94,9 +94,11 @@ public class ShipEventHandler implements OVDEventHandler {
 			ShipCreationEvent event = (ShipCreationEvent)e;
 
 			int shipRefId = event.getShipRefId();
-			ShipModel shipModel = context.getBlueprintManager().createModel( event.getShipBlueprintId(), event.getConstructorArgs() );
-			if ( shipModel == null )
+			ShipModel shipModel = context.getBlueprintManager().createModel( event.getShipBlueprintId() );
+			if ( shipModel == null ) {
 				shipModel = new TestShipModel(); // TODO: Change to default ship model
+			}
+			shipModel.getProperties().setAll( event.getProperties() );
 
 			context.getReferenceManager().addObject( shipModel, shipRefId );
 		}
@@ -235,10 +237,11 @@ public class ShipEventHandler implements OVDEventHandler {
 			SystemCreationEvent event = (SystemCreationEvent)e;
 
 			int systemRefId = event.getSystemRefId();
-			SystemModel sysModel = context.getBlueprintManager().createModel( event.getSystemBlueprintId(), event.getConstructorArgs() );
+			SystemModel sysModel = context.getBlueprintManager().createModel( event.getSystemBlueprintId() );
 			if ( sysModel == null ) {
-				sysModel = new ShieldSystemModel(); // TODO: Default system model, or something.
+				sysModel = new DefaultSystemModel();
 			}
+			sysModel.getProperties().setAll( event.getProperties() );
 
 			context.getReferenceManager().addObject( sysModel, systemRefId );
 		}

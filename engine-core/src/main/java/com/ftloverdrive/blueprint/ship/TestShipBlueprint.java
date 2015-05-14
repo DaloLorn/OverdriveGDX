@@ -3,6 +3,7 @@ package com.ftloverdrive.blueprint.ship;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Pools;
 import com.ftloverdrive.core.OverdriveContext;
+import com.ftloverdrive.event.PropertyEvent;
 import com.ftloverdrive.event.ship.ShipCreationEvent;
 import com.ftloverdrive.event.ship.ShipCrewAddEvent;
 import com.ftloverdrive.event.ship.ShipCrewCreationEvent;
@@ -17,6 +18,7 @@ import com.ftloverdrive.event.ship.ShipRoomCreationEvent;
 import com.ftloverdrive.event.ship.ShipRoomImageChangeEvent;
 import com.ftloverdrive.event.ship.ShipSystemAddEvent;
 import com.ftloverdrive.event.ship.ShipTeleportPadCreationEvent;
+import com.ftloverdrive.event.system.SystemPropertyEvent;
 import com.ftloverdrive.io.ImageSpec;
 import com.ftloverdrive.model.ship.ShipCoordinate;
 import com.ftloverdrive.model.ship.ShipLayout;
@@ -28,7 +30,7 @@ public class TestShipBlueprint extends ShipBlueprint {
 	public TestShipBlueprint( ShipBlueprint prototype ) {
 		super( prototype );
 
-		propertyMap.put( OVDConstants.BLUEPRINT_NAME, getClass().getSimpleName() );
+		properties.setString( OVDConstants.BLUEPRINT_NAME, getClass().getSimpleName() );
 	}
 
 	@Override
@@ -36,10 +38,8 @@ public class TestShipBlueprint extends ShipBlueprint {
 		int shipRefId = context.getNetManager().requestNewRefId();
 
 		ShipCreationEvent shipCreateEvent = Pools.get( ShipCreationEvent.class ).obtain();
-		shipCreateEvent.init( shipRefId, getProperty( OVDConstants.BLUEPRINT_NAME, String.class ) );
+		shipCreateEvent.init( shipRefId, getString( OVDConstants.BLUEPRINT_NAME ), properties );
 		context.getScreenEventManager().postDelayedEvent( shipCreateEvent );
-
-		// TODO: Events to copy properties from the blueprint to the model.
 
 		int roomRefId = -1;
 		ShipCoordinate[] roomCoords = null;
@@ -128,12 +128,20 @@ public class TestShipBlueprint extends ShipBlueprint {
 		ShieldSystemBlueprint shieldSys = new ShieldSystemBlueprint();
 		int sysRefId = shieldSys.construct( context );
 
+		SystemPropertyEvent sysPropE = Pools.get( SystemPropertyEvent.class ).obtain();
+		sysPropE.init( sysRefId, PropertyEvent.SET_ACTION, OVDConstants.LEVEL, 8 ); // TODO: Normally would be loaded from blueprint
+		context.getScreenEventManager().postDelayedEvent( sysPropE );
+
 		ShipSystemAddEvent sysAddE = Pools.get( ShipSystemAddEvent.class ).obtain();
 		sysAddE.init( shipRefId, roomRefIds[5], sysRefId );
 		context.getScreenEventManager().postDelayedEvent( sysAddE );
 
 		EngineSystemBlueprint engineSys = new EngineSystemBlueprint();
 		sysRefId = engineSys.construct( context );
+
+		sysPropE = Pools.get( SystemPropertyEvent.class ).obtain();
+		sysPropE.init( sysRefId, PropertyEvent.SET_ACTION, OVDConstants.LEVEL, 8 ); // TODO: Normally would be loaded from blueprint
+		context.getScreenEventManager().postDelayedEvent( sysPropE );
 
 		sysAddE = Pools.get( ShipSystemAddEvent.class ).obtain();
 		sysAddE.init( shipRefId, roomRefIds[14], sysRefId );
