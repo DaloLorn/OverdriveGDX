@@ -25,7 +25,7 @@ public class TestShipModel extends AbstractShipModel {
 		this.setCloakImageSpec( new ImageSpec( OVDConstants.SHIP_ATLAS, "kestral-cloak" ) );
 		this.setFloorImageSpec( new ImageSpec( OVDConstants.SHIP_ATLAS, "kestral-floor" ) );
 
-		this.getProperties().setInt( OVDConstants.HULL_MAX, 30 );
+		this.getProperties().setInt( OVDConstants.HEALTH_MAX, 30 );
 		this.getProperties().setInt( OVDConstants.POWER_IONED, 2 );
 		this.getProperties().setInt( OVDConstants.POWER_MAX, 25 );
 		this.getProperties().setInt( OVDConstants.POWER, 20 );

@@ -15,9 +15,11 @@ public abstract class AbstractSystemModel implements SystemModel {
 
 	public AbstractSystemModel() {
 		super();
-		// TODO: Common properties for health, etc?
-		systemProperties.setInt( OVDConstants.HULL_MAX, 0 );
-		systemProperties.setInt( OVDConstants.HULL, 0 );
+		systemProperties.setInt( OVDConstants.HEALTH_MAX, 0 );
+		systemProperties.setInt( OVDConstants.HEALTH, 0 );
+		systemProperties.setInt( OVDConstants.POWER_INCREMENT, 0 );
+		systemProperties.setBool( OVDConstants.SELF_POWERED, false );
+		systemProperties.setString( OVDConstants.ICON_NAME, "" );
 		systemProperties.setInt( OVDConstants.POWER_IONED, 0 );
 		systemProperties.setInt( OVDConstants.POWER_MAX, 0 );
 		systemProperties.setInt( OVDConstants.POWER, 0 );
@@ -51,5 +53,20 @@ public abstract class AbstractSystemModel implements SystemModel {
 	public void damage( OverdriveContext context, int value ) {
 		// TODO Auto-generated method stub
 
+	}
+
+	@Override
+	public int getPowerIncrement() {
+		return systemProperties.getInt( OVDConstants.POWER_INCREMENT );
+	}
+
+	@Override
+	public boolean isSelfPowered() {
+		return systemProperties.getBool( OVDConstants.SELF_POWERED );
+	}
+
+	@Override
+	public String getIconName() {
+		return systemProperties.getString( OVDConstants.ICON_NAME );
 	}
 }

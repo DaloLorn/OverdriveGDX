@@ -98,7 +98,7 @@ public class PlayerShipHullMonitor extends Actor implements Disposable, GamePlay
 		if ( e.getModelRefId() != shipModelRefId ) return;
 
 		if ( e.getPropertyType() == PropertyEvent.INT_TYPE ) {
-			if ( OVDConstants.HULL.equals( e.getPropertyKey() ) || OVDConstants.HULL_MAX.equals( e.getPropertyKey() ) ) {
+			if ( OVDConstants.HEALTH.equals( e.getPropertyKey() ) || OVDConstants.HEALTH_MAX.equals( e.getPropertyKey() ) ) {
 				updateShipInfo( context );
 			}
 		}
@@ -113,8 +113,8 @@ public class PlayerShipHullMonitor extends Actor implements Disposable, GamePlay
 		}
 		else {
 			ShipModel shipModel = context.getReferenceManager().getObject( shipModelRefId, ShipModel.class );
-			int hullAmt = shipModel.getProperties().getInt( OVDConstants.HULL );
-			int hullMax = shipModel.getProperties().getInt( OVDConstants.HULL_MAX );
+			int hullAmt = shipModel.getProperties().getInt( OVDConstants.HEALTH );
+			int hullMax = shipModel.getProperties().getInt( OVDConstants.HEALTH_MAX );
 			if ( hullMax != 0 ) {
 				barClipWidth = Math.min( ( (float)hullAmt / hullMax ) * barSprite.getWidth(), barSprite.getWidth() );
 

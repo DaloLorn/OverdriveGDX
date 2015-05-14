@@ -46,8 +46,8 @@ public class AbstractShipModel extends AbstractOVDModel implements ShipModel {
 
 	public AbstractShipModel() {
 		super();
-		shipProperties.setInt( OVDConstants.HULL_MAX, 0 );
-		shipProperties.setInt( OVDConstants.HULL, 0 );
+		shipProperties.setInt( OVDConstants.HEALTH_MAX, 0 );
+		shipProperties.setInt( OVDConstants.HEALTH, 0 );
 		shipProperties.setInt( OVDConstants.SHIELD_MAX, 0 );
 		shipProperties.setInt( OVDConstants.SHIELD, 0 );
 		shipProperties.setInt( OVDConstants.POWER_MAX, 0 );
@@ -271,7 +271,7 @@ public class AbstractShipModel extends AbstractOVDModel implements ShipModel {
 		}
 		else {
 			ShipPropertyEvent event = Pools.get( ShipPropertyEvent.class ).obtain();
-			event.init( selfRefId, PropertyEvent.INCREMENT_ACTION, OVDConstants.HULL, -value );
+			event.init( selfRefId, PropertyEvent.INCREMENT_ACTION, OVDConstants.HEALTH, -value );
 			context.getScreenEventManager().postDelayedEvent( event );
 		}
 	}

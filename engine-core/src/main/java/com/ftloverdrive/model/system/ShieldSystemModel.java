@@ -7,8 +7,8 @@ public class ShieldSystemModel extends AbstractSystemModel {
 
 	public ShieldSystemModel() {
 		super();
-		systemProperties.setInt( OVDConstants.HULL_MAX, 100 );
-		systemProperties.setInt( OVDConstants.HULL, 100 );
+		systemProperties.setInt( OVDConstants.HEALTH_MAX, 100 );
+		systemProperties.setInt( OVDConstants.HEALTH, 100 );
 		systemProperties.setInt( OVDConstants.POWER_MAX, 8 );
 		systemProperties.setInt( OVDConstants.POWER, 4 );
 	}

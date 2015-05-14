@@ -241,11 +241,11 @@ public class TestScreen extends BaseScreen {
 					if ( shipRefId != -1 ) {
 						ShipModel shipModel = context.getReferenceManager().getObject( shipRefId, ShipModel.class );
 
-						int hull = shipModel.getProperties().getInt( OVDConstants.HULL );
-						int hullMax = shipModel.getProperties().getInt( OVDConstants.HULL_MAX );
+						int hull = shipModel.getProperties().getInt( OVDConstants.HEALTH );
+						int hullMax = shipModel.getProperties().getInt( OVDConstants.HEALTH_MAX );
 						if ( hull < hullMax ) {
 							ShipPropertyEvent event = Pools.get( ShipPropertyEvent.class ).obtain();
-							event.init( shipRefId, PropertyEvent.INCREMENT_ACTION, OVDConstants.HULL, 1 );
+							event.init( shipRefId, PropertyEvent.INCREMENT_ACTION, OVDConstants.HEALTH, 1 );
 							context.getScreenEventManager().postDelayedEvent( event );
 						}
 					}

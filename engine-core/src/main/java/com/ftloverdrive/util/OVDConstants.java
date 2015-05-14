@@ -23,6 +23,26 @@ public class OVDConstants {
 	/** A constant indicating western orientation, ie. facing leftwards. */
 	public static final int ORIENT_WEST = 3;
 
+	/*
+	 * ========================================
+	 * Common properties.
+	 */
+
+	/** Maximum health the entity can possibly attain. */
+	public static final String HEALTH_MAX = "HealthMax";
+
+	/** Current health. */
+	public static final String HEALTH = "Health";
+
+	/** Number of power bars affected by ion damage. */
+	public static final String POWER_IONED = "PowerIoned";
+
+	/** Maximum number of power bars the entity can possibly attain. */
+	public static final String POWER_MAX = "PowerMax";
+
+	/** Current power. */
+	public static final String POWER = "Power";
+
 
 	/*
 	 * ========================================
@@ -30,25 +50,10 @@ public class OVDConstants {
 	 */
 
 	/** Ship property. */
-	public static final String HULL_MAX = "HullMax";
-
-	/** Ship property. */
-	public static final String HULL = "Hull";
-
-	/** Ship property. */
 	public static final String SHIELD_MAX = "ShieldMax";
 
 	/** Ship property. */
 	public static final String SHIELD = "Shield";
-
-	/** Ship property. */
-	public static final String POWER_IONED = "PowerIoned";
-
-	/** Ship property. */
-	public static final String POWER_MAX = "PowerMax";
-
-	/** Ship property. */
-	public static final String POWER = "Power";
 
 	/** Ship property. */
 	public static final String SCRAP = "Scrap";
@@ -107,6 +112,21 @@ public class OVDConstants {
 	 */
 	public static final String DOOR_LOCKED = "DoorLocked";
 	public static final String DOOR_ANIM_SPEC = "DoorAnimSpec";
+
+
+	/*
+	 * ========================================
+	 * System properties.
+	 */
+
+	/** System property. */
+	public static final String POWER_INCREMENT = "PowerIncrement";
+
+	/** System property. */
+	public static final String SELF_POWERED = "SelfPowered";
+
+	/** System property. */
+	public static final String ICON_NAME = "SystemIconName";
 
 	/*
 	 * ========================================
