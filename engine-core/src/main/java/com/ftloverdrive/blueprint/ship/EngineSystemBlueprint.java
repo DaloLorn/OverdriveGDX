@@ -6,12 +6,12 @@ import com.ftloverdrive.event.ship.SystemCreationEvent;
 import com.ftloverdrive.util.OVDConstants;
 
 
-public class ShieldSystemBlueprint extends SystemBlueprint {
+public class EngineSystemBlueprint extends SystemBlueprint {
 
 
-	public ShieldSystemBlueprint() {
+	public EngineSystemBlueprint() {
 		super( null );
-		systemIcon = "s-shields";
+		systemIcon = "s-engines";
 		propertyMap.put( OVDConstants.BLUEPRINT_NAME, getClass().getSimpleName() );
 	}
 

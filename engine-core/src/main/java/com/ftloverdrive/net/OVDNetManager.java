@@ -42,6 +42,7 @@ import com.ftloverdrive.event.ship.ShipRoomImageChangeEvent;
 import com.ftloverdrive.event.ship.ShipSystemAddEvent;
 import com.ftloverdrive.event.ship.ShipTeleportPadCreationEvent;
 import com.ftloverdrive.event.ship.SystemCreationEvent;
+import com.ftloverdrive.event.system.SystemPropertyEvent;
 import com.ftloverdrive.io.AnimSpec;
 import com.ftloverdrive.io.ImageSpec;
 import com.ftloverdrive.model.DefaultGameModel;
@@ -245,6 +246,7 @@ public class OVDNetManager {
 		kryo.register( ShipPropertyEvent.class );
 		kryo.register( ShipRoomImageChangeEvent.class );
 		kryo.register( SystemCreationEvent.class );
+		kryo.register( SystemPropertyEvent.class );
 		kryo.register( ShipSystemAddEvent.class );
 		kryo.register( ShipLayoutSystemIconAddEvent.class );
 	}

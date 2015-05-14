@@ -235,7 +235,11 @@ public class ShipEventHandler implements OVDEventHandler {
 			SystemCreationEvent event = (SystemCreationEvent)e;
 
 			int systemRefId = event.getSystemRefId();
-			SystemModel sysModel = new ShieldSystemModel(); // TODO: Default system model, or something.
+			SystemModel sysModel = context.getBlueprintManager().createModel( event.getSystemBlueprintId(), event.getConstructorArgs() );
+			if ( sysModel == null ) {
+				sysModel = new ShieldSystemModel(); // TODO: Default system model, or something.
+			}
+
 			context.getReferenceManager().addObject( sysModel, systemRefId );
 		}
 		else if ( e instanceof ShipSystemAddEvent ) {

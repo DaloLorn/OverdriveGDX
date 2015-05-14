@@ -74,9 +74,11 @@ public class TestShipBlueprint extends ShipBlueprint {
 		roomsDecor[14] = new ImageSpec( OVDConstants.SHIP_INTERIOR_ATLAS, "room-engines" );
 		roomsDecor[10] = new ImageSpec( OVDConstants.SHIP_INTERIOR_ATLAS, "room-weapons" );
 
+		int[] roomRefIds = new int[roomsXYWH.length];
 		for ( int i = 0; i < roomsXYWH.length; i++ ) {
 			int[] xywh = roomsXYWH[i];
 			roomRefId = context.getNetManager().requestNewRefId();
+			roomRefIds[i] = roomRefId;
 			roomCoords = ShipLayout.createRoomCoords( xywh[0], xywh[1], xywh[2], xywh[3] );
 
 			ShipRoomCreationEvent roomCreateEvent = Pools.get( ShipRoomCreationEvent.class ).obtain();
@@ -95,7 +97,7 @@ public class TestShipBlueprint extends ShipBlueprint {
 			context.getScreenEventManager().postDelayedEvent( roomAddEvent );
 
 			ShipLayoutSystemIconAddEvent iconAddEvent = Pools.get( ShipLayoutSystemIconAddEvent.class ).obtain();
-			iconAddEvent.init( shipRefId, roomRefId, xywh[0] + xywh[2] * 0.5f, xywh[1] + xywh[3] * 0.5f );
+			iconAddEvent.init( shipRefId, roomRefId, xywh[0] + ( xywh[2] - 1 ) * 0.5f, xywh[1] + ( xywh[3] + 1 ) * 0.5f );
 			context.getScreenEventManager().postDelayedEvent( iconAddEvent );
 		}
 
@@ -122,11 +124,19 @@ public class TestShipBlueprint extends ShipBlueprint {
 		// =======
 		// Systems
 
+		// TODO: Add system blueprints instead?
 		ShieldSystemBlueprint shieldSys = new ShieldSystemBlueprint();
 		int sysRefId = shieldSys.construct( context );
 
 		ShipSystemAddEvent sysAddE = Pools.get( ShipSystemAddEvent.class ).obtain();
-		sysAddE.init( shipRefId, roomRefId, sysRefId );
+		sysAddE.init( shipRefId, roomRefIds[5], sysRefId );
+		context.getScreenEventManager().postDelayedEvent( sysAddE );
+
+		EngineSystemBlueprint engineSys = new EngineSystemBlueprint();
+		sysRefId = engineSys.construct( context );
+
+		sysAddE = Pools.get( ShipSystemAddEvent.class ).obtain();
+		sysAddE.init( shipRefId, roomRefIds[14], sysRefId );
 		context.getScreenEventManager().postDelayedEvent( sysAddE );
 
 		// =====

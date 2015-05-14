@@ -1,11 +1,9 @@
 package com.ftloverdrive.model.system;
 
-import com.ftloverdrive.core.OverdriveContext;
 import com.ftloverdrive.model.Damagable;
 import com.ftloverdrive.model.NamedProperties;
 import com.ftloverdrive.model.OVDModel;
 import com.ftloverdrive.model.Powerable;
-import com.ftloverdrive.ui.ship.SystemActor;
 
 
 public interface SystemModel extends OVDModel, Powerable, Damagable {
@@ -43,9 +41,4 @@ public interface SystemModel extends OVDModel, Powerable, Damagable {
 	 * Could instead return ImageSpec?
 	 */
 	public String getIconName();
-
-	/**
-	 * Creates and returns the representation of the system in the player's HUD.
-	 */
-	public SystemActor createActor( OverdriveContext context );
 }

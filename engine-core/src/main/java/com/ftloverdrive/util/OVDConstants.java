@@ -42,6 +42,9 @@ public class OVDConstants {
 	public static final String SHIELD = "Shield";
 
 	/** Ship property. */
+	public static final String POWER_IONED = "PowerIoned";
+
+	/** Ship property. */
 	public static final String POWER_MAX = "PowerMax";
 
 	/** Ship property. */

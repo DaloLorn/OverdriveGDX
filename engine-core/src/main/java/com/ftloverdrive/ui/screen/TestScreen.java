@@ -24,10 +24,12 @@ import com.ftloverdrive.event.handler.GameEventHandler;
 import com.ftloverdrive.event.handler.IncidentEventHandler;
 import com.ftloverdrive.event.handler.LocalEventHandler;
 import com.ftloverdrive.event.handler.ShipEventHandler;
+import com.ftloverdrive.event.handler.SystemEventHandler;
 import com.ftloverdrive.event.handler.TickEventHandler;
 import com.ftloverdrive.event.incident.IncidentSelectionEvent;
 import com.ftloverdrive.event.ship.ShipPropertyEvent;
 import com.ftloverdrive.event.ship.ShipPropertyListener;
+import com.ftloverdrive.event.system.SystemPropertyListener;
 import com.ftloverdrive.model.DefaultPlayerModel;
 import com.ftloverdrive.model.GameModel;
 import com.ftloverdrive.model.PlayerModel;
@@ -178,6 +180,10 @@ public class TestScreen extends BaseScreen {
 		for ( Class c : doorHandler.getEventClasses() )
 			eventManager.setEventHandler( c, doorHandler );
 
+		SystemEventHandler systemHandler = new SystemEventHandler();
+		for ( Class c : systemHandler.getEventClasses() )
+			eventManager.setEventHandler( c, systemHandler );
+
 		IncidentEventHandler incHandler = new IncidentEventHandler();
 		for ( Class c : incHandler.getEventClasses() )
 			eventManager.setEventHandler( c, incHandler );
@@ -190,6 +196,7 @@ public class TestScreen extends BaseScreen {
 		eventManager.addEventListener( playerScrapMonitor, ShipPropertyListener.class );
 		eventManager.addEventListener( playerShipReactor, GamePlayerShipChangeListener.class );
 		eventManager.addEventListener( playerShipReactor, ShipPropertyListener.class );
+		eventManager.addEventListener( playerShipReactor, SystemPropertyListener.class );
 
 		eventManager.addEventListener( shipActor, GamePlayerShipChangeListener.class );
 		eventManager.addEventListener( shipActor, ShipPropertyListener.class );

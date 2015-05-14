@@ -22,7 +22,7 @@ public interface Powerable {
 	/**
 	 * Returns the number of power pars to add/remove with each power adjustment.
 	 */
-	public int getPowerIncrement( int n );
+	public int getPowerIncrement();
 
 
 	/**

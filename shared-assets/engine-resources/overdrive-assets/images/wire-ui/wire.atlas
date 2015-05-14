@@ -19,17 +19,17 @@ connector
   offset: 0, 0
   index: -1
 bar-empty
-  rotate: true
-  xy: 67, 0
-  size: 28, 7
-  orig: 28, 7
+  rotate: false
+  xy: 42, 51
+  size: 3, 3
+  orig: 3, 3
   offset: 0, 0
   index: -1
 bar-full
-  rotate: true
-  xy: 74, 0
-  size: 28, 7
-  orig: 28, 7
+  rotate: false
+  xy: 45, 51
+  size: 3, 3
+  orig: 3, 3
   offset: 0, 0
   index: -1
 system-none-cap
@@ -86,5 +86,18 @@ reactor-cap
   xy: 43, 23
   size: 20, 28
   orig: 20, 28
+  offset: 0, 0
+  index: -1
+
+wire-ui-fuzzy.png
+size: 8,8
+format: RGBA8888
+filter: Linear,Linear
+repeat: none
+bar-disabled
+  rotate: false
+  xy: 0, 0
+  size: 6, 6
+  orig: 6, 6
   offset: 0, 0
   index: -1

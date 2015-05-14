@@ -62,7 +62,7 @@ public class ShipSystemIconsActor extends Group
 		int yCoord = (int)y;
 		x -= xCoord;
 		y -= yCoord;
-		iconImage.setPosition( calcTileX( xCoord ) + x, calcTileY( yCoord ) + y );
+		iconImage.setPosition( calcTileX( xCoord ) + x * tileSize + 2, calcTileY( yCoord ) + y * tileSize + 1 );
 		addActor( iconImage );
 	}
 
