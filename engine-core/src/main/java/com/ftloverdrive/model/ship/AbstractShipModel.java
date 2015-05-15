@@ -11,7 +11,8 @@ import com.ftloverdrive.model.NamedProperties;
 import com.ftloverdrive.util.OVDConstants;
 
 
-public class AbstractShipModel extends AbstractOVDModel implements ShipModel {
+public class AbstractShipModel extends AbstractOVDModel
+		implements ShipModel {
 
 	protected NamedProperties shipProperties = new NamedProperties();
 

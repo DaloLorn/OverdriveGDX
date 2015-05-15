@@ -30,6 +30,7 @@ import com.ftloverdrive.event.incident.IncidentSelectionEvent;
 import com.ftloverdrive.event.ship.ShipPropertyEvent;
 import com.ftloverdrive.event.ship.ShipPropertyListener;
 import com.ftloverdrive.event.system.SystemPropertyListener;
+import com.ftloverdrive.event.system.SystemPropertySentinel;
 import com.ftloverdrive.model.DefaultPlayerModel;
 import com.ftloverdrive.model.GameModel;
 import com.ftloverdrive.model.PlayerModel;
@@ -197,9 +198,11 @@ public class TestScreen extends BaseScreen {
 		eventManager.addEventListener( playerShipReactor, GamePlayerShipChangeListener.class );
 		eventManager.addEventListener( playerShipReactor, ShipPropertyListener.class );
 		eventManager.addEventListener( playerShipReactor, SystemPropertyListener.class );
+		eventManager.addEventListener( playerShipReactor, SystemPropertySentinel.class );
 
 		eventManager.addEventListener( shipActor, GamePlayerShipChangeListener.class );
 		eventManager.addEventListener( shipActor, ShipPropertyListener.class );
+		eventManager.addEventListener( shipActor, SystemPropertyListener.class );
 
 		// XXX: Periodic events can be registered like this...
 		// eventManager.addTickListener( numberOfTicks, tickListener );

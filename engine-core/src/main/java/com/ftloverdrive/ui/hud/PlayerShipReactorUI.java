@@ -1,9 +1,7 @@
 package com.ftloverdrive.ui.hud;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Color;
@@ -18,6 +16,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.Align;
 import com.badlogic.gdx.scenes.scene2d.utils.NinePatchDrawable;
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.IntMap.Keys;
+import com.badlogic.gdx.utils.Pools;
 import com.ftloverdrive.core.OverdriveContext;
 import com.ftloverdrive.event.PropertyEvent;
 import com.ftloverdrive.event.game.GamePlayerShipChangeEvent;
@@ -26,8 +25,10 @@ import com.ftloverdrive.event.ship.ShipPropertyEvent;
 import com.ftloverdrive.event.ship.ShipPropertyListener;
 import com.ftloverdrive.event.system.SystemPropertyEvent;
 import com.ftloverdrive.event.system.SystemPropertyListener;
+import com.ftloverdrive.event.system.SystemPropertySentinel;
 import com.ftloverdrive.io.OVDSkin;
 import com.ftloverdrive.model.ship.ShipModel;
+import com.ftloverdrive.model.system.SystemModel;
 import com.ftloverdrive.ui.ShaderLabel;
 import com.ftloverdrive.ui.ShaderLabel.ShaderLabelStyle;
 import com.ftloverdrive.util.OVDConstants;
@@ -41,10 +42,11 @@ import com.ftloverdrive.util.OVDConstants;
  *
  */
 public class PlayerShipReactorUI extends Group
-		implements Disposable, GamePlayerShipChangeListener, ShipPropertyListener, SystemPropertyListener {
+		implements Disposable, GamePlayerShipChangeListener, ShipPropertyListener, SystemPropertyListener,
+		SystemPropertySentinel {
 
-	public static final String SKIN_PATH = "overdrive-assets/skins/player-hud/reactor-ui.json";
-	public static final String ATLAS_PATH = "overdrive-assets/images/wire-ui/wire.atlas";
+	public static final String SKIN_PATH = "overdrive-assets/skins/player-hud/reactor-ui/reactor-ui.json";
+	public static final String ATLAS_PATH = "overdrive-assets/skins/player-hud/reactor-ui/reactor-ui.atlas";
 
 	protected final Sprite wireTile;
 	protected final Sprite connector;
@@ -56,7 +58,6 @@ public class PlayerShipReactorUI extends Group
 
 	protected final Color colorHasPower;
 	protected final Color colorNoPower;
-	protected final Color colorIon;
 	protected final Color colorDisabled;
 	protected final Color colorSelfPower;
 
@@ -85,11 +86,11 @@ public class PlayerShipReactorUI extends Group
 	protected final int connectorSystemOffsetX;
 	protected final int systemTileAlignX;
 	protected final int systemTileAlignY;
+	protected final int systemPaddingX;
 	protected final int reactorBarWidth;
 	protected final int reactorBarHeight;
 	protected final float unpoweredAlpha;
 
-	protected final Map<String, Object> resourceMap = new HashMap<String, Object>();
 	protected final List<Vector2> systemOffsetsList = new ArrayList<Vector2>();
 
 	private final AssetManager assetManager;
@@ -117,14 +118,8 @@ public class PlayerShipReactorUI extends Group
 
 		colorHasPower = skin.getColor( "power-available" );
 		colorNoPower = skin.getColor( "power-none" );
-		colorIon = skin.getColor( "power-ion" );
 		colorDisabled = skin.getColor( "power-disabled" );
 		colorSelfPower = skin.getColor( "power-self" );
-		resourceMap.put( "power-available", colorHasPower );
-		resourceMap.put( "power-none", colorNoPower );
-		resourceMap.put( "power-ion", colorIon );
-		resourceMap.put( "power-disabled", colorDisabled );
-		resourceMap.put( "power-self", colorSelfPower );
 
 		barEmpty = new NinePatch( wireAtlas.findRegion( "bar-empty" ), 1, 1, 1, 1 );
 		barEmpty.setColor( colorNoPower );
@@ -132,9 +127,6 @@ public class PlayerShipReactorUI extends Group
 		barFull.setColor( colorHasPower );
 		barDisabled = new NinePatch( wireAtlas.findRegion( "bar-disabled" ), 1, 1, 1, 1 );
 		barDisabled.setColor( colorDisabled );
-		resourceMap.put( "bar-empty", barEmpty );
-		resourceMap.put( "bar-full", barFull );
-		resourceMap.put( "bar-disabled", barDisabled );
 
 		systemNoneCap = wireAtlas.createSprite( "system-none-cap" );
 		systemTile = wireAtlas.createSprite( "system-tile" );
@@ -157,17 +149,14 @@ public class PlayerShipReactorUI extends Group
 		connectorSystemOffsetX = skin.getInt( "connector-system-offset-x" );
 		systemTileAlignX = skin.getInt( "system-tile-align-x" );
 		systemTileAlignY = skin.getInt( "system-tile-align-y" );
+		systemPaddingX = skin.getInt( "system-padding-x" );
 
 		reactorBarWidth = skin.getInt( "reactor-bar-width" );
 		reactorBarHeight = skin.getInt( "reactor-bar-height" );
 
-		resourceMap.put( "system-bar-width", skin.getInt( "system-bar-width" ) );
-		resourceMap.put( "system-bar-height", skin.getInt( "system-bar-height" ) );
-
 		unpoweredAlpha = skin.getFloat( "unpowered-alpha" );
 
 		barDrawable = new NinePatchDrawable();
-		resourceMap.put( "bar-drawable", barDrawable );
 
 		ShaderLabelStyle stlScrap = skin.get( "power-text-style", ShaderLabelStyle.class );
 		lblPower = new ShaderLabel( "####", stlScrap );
@@ -283,11 +272,44 @@ public class PlayerShipReactorUI extends Group
 	}
 
 	@Override
-	public void systemPropertyChanged( OverdriveContext context, SystemPropertyEvent e ) {
-		for ( Actor a : getChildren() ) {
-			if ( a instanceof SystemPropertyListener ) {
-				( (SystemPropertyListener)a ).systemPropertyChanged( context, e );
+	public void systemPropertyChanging( OverdriveContext context, SystemPropertyEvent e ) {
+		if ( shipModelRefId == -1 )
+			return;
+
+		if ( OVDConstants.POWER.equals( e.getPropertyKey() ) ) {
+			ShipModel shipModel = context.getReferenceManager().getObject( shipModelRefId, ShipModel.class );
+			Keys it = shipModel.getLayout().systemRefIds();
+			boolean found = false;
+			while ( it.hasNext && !found )
+				found = it.next() == e.getModelRefId();
+			it.reset();
+
+			if ( found ) {
+				SystemModel systemModel = context.getReferenceManager().getObject( e.getModelRefId(), SystemModel.class );
+				int difference = systemModel.getCurrentPower() - e.getIntValue();
+				if ( barCount + difference >= 0 ) {
+					ShipPropertyEvent event = Pools.get( ShipPropertyEvent.class ).obtain();
+					event.init( shipModelRefId, PropertyEvent.INCREMENT_ACTION, OVDConstants.POWER, difference );
+					context.getScreenEventManager().postDelayedEvent( event );
+
+					// TODO: Sound events
+				}
+				else {
+					// TODO: Not enough power sound + info
+					e.cancel();
+				}
 			}
+		}
+	}
+
+	@Override
+	public void systemPropertyChanged( OverdriveContext context, SystemPropertyEvent e ) {
+		if ( shipModelRefId == -1 )
+			return;
+
+		for ( Actor a : getChildren() ) {
+			if ( a instanceof SystemActor )
+				( (SystemActor)a ).updateInfo( context );
 		}
 	}
 
@@ -296,10 +318,7 @@ public class PlayerShipReactorUI extends Group
 		if ( e.getModelRefId() != shipModelRefId ) return;
 
 		if ( e.getPropertyType() == PropertyEvent.INT_TYPE ) {
-			if ( OVDConstants.POWER.equals( e.getPropertyKey() ) ) {
-				updateInfo( context );
-			}
-			if ( OVDConstants.POWER_MAX.equals( e.getPropertyKey() ) ) {
+			if ( OVDConstants.POWER.equals( e.getPropertyKey() ) || OVDConstants.POWER_MAX.equals( e.getPropertyKey() ) ) {
 				updateInfo( context );
 			}
 		}
@@ -311,18 +330,19 @@ public class PlayerShipReactorUI extends Group
 			barCount = 0;
 			barMax = 0;
 
-			systemOffsetsList.clear();
-
 			lblPower.setVisible( false );
-			
+
+			systemOffsetsList.clear();
 			for ( Actor a : getChildren() ) {
-				if ( a instanceof SystemActor )
+				if ( a instanceof SystemActor ) {
 					a.remove();
+					( (SystemActor)a ).dispose();
+				}
 			}
 		}
 		else {
 			ShipModel shipModel = context.getReferenceManager().getObject( shipModelRefId, ShipModel.class );
-			barDisabledCount = shipModel.getProperties().getInt( OVDConstants.POWER_IONED );
+			barDisabledCount = shipModel.getProperties().getInt( OVDConstants.POWER_DISABLED );
 			barCount = shipModel.getProperties().getInt( OVDConstants.POWER );
 			barMax = shipModel.getProperties().getInt( OVDConstants.POWER_MAX );
 
@@ -338,22 +358,43 @@ public class PlayerShipReactorUI extends Group
 				lblPower.setVisible( false );
 			}
 
+			systemOffsetsList.clear();
+			// Reuse already created actors.
+			List<SystemActor> systemActors = new ArrayList<SystemActor>();
+			for ( Actor a : getChildren() ) {
+				if ( a instanceof SystemActor ) {
+					systemActors.add( (SystemActor)a );
+				}
+			}
+
 			int systemWireWidth = connectorSystemOffsetX;
 			Keys it = shipModel.getLayout().systemRefIds();
+			boolean first = true;
 			while ( it.hasNext ) {
 				int systemRefId = it.next();
-				// TODO: Reuse actors?
-				SystemActor sysActor = new SystemActor( context, resourceMap );
-				addActor( sysActor );
-				sysActor.setModelRefId( systemRefId );
 
-				systemOffsetsList.add( new Vector2( sysActor.getOffsetX(), sysActor.getWidth() ) );
-				if ( it.hasNext ) {
-					sysActor.setPosition( sysActor.getOffsetX() + systemWireWidth, sysActor.getOffsetY() );
-					systemWireWidth += sysActor.getWidth();
+				SystemActor sysActor = null;
+				if ( systemActors.size() > 0 ) {
+					sysActor = systemActors.remove( 0 );
 				}
 				else {
-					sysActor.setPosition( sysActor.getOffsetX() + systemWireWidth - systemTileAlignX, sysActor.getOffsetY() );
+					sysActor = new SystemActor( context );
+					addActor( sysActor );
+				}
+
+				sysActor.setModelRefId( systemRefId );
+				systemOffsetsList.add( new Vector2( sysActor.getSystemOffset() + ( first ? 0 : systemPaddingX ), sysActor.getWidth() ) );
+				if ( it.hasNext ) {
+					sysActor.setPosition( systemWireWidth + systemTile.getWidth() + sysActor.getSystemOffset() + ( first ? 0 : systemPaddingX ),
+							wireTile.getHeight() + systemTile.getHeight() + systemTileAlignY );
+					systemWireWidth += sysActor.getWidth() + sysActor.getSystemOffset() + ( first ? 0 : systemPaddingX );
+
+					first = false;
+				}
+				else {
+					sysActor.setPosition( systemWireWidth + systemTile.getWidth() + sysActor.getSystemOffset() + systemPaddingX,
+							wireTile.getHeight() + systemTile.getHeight() + systemTileAlignY );
+					systemWireWidth += sysActor.getSystemOffset() + systemTileAlignX + systemPaddingX;
 				}
 			}
 
