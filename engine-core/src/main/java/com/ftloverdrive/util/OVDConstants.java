@@ -37,6 +37,9 @@ public class OVDConstants {
 	/** Number of power bars affected by ion damage. */
 	public static final String POWER_IONED = "PowerIoned";
 
+	/** Number of power bars affected by system disables. */
+	public static final String POWER_DISABLED = "PowerDisabled";
+
 	/** Maximum number of power bars the entity can possibly attain. */
 	public static final String POWER_MAX = "PowerMax";
 
@@ -121,6 +124,9 @@ public class OVDConstants {
 
 	/** System property. */
 	public static final String POWER_INCREMENT = "PowerIncrement";
+
+	/** System property. */
+	public static final String POWER_DESTROYED = "PowerDestroyed";
 
 	/** System property. */
 	public static final String SELF_POWERED = "SelfPowered";

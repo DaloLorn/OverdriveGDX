@@ -1,0 +1,27 @@
+{
+  // Fields the game is hardcoded to look for.
+  // Values can be changed freely, but entry names must remain the same.
+
+  com.badlogic.gdx.graphics.Color: {
+    power-available: { a: 1, r: 0.4, g: 1, b: 0.4 },
+    power-none: { a: 1, r: 1, g: 1, b: 1 },
+    power-ion: { a: 1, r: 0.52, g: 0.9, b: 0.93 },
+    power-self: { a: 1, r: 1, g: 0.98, b: 0.35 },
+    power-disabled: { a: 1, r: 0.15, g: 0.82, b: 0.9 },
+    power-destroyed: { a: 1, r: 1, g: 0.2, b: 0.2 }
+  },
+
+  java.lang.Integer: {
+    system-bar-width: 16,
+    system-bar-height: 6,
+    bar-padding-y: 2,
+    bar-group-padding-y: 6,
+    ion-frame-gap-x: 1,
+    ion-frame-gap-y: 1,
+    bar-offset-y: 5,
+
+    clickable-icon-width: 26,
+    clickable-icon-height: 26,
+    icon-offset-y: 3
+  }
+}

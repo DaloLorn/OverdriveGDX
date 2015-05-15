@@ -17,10 +17,8 @@
   com.badlogic.gdx.graphics.Color: {
     power-available: { a: 1, r: 0.4, g: 1, b: 0.4 },
     power-none: { a: 1, r: 1, g: 1, b: 1 },
-    power-ion: { a: 1, r: 0.52, g: 0.9, b: 0.93 },
     power-self: { a: 1, r: 1, g: 0.98, b: 0.35 },
-    power-disabled: { a: 1, r: 0.15, g: 0.82, b: 0.9 },
-    power-destroyed: { a: 1, r: 1, g: 0.82, b: 0.9 } // TODO
+    power-disabled: { a: 1, r: 0.15, g: 0.82, b: 0.9 }
   },
 
   com.ftloverdrive.ui.ShaderLabel$ShaderLabelStyle: {
@@ -32,9 +30,7 @@
     reactor-max-bars-to-show: 25,
     reactor-bar-width: 28,
     reactor-bar-height: 7,
-    system-bar-width: 16,
-    system-bar-height: 6,
-    
+
     power-text-offset-x: -30,
     power-text-offset-y: 5,
     reactor-tile-align-y: 11,
@@ -43,8 +39,9 @@
     bar-offset-x: -6,
     bar-offset-y: -2,
     connector-system-offset-x: 15,
-    system-tile-align-x: 3,
-    system-tile-align-y: 8
+    system-tile-align-x: 0,
+    system-tile-align-y: 8,
+    system-padding-x: 10
   },
   
   java.lang.Float: {
