@@ -97,7 +97,8 @@ public class TestShipBlueprint extends ShipBlueprint {
 			context.getScreenEventManager().postDelayedEvent( roomAddEvent );
 
 			ShipLayoutSystemIconAddEvent iconAddEvent = Pools.get( ShipLayoutSystemIconAddEvent.class ).obtain();
-			iconAddEvent.init( shipRefId, roomRefId, xywh[0] + ( xywh[2] - 1 ) * 0.5f, xywh[1] + ( xywh[3] + 1 ) * 0.5f );
+			iconAddEvent.init( shipRefId, roomRefId, xywh[0] + ( xywh[2] - 1 ) * 0.5f,
+					xywh[1] + ( xywh[3] - 1 ) * 0.5f + ( xywh[3] > 1 ? 1 : 0 ) );
 			context.getScreenEventManager().postDelayedEvent( iconAddEvent );
 		}
 
@@ -145,6 +146,28 @@ public class TestShipBlueprint extends ShipBlueprint {
 
 		sysAddE = Pools.get( ShipSystemAddEvent.class ).obtain();
 		sysAddE.init( shipRefId, roomRefIds[14], sysRefId );
+		context.getScreenEventManager().postDelayedEvent( sysAddE );
+
+		MedbaySystemBlueprint medbaySys = new MedbaySystemBlueprint();
+		sysRefId = medbaySys.construct( context );
+
+		sysPropE = Pools.get( SystemPropertyEvent.class ).obtain();
+		sysPropE.init( sysRefId, PropertyEvent.SET_ACTION, OVDConstants.LEVEL, 3 ); // TODO: Normally would be loaded from blueprint
+		context.getScreenEventManager().postDelayedEvent( sysPropE );
+
+		sysAddE = Pools.get( ShipSystemAddEvent.class ).obtain();
+		sysAddE.init( shipRefId, roomRefIds[4], sysRefId );
+		context.getScreenEventManager().postDelayedEvent( sysAddE );
+
+		OxygenSystemBlueprint oxySys = new OxygenSystemBlueprint();
+		sysRefId = oxySys.construct( context );
+
+		sysPropE = Pools.get( SystemPropertyEvent.class ).obtain();
+		sysPropE.init( sysRefId, PropertyEvent.SET_ACTION, OVDConstants.LEVEL, 3 ); // TODO: Normally would be loaded from blueprint
+		context.getScreenEventManager().postDelayedEvent( sysPropE );
+
+		sysAddE = Pools.get( ShipSystemAddEvent.class ).obtain();
+		sysAddE.init( shipRefId, roomRefIds[13], sysRefId );
 		context.getScreenEventManager().postDelayedEvent( sysAddE );
 
 		// =====

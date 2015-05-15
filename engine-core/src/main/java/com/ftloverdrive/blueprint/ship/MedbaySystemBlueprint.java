@@ -6,19 +6,17 @@ import com.ftloverdrive.event.ship.SystemCreationEvent;
 import com.ftloverdrive.util.OVDConstants;
 
 
-public class ShieldSystemBlueprint extends SystemBlueprint {
+public class MedbaySystemBlueprint extends SystemBlueprint {
 
 
-	public ShieldSystemBlueprint() {
+	public MedbaySystemBlueprint() {
 		super( null );
 		properties.setString( OVDConstants.BLUEPRINT_NAME, getClass().getSimpleName() );
 
-		properties.setString( OVDConstants.ICON_NAME, "s-shields" );
+		properties.setString( OVDConstants.ICON_NAME, "s-medbay" );
 		properties.setBool( OVDConstants.SELF_POWERED, false );
-		properties.setInt( OVDConstants.LEVEL_MAX, 8 );
-		properties.setInt( OVDConstants.POWER_INCREMENT, 2 );
-		properties.setInt( OVDConstants.POWER_DISABLED, 1 );
-		properties.setInt( OVDConstants.POWER_DESTROYED, 2 );
+		properties.setInt( OVDConstants.LEVEL_MAX, 3 );
+		properties.setInt( OVDConstants.POWER_INCREMENT, 1 );
 	}
 
 
