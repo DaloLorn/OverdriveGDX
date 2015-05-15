@@ -13,6 +13,8 @@ import com.badlogic.gdx.scenes.scene2d.utils.SpriteDrawable;
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.IntMap;
 import com.badlogic.gdx.utils.Pools;
+import com.badlogic.gdx.utils.IntMap.Keys;
+import com.ftloverdrive.blueprint.ship.ShieldSystemBlueprint;
 import com.ftloverdrive.core.OverdriveContext;
 import com.ftloverdrive.event.PropertyEvent;
 import com.ftloverdrive.event.engine.TickEvent;
@@ -23,6 +25,8 @@ import com.ftloverdrive.event.local.LocalActorClickedListener;
 import com.ftloverdrive.event.player.OrderListener;
 import com.ftloverdrive.event.ship.ShipPropertyEvent;
 import com.ftloverdrive.event.ship.ShipPropertyListener;
+import com.ftloverdrive.event.system.SystemPropertyEvent;
+import com.ftloverdrive.event.system.SystemPropertyListener;
 import com.ftloverdrive.io.ImageSpec;
 import com.ftloverdrive.model.ship.RoomModel;
 import com.ftloverdrive.model.ship.ShipCoordinate;
@@ -33,7 +37,7 @@ import com.ftloverdrive.util.OVDConstants;
 
 
 public class ShipActor extends ModelActor
-		implements Disposable, GamePlayerShipChangeListener, ShipPropertyListener, TickListener {
+		implements Disposable, GamePlayerShipChangeListener, ShipPropertyListener, SystemPropertyListener, TickListener {
 
 	protected AssetManager assetManager;
 
@@ -170,6 +174,35 @@ public class ShipActor extends ModelActor
 						event.init( modelRefId, PropertyEvent.INCREMENT_ACTION, OVDConstants.SHIELD, 1 );
 						context.getScreenEventManager().postDelayedEvent( event, 3 );
 					}
+					else {
+						ShipPropertyEvent event = Pools.get( ShipPropertyEvent.class ).obtain();
+						event.init( modelRefId, PropertyEvent.SET_ACTION, OVDConstants.SHIELD, shieldMax );
+						context.getScreenEventManager().postDelayedEvent( event );
+					}
+				}
+			}
+		}
+	}
+
+	@Override
+	public void systemPropertyChanged( OverdriveContext context, SystemPropertyEvent e ) {
+		if ( OVDConstants.POWER.equals( e.getPropertyKey() ) ) {
+			ShipModel shipModel = context.getReferenceManager().getObject( modelRefId, ShipModel.class );
+			Keys it = shipModel.getLayout().systemRefIds();
+			boolean found = false;
+			while ( it.hasNext && !found )
+				found = it.next() == e.getModelRefId();
+			it.reset();
+
+			if ( found ) {
+				SystemModel systemModel = context.getReferenceManager().getObject( e.getModelRefId(), SystemModel.class );
+				// TODO Revise this
+				if ( systemModel.getProperties().getString( OVDConstants.BLUEPRINT_NAME ).equals( ShieldSystemBlueprint.class.getSimpleName() ) ) {
+					int level = systemModel.getCurrentPower() / systemModel.getPowerIncrement();
+
+					ShipPropertyEvent event = Pools.get( ShipPropertyEvent.class ).obtain();
+					event.init( modelRefId, PropertyEvent.SET_ACTION, OVDConstants.SHIELD_MAX, level );
+					context.getScreenEventManager().postDelayedEvent( event );
 				}
 			}
 		}
