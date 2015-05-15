@@ -23,6 +23,7 @@ public class TeleportPadActor extends ModelActor
 
 	public TeleportPadActor( OverdriveContext context ) {
 		super( context );
+		setTouchable( Touchable.disabled );
 	}
 
 	@Override
