@@ -7,6 +7,7 @@ import com.ftloverdrive.event.OVDEventHandler;
 import com.ftloverdrive.event.PropertyEvent;
 import com.ftloverdrive.event.ship.DoorPropertyEvent;
 import com.ftloverdrive.event.ship.DoorPropertyListener;
+import com.ftloverdrive.event.ship.DoorPropertySentinel;
 import com.ftloverdrive.model.ship.DoorModel;
 import com.ftloverdrive.util.OVDConstants;
 
@@ -22,6 +23,7 @@ public class DoorEventHandler implements OVDEventHandler {
 		};
 		listenerClasses = new Class[] {
 				DoorPropertyListener.class,
+				DoorPropertySentinel.class
 		};
 	}
 
@@ -45,6 +47,12 @@ public class DoorEventHandler implements OVDEventHandler {
 
 		if ( e instanceof DoorPropertyEvent ) {
 			DoorPropertyEvent event = (DoorPropertyEvent)e;
+
+			for ( int i = listeners.length - 2; i >= 0; i -= 2 ) {
+				if ( listeners[i] == DoorPropertySentinel.class ) {
+					( (DoorPropertySentinel)listeners[i + 1] ).doorPropertyChanging( context, event );
+				}
+			}
 
 			int doorRefId = event.getModelRefId();
 			DoorModel doorModel = context.getReferenceManager().getObject( doorRefId, DoorModel.class );

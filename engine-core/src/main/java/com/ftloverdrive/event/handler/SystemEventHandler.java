@@ -7,6 +7,7 @@ import com.ftloverdrive.event.OVDEventHandler;
 import com.ftloverdrive.event.PropertyEvent;
 import com.ftloverdrive.event.system.SystemPropertyEvent;
 import com.ftloverdrive.event.system.SystemPropertyListener;
+import com.ftloverdrive.event.system.SystemPropertySentinel;
 import com.ftloverdrive.model.system.SystemModel;
 import com.ftloverdrive.util.OVDConstants;
 
@@ -22,6 +23,7 @@ public class SystemEventHandler implements OVDEventHandler {
 		};
 		listenerClasses = new Class[] {
 				SystemPropertyListener.class,
+				SystemPropertySentinel.class
 		};
 	}
 
@@ -39,6 +41,15 @@ public class SystemEventHandler implements OVDEventHandler {
 	public void handle( OverdriveContext context, OVDEvent e, Object[] listeners ) {
 		if ( e instanceof SystemPropertyEvent ) {
 			SystemPropertyEvent event = (SystemPropertyEvent)e;
+
+			for ( int i = listeners.length - 2; i >= 0; i -= 2 ) {
+				if ( listeners[i] == SystemPropertySentinel.class ) {
+					( (SystemPropertySentinel)listeners[i + 1] ).systemPropertyChanging( context, event );
+				}
+			}
+			
+			if ( e.isCancelled() )
+				return;
 
 			int systemRefId = event.getModelRefId();
 			SystemModel systemModel = context.getReferenceManager().getObject( systemRefId, SystemModel.class );

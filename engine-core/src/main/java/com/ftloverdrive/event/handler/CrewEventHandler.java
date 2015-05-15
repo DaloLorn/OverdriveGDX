@@ -2,23 +2,26 @@ package com.ftloverdrive.event.handler;
 
 import com.badlogic.gdx.utils.Pools;
 import com.ftloverdrive.core.OverdriveContext;
-import com.ftloverdrive.event.PropertyEvent;
 import com.ftloverdrive.event.OVDEvent;
 import com.ftloverdrive.event.OVDEventHandler;
+import com.ftloverdrive.event.PropertyEvent;
 import com.ftloverdrive.event.ship.CrewPropertyEvent;
 import com.ftloverdrive.event.ship.CrewPropertyListener;
+import com.ftloverdrive.event.ship.CrewPropertySentinel;
 import com.ftloverdrive.model.ship.CrewModel;
+
 
 public class CrewEventHandler implements OVDEventHandler {
 	private Class[] eventClasses;
 	private Class[] listenerClasses;
 
+
 	public CrewEventHandler() {
 		eventClasses = new Class[] {
-			CrewPropertyEvent.class
+				CrewPropertyEvent.class
 		};
 		listenerClasses = new Class[] {
-			CrewPropertyListener.class,
+				CrewPropertyListener.class,
 		};
 	}
 
@@ -36,6 +39,12 @@ public class CrewEventHandler implements OVDEventHandler {
 	public void handle( OverdriveContext context, OVDEvent e, Object[] listeners ) {
 		if ( e instanceof CrewPropertyEvent ) {
 			CrewPropertyEvent event = (CrewPropertyEvent)e;
+
+			for ( int i = listeners.length - 2; i >= 0; i -= 2 ) {
+				if ( listeners[i] == CrewPropertySentinel.class ) {
+					( (CrewPropertySentinel)listeners[i + 1] ).crewPropertyChanging( context, event );
+				}
+			}
 
 			int crewRefId = event.getModelRefId();
 			CrewModel crewModel = context.getReferenceManager().getObject( crewRefId, CrewModel.class );
@@ -63,9 +72,9 @@ public class CrewEventHandler implements OVDEventHandler {
 				}
 			}
 
-			for ( int i = listeners.length-2; i >= 0; i-=2 ) {
+			for ( int i = listeners.length - 2; i >= 0; i -= 2 ) {
 				if ( listeners[i] == CrewPropertyListener.class ) {
-					((CrewPropertyListener)listeners[i+1]).crewPropertyChanged( context, event );
+					( (CrewPropertyListener)listeners[i + 1] ).crewPropertyChanged( context, event );
 				}
 			}
 		}

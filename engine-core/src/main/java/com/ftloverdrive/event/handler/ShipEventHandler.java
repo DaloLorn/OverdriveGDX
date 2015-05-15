@@ -21,6 +21,7 @@ import com.ftloverdrive.event.ship.ShipLayoutSystemIconAddEvent;
 import com.ftloverdrive.event.ship.ShipLayoutTeleportPadAddEvent;
 import com.ftloverdrive.event.ship.ShipPropertyEvent;
 import com.ftloverdrive.event.ship.ShipPropertyListener;
+import com.ftloverdrive.event.ship.ShipPropertySentinel;
 import com.ftloverdrive.event.ship.ShipRoomCreationEvent;
 import com.ftloverdrive.event.ship.ShipRoomImageChangeEvent;
 import com.ftloverdrive.event.ship.ShipSystemAddEvent;
@@ -70,6 +71,7 @@ public class ShipEventHandler implements OVDEventHandler {
 		};
 		listenerClasses = new Class[] {
 				ShipPropertyListener.class,
+				ShipPropertySentinel.class,
 				ShipLayoutListener.class,
 				OrderListener.class
 		};
@@ -104,6 +106,11 @@ public class ShipEventHandler implements OVDEventHandler {
 		}
 		else if ( e instanceof ShipPropertyEvent ) {
 			ShipPropertyEvent event = (ShipPropertyEvent)e;
+
+			for ( int i = listeners.length - 2; i >= 0; i -= 2 ) {
+				if ( listeners[i] == ShipPropertySentinel.class )
+					( (ShipPropertySentinel)listeners[i + 1] ).shipPropertyChanging( context, event );
+			}
 
 			int shipRefId = event.getModelRefId();
 			ShipModel shipModel = context.getReferenceManager().getObject( shipRefId, ShipModel.class );
