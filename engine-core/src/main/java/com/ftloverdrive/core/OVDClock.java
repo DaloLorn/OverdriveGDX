@@ -11,10 +11,10 @@ import com.ftloverdrive.event.engine.TickEvent;
 
 public class OVDClock {
 
-	private OVDEventManager eventManager;
-
 	/** Milliseconds per tick of game-time. */
-	private final int tickRate = 1000;
+	public static final int TICK_RATE = 100;
+
+	private OVDEventManager eventManager;
 
 	private int spareTime;
 	// Micro-optimization to avoid redeclaring a variable.
@@ -46,7 +46,7 @@ public class OVDClock {
 	 */
 	public void secondsElapsed( float t ) {
 		spareTime += (int)( t * 1000 ); // Add as milliseconds.
-		elapsedTicks = spareTime / tickRate;
+		elapsedTicks = spareTime / TICK_RATE;
 
 		if ( elapsedTicks > 0 ) {
 			for ( IntIntMap.Entry entry : tickRefMap ) {
@@ -54,11 +54,10 @@ public class OVDClock {
 				int i = tickCountMap.get( entry.key, 0 );
 
 				if ( i >= entry.key ) {
-					tickCountMap.put( entry.key, i - entry.key );
+					i = tickCountMap.getAndIncrement( entry.key, 0, -i );
 					TickEvent tickEvent = tickEventPool.obtain();
 					tickEvent.init();
-					tickEvent.setTickCount( i );
-
+					tickEvent.setTickCount( entry.key );
 					eventManager.postDelayedEvent( tickEvent );
 				}
 			}
@@ -73,7 +72,7 @@ public class OVDClock {
 					delayedEventMap.put( de, ticks );
 			}
 
-			spareTime = spareTime % tickRate;
+			spareTime = spareTime % TICK_RATE;
 		}
 	}
 
