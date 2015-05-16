@@ -12,6 +12,7 @@ import com.ftloverdrive.blueprint.incident.ConsequenceResourceBlueprint;
 import com.ftloverdrive.blueprint.incident.IncidentBlueprint;
 import com.ftloverdrive.blueprint.incident.PlotBranchBlueprint;
 import com.ftloverdrive.blueprint.ship.TestShipBlueprint;
+import com.ftloverdrive.core.OVDClock;
 import com.ftloverdrive.core.OverdriveContext;
 import com.ftloverdrive.event.PropertyEvent;
 import com.ftloverdrive.event.engine.TickEvent;
@@ -232,13 +233,13 @@ public class TestScreen extends BaseScreen {
 
 	private void serverSetup() {
 		// When there's a ship, increment its hull after every tick.
-		eventManager.addEventListener( new TickListener() {
+		eventManager.addTickListener( 10, new TickListener() {
 
 			@Override
 			public void ticksAccumulated( TickEvent e ) {
 				// System.out.println( "Tick ("+ e.getTickCount() +")" );
 
-				if ( e.getTickCount() == 1 ) {
+				if ( e.getTickCount() == 10 ) {
 					GameModel gameModel = context.getReferenceManager().getObject( context.getGameModelRefId(), GameModel.class );
 					int shipRefId = gameModel.getPlayerShip( context.getNetManager().getLocalPlayerRefId() );
 					if ( shipRefId != -1 ) {
@@ -259,7 +260,32 @@ public class TestScreen extends BaseScreen {
 				// certain property names - vetoing attempts to increment beyond
 				// the names' associated maxes?
 			}
-		}, TickListener.class );
+		} );
+
+		eventManager.addTickListener( 1, new TickListener() {
+
+			@Override
+			public void ticksAccumulated( TickEvent e ) {
+				if ( e.getTickCount() == 1 ) {
+					GameModel gameModel = context.getReferenceManager().getObject( context.getGameModelRefId(), GameModel.class );
+					int shipRefId = gameModel.getPlayerShip( context.getNetManager().getLocalPlayerRefId() );
+					if ( shipRefId != -1 ) {
+						ShipModel shipModel = context.getReferenceManager().getObject( shipRefId, ShipModel.class );
+
+						int shield = shipModel.getProperties().getInt( OVDConstants.SHIELD );
+						int shieldMax = shipModel.getProperties().getInt( OVDConstants.SHIELD_MAX );
+						int fractionMax = shipModel.getProperties().getInt( OVDConstants.SHIELD_FRACTION_MAX );
+
+						if ( shield < shieldMax ) {
+							ShipPropertyEvent event = Pools.get( ShipPropertyEvent.class ).obtain();
+							event.init( shipRefId, PropertyEvent.INCREMENT_ACTION, OVDConstants.SHIELD_FRACTION,
+									5 * fractionMax / OVDClock.TICK_RATE );
+							context.getScreenEventManager().postDelayedEvent( event );
+						}
+					}
+				}
+			}
+		} );
 	}
 
 	private void incidentWindowDemo() {

@@ -1,5 +1,6 @@
 package com.ftloverdrive.ui.ship;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.Sprite;
@@ -166,22 +167,51 @@ public class ShipActor extends ModelActor
 		ShipModel shipModel = context.getReferenceManager().getObject( modelRefId, ShipModel.class );
 		if ( e.getPropertyType() == PropertyEvent.INT_TYPE ) {
 			if ( OVDConstants.SHIELD.equals( e.getPropertyKey() ) || OVDConstants.SHIELD_MAX.equals( e.getPropertyKey() ) ) {
-				if ( e.getIntValue() > 0 ) {
-					int shield = shipModel.getProperties().getInt( OVDConstants.SHIELD );
-					int shieldMax = shipModel.getProperties().getInt( OVDConstants.SHIELD_MAX );
-					if ( shield < shieldMax ) {
-						ShipPropertyEvent event = Pools.get( ShipPropertyEvent.class ).obtain();
-						event.init( modelRefId, PropertyEvent.INCREMENT_ACTION, OVDConstants.SHIELD, 1 );
-						context.getScreenEventManager().postDelayedEvent( event, 3 );
-					}
-					else {
-						ShipPropertyEvent event = Pools.get( ShipPropertyEvent.class ).obtain();
-						event.init( modelRefId, PropertyEvent.SET_ACTION, OVDConstants.SHIELD, shieldMax );
-						context.getScreenEventManager().postDelayedEvent( event );
-					}
+				int shield = shipModel.getProperties().getInt( OVDConstants.SHIELD );
+				int shieldMax = shipModel.getProperties().getInt( OVDConstants.SHIELD_MAX );
+				if ( shield > shieldMax ) {
+					ShipPropertyEvent event = Pools.get( ShipPropertyEvent.class ).obtain();
+					event.init( modelRefId, PropertyEvent.SET_ACTION, OVDConstants.SHIELD, shieldMax );
+					context.getScreenEventManager().postDelayedEvent( event );
+				}
+				if ( shield == shieldMax ) {
+					ShipPropertyEvent event = Pools.get( ShipPropertyEvent.class ).obtain();
+					event.init( modelRefId, PropertyEvent.SET_ACTION, OVDConstants.SHIELD_FRACTION, 0 );
+					context.getScreenEventManager().postDelayedEvent( event );
+				}
+			}
+			else if ( OVDConstants.SHIELD_FRACTION.equals( e.getPropertyKey() ) ||
+					OVDConstants.SHIELD_FRACTION_MAX.equals( e.getPropertyKey() ) ) {
+				int fraction = shipModel.getProperties().getInt( OVDConstants.SHIELD_FRACTION );
+				int fractionMax = shipModel.getProperties().getInt( OVDConstants.SHIELD_FRACTION_MAX );
+
+				if ( fraction >= fractionMax ) {
+					ShipPropertyEvent event = Pools.get( ShipPropertyEvent.class ).obtain();
+					event.init( modelRefId, PropertyEvent.SET_ACTION, OVDConstants.SHIELD_FRACTION, fraction - fractionMax );
+					context.getScreenEventManager().postDelayedEvent( event );
+
+					event = Pools.get( ShipPropertyEvent.class ).obtain();
+					event.init( modelRefId, PropertyEvent.INCREMENT_ACTION, OVDConstants.SHIELD, 1 );
+					context.getScreenEventManager().postDelayedEvent( event );
+				}
+				else if ( fraction < 0 ) {
+					ShipPropertyEvent event = Pools.get( ShipPropertyEvent.class ).obtain();
+					event.init( modelRefId, PropertyEvent.SET_ACTION, OVDConstants.SHIELD_FRACTION, fractionMax - fraction );
+					context.getScreenEventManager().postDelayedEvent( event );
+
+					event = Pools.get( ShipPropertyEvent.class ).obtain();
+					event.init( modelRefId, PropertyEvent.INCREMENT_ACTION, OVDConstants.SHIELD, -1 );
+					context.getScreenEventManager().postDelayedEvent( event );
 				}
 			}
 		}
+	}
+
+	@Override
+	public void ticksAccumulated( TickEvent e ) {
+		// ShipPropertyEvent event = Pools.get( ShipPropertyEvent.class ).obtain();
+		// event.init( modelRefId, PropertyEvent.SET_ACTION, OVDConstants.SHIELD_FRACTION, Gdx.app. );
+		// context.getScreenEventManager().postDelayedEvent( event );
 	}
 
 	@Override
@@ -196,7 +226,7 @@ public class ShipActor extends ModelActor
 
 			if ( found ) {
 				SystemModel systemModel = context.getReferenceManager().getObject( e.getModelRefId(), SystemModel.class );
-				// TODO Revise this
+				// TODO Revise this condition
 				if ( systemModel.getProperties().getString( OVDConstants.BLUEPRINT_NAME ).equals( ShieldSystemBlueprint.class.getSimpleName() ) ) {
 					int level = systemModel.getCurrentPower() / systemModel.getPowerIncrement();
 
@@ -207,7 +237,6 @@ public class ShipActor extends ModelActor
 			}
 		}
 	}
-
 
 	/**
 	 * Updates the everything to match the current ShipModel.
@@ -454,9 +483,5 @@ public class ShipActor extends ModelActor
 		roomDecors.dispose();
 		assetManager.unload( OVDConstants.SHIP_ATLAS );
 		assetManager.unload( OVDConstants.ROOT_ATLAS );
-	}
-
-	@Override
-	public void ticksAccumulated( TickEvent e ) {
 	}
 }

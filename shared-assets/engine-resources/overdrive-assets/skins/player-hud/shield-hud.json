@@ -3,22 +3,32 @@
     shield-bg-tex-on:  { atlasPath: "img/statusUI/.atlas.atlas", regionName: "top-shields4-on" },
     shield-bg-tex-off: { atlasPath: "img/statusUI/.atlas.atlas", regionName: "top-shields4-off" },
     shield-tex-empty:  { atlasPath: "img/statusUI/.atlas.atlas", regionName: "top-shieldsquare1-off" },
-    shield-tex-full:   { atlasPath: "img/statusUI/.atlas.atlas", regionName: "top-shieldsquare1-on" }
+    shield-tex-full:   { atlasPath: "img/statusUI/.atlas.atlas", regionName: "top-shieldsquare1-on" },
+    shield-tex-recharge-box: { atlasPath: "img/statusUI/.atlas.atlas", regionName: "energy-shield-box" },
+    shield-tex-recharge-bar: { atlasPath: "overdrive-assets/skins/player-hud/reactor-ui/reactor-ui.atlas", regionName: "bar-full" }
   },
 
   // Fields the game is hardcoded to look for.
   // Values can be changed freely, but entry names must remain the same.
+  
+  com.badlogic.gdx.graphics.Color: {
+    recharge-bar-color: { a: 1, r: 0.1, g: 0.52, b: 1 }
+  },
 
   com.badlogic.gdx.graphics.g2d.Sprite: {
     shield-bg-on:  { texture: shield-bg-tex-on },
     shield-bg-off: { texture: shield-bg-tex-off },
     shield-empty:  { texture: shield-tex-empty },
-    shield-full:   { texture: shield-tex-full }
+    shield-full:   { texture: shield-tex-full },
+    shield-recharge-bg: { texture: shield-tex-recharge-box },
+    shield-recharge-bar: { texture: shield-tex-recharge-bar }
   },
 
   java.lang.Integer: {
     shield-offset-x: 12,
     shield-offset-y: 10,
-    shield-spacing-x: 23
+    shield-spacing-x: 23,
+    shield-recharge-bg-align-x: 12,
+    shield-recharge-bg-align-y: -3
   }
 }

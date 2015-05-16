@@ -1,8 +1,10 @@
 package com.ftloverdrive.ui.hud;
 
 import com.badlogic.gdx.assets.AssetManager;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.Sprite;
+import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.utils.Disposable;
 import com.ftloverdrive.core.OverdriveContext;
@@ -20,19 +22,28 @@ public class PlayerShipShieldMonitor extends Actor implements Disposable, GamePl
 
 	public static final String SKIN_PATH = "overdrive-assets/skins/player-hud/shield-hud.json";
 
-	protected AssetManager assetManager;
+	protected final Sprite bgSprite;
+	protected final Sprite shieldEmptySprite;
+	protected final Sprite shieldFullSprite;
+	protected final Sprite shieldRechargeBgSprite;
+	protected final Sprite shieldRechargeBarSprite;
+
+	protected final int offsetX;
+	protected final int offsetY;
+	protected final int spacingX;
+	protected final int shieldRechargeBgAlignX;
+	protected final int shieldRechargeBgAlignY;
+
+	protected final Color colorRechargeBar;
+
+	private final AssetManager assetManager;
+
 	protected int shipModelRefId = -1;
 
 	protected int shieldMax = 0;
-	protected int shieldFull = 0;
-
-	protected Sprite bgSprite;
-	protected Sprite shieldEmptySprite;
-	protected Sprite shieldFullSprite;
-
-	protected int offsetX = 0;
-	protected int offsetY = 0;
-	protected int spacingX = 0;
+	protected int shield = 0;
+	protected float recharge = 0;
+	protected float rechargePrev = 0;
 
 
 	public PlayerShipShieldMonitor( OverdriveContext context ) {
@@ -47,10 +58,16 @@ public class PlayerShipShieldMonitor extends Actor implements Disposable, GamePl
 		bgSprite = skin.getSprite( "shield-bg-on" );
 		shieldEmptySprite = skin.getSprite( "shield-empty" );
 		shieldFullSprite = skin.getSprite( "shield-full" );
+		shieldRechargeBgSprite = skin.getSprite( "shield-recharge-bg" );
+		shieldRechargeBarSprite = skin.getSprite( "shield-recharge-bar" );
+
+		colorRechargeBar = skin.getColor( "recharge-bar-color" );
 
 		offsetX = skin.getInt( "shield-offset-x" );
 		offsetY = skin.getInt( "shield-offset-y" );
 		spacingX = skin.getInt( "shield-spacing-x" );
+		shieldRechargeBgAlignX = skin.getInt( "shield-recharge-bg-align-x" );
+		shieldRechargeBgAlignY = skin.getInt( "shield-recharge-bg-align-y" );
 
 		setWidth( bgSprite.getWidth() );
 		setHeight( bgSprite.getHeight() );
@@ -63,8 +80,17 @@ public class PlayerShipShieldMonitor extends Actor implements Disposable, GamePl
 		bgSprite.setPosition( getX(), getY() );
 		bgSprite.draw( batch, parentAlpha );
 
+		shieldRechargeBgSprite.setPosition( getX() + shieldRechargeBgAlignX, getY() + shieldRechargeBgAlignY );
+		shieldRechargeBgSprite.draw( batch, parentAlpha );
+
+		// Interpolate the percentage to make it more smooth.
+		recharge = Interpolation.linear.apply( recharge, rechargePrev, 0.25f );
+		shieldRechargeBarSprite.setSize( recharge * ( shieldRechargeBgSprite.getWidth() - 6 ), 6 );
+		shieldRechargeBarSprite.setPosition( getX() + shieldRechargeBgAlignX + 3, getY() + shieldRechargeBgAlignY + 3 );
+		shieldRechargeBarSprite.draw( batch, parentAlpha );
+
 		for ( int shieldIndex = 0; shieldIndex < shieldMax; ++shieldIndex ) {
-			if ( shieldIndex < shieldFull ) {
+			if ( shieldIndex < shield ) {
 				shieldFullSprite.setPosition( getX() + offsetX + shieldIndex * spacingX,
 						getY() + offsetY );
 				shieldFullSprite.draw( batch, parentAlpha );
@@ -96,7 +122,10 @@ public class PlayerShipShieldMonitor extends Actor implements Disposable, GamePl
 		if ( e.getModelRefId() != shipModelRefId ) return;
 
 		if ( e.getPropertyType() == PropertyEvent.INT_TYPE ) {
-			if ( OVDConstants.SHIELD.equals( e.getPropertyKey() ) || OVDConstants.SHIELD_MAX.equals( e.getPropertyKey() ) ) {
+			if ( OVDConstants.SHIELD.equals( e.getPropertyKey() ) ||
+					OVDConstants.SHIELD_MAX.equals( e.getPropertyKey() ) ||
+					OVDConstants.SHIELD_FRACTION_MAX.equals( e.getPropertyKey() ) ||
+					OVDConstants.SHIELD_FRACTION.equals( e.getPropertyKey() ) ) {
 				updateShipInfo( context );
 			}
 		}
@@ -107,13 +136,26 @@ public class PlayerShipShieldMonitor extends Actor implements Disposable, GamePl
 	 */
 	private void updateShipInfo( OverdriveContext context ) {
 		if ( shipModelRefId == -1 ) {
-			shieldMax = 0;
-			shieldFull = 0;
+			shieldMax = -1;
+			shield = -1;
+			recharge = -1;
+			rechargePrev = -1;
 		}
 		else {
 			ShipModel shipModel = context.getReferenceManager().getObject( shipModelRefId, ShipModel.class );
-			shieldFull = shipModel.getProperties().getInt( OVDConstants.SHIELD );
+			int prevShield = shield;
+			shield = shipModel.getProperties().getInt( OVDConstants.SHIELD );
 			shieldMax = shipModel.getProperties().getInt( OVDConstants.SHIELD_MAX );
+
+			if ( shield != prevShield || shield == shieldMax ) {
+				recharge = 0;
+				rechargePrev = 0;
+			}
+
+			float shieldFraction = shipModel.getProperties().getInt( OVDConstants.SHIELD_FRACTION );
+			float shieldFractionMax = shipModel.getProperties().getInt( OVDConstants.SHIELD_FRACTION_MAX );
+			rechargePrev = shieldFraction / shieldFractionMax;
+			shieldRechargeBarSprite.setColor( colorRechargeBar );
 		}
 	}
 

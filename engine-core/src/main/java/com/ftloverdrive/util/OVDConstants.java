@@ -59,6 +59,12 @@ public class OVDConstants {
 	public static final String SHIELD = "Shield";
 
 	/** Ship property. */
+	public static final String SHIELD_FRACTION_MAX = "ShieldFractionMax";
+
+	/** Ship property. */
+	public static final String SHIELD_FRACTION = "ShieldFraction";
+
+	/** Ship property. */
 	public static final String SCRAP = "Scrap";
 
 	/** Ship property. */
