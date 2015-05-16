@@ -47,19 +47,21 @@ public class AbstractShipModel extends AbstractOVDModel
 
 	public AbstractShipModel() {
 		super();
-		shipProperties.setInt( OVDConstants.HEALTH_MAX, 0 );
-		shipProperties.setInt( OVDConstants.HEALTH, 0 );
+		shipProperties.setInt( OVDConstants.HEALTH_MAX, 30 );
+		shipProperties.setInt( OVDConstants.HEALTH, 30 );
 		shipProperties.setInt( OVDConstants.SHIELD_MAX, 0 );
 		shipProperties.setInt( OVDConstants.SHIELD, 0 );
-		shipProperties.setInt( OVDConstants.POWER_MAX, 0 );
-		shipProperties.setInt( OVDConstants.POWER, 0 );
+		shipProperties.setInt( OVDConstants.SHIELD_FRACTION_MAX, 1000 );
+		shipProperties.setInt( OVDConstants.SHIELD_FRACTION, 0 );
+		shipProperties.setInt( OVDConstants.POWER_MAX, 30 );
+		shipProperties.setInt( OVDConstants.POWER, 8 );
 		shipProperties.setInt( OVDConstants.SCRAP, 0 );
-		shipProperties.setInt( OVDConstants.FUEL, 0 );
+		shipProperties.setInt( OVDConstants.FUEL, 5 );
 		shipProperties.setInt( OVDConstants.MISSILES, 0 );
 		shipProperties.setInt( OVDConstants.DRONES, 0 );
-		shipProperties.setInt( OVDConstants.WEAPON_SLOTS, 0 );
-		shipProperties.setInt( OVDConstants.DRONE_SLOTS, 0 );
-		shipProperties.setInt( OVDConstants.AUGMENT_SLOTS, 0 );
+		shipProperties.setInt( OVDConstants.WEAPON_SLOTS, 4 );
+		shipProperties.setInt( OVDConstants.DRONE_SLOTS, 2 );
+		shipProperties.setInt( OVDConstants.AUGMENT_SLOTS, 3 );
 		shipProperties.setInt( OVDConstants.CREW_SLOTS, 8 );
 		shipProperties.setString( OVDConstants.BLUEPRINT_NAME, "DEFAULT" );
 
