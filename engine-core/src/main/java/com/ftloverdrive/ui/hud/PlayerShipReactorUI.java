@@ -52,8 +52,8 @@ public class PlayerShipReactorUI extends Group
 	protected final Sprite connector;
 
 	protected final NinePatch barEmpty;
-	protected final NinePatch barDisabled;
 	protected final NinePatch barFull;
+	protected final NinePatch diagonal;
 	protected final NinePatchDrawable barDrawable;
 
 	protected final Color colorHasPower;
@@ -125,8 +125,8 @@ public class PlayerShipReactorUI extends Group
 		barEmpty.setColor( colorNoPower );
 		barFull = new NinePatch( wireAtlas.findRegion( "bar-full" ), 1, 1, 1, 1 );
 		barFull.setColor( colorHasPower );
-		barDisabled = new NinePatch( wireAtlas.findRegion( "bar-disabled" ), 1, 1, 1, 1 );
-		barDisabled.setColor( colorDisabled );
+		diagonal = new NinePatch( wireAtlas.findRegion( "diagonal" ) );
+		diagonal.setColor( colorDisabled );
 
 		systemNoneCap = wireAtlas.createSprite( "system-none-cap" );
 		systemTile = wireAtlas.createSprite( "system-tile" );
@@ -216,11 +216,15 @@ public class PlayerShipReactorUI extends Group
 		barDrawable.setPatch( barFull );
 		for ( int i = 0; i < barMax && i < reactorMaxBarsToShow; ++i ) {
 			if ( i >= powerDiff ) {
-				if ( barDrawable.getPatch() != barDisabled )
-					barDrawable.setPatch( barDisabled );
-			}
-			else if ( i >= barCount && barDrawable.getPatch() != barEmpty )
+				barDrawable.setPatch( diagonal );
+				barDrawable.draw( batch, x - reactorBarWidth, y + barOffsetY, reactorBarWidth, reactorBarHeight );
 				barDrawable.setPatch( barEmpty );
+				barEmpty.setColor( colorDisabled );
+			}
+			else if ( i >= barCount ) {
+				barDrawable.setPatch( barEmpty );
+				barEmpty.setColor( colorNoPower );
+			}
 			barDrawable.draw( batch, x - reactorBarWidth, y + barOffsetY, reactorBarWidth, reactorBarHeight );
 
 			y += barSpacingV;

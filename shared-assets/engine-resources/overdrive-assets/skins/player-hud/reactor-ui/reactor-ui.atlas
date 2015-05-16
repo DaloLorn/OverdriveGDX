@@ -76,41 +76,49 @@ reactor-cap
   index: -1
 
 bar-ui.png
-size: 8,8
+size: 8, 8
 format: RGBA8888
 filter: Nearest,Nearest
 repeat: none
 bar-empty
   rotate: false
-  xy: 0, 0
+  xy: 5, 0
   size: 3, 3
   orig: 3, 3
   offset: 0, 0
   index: -1
 bar-full
   rotate: false
-  xy: 3, 0
+  xy: 5, 3
   size: 3, 3
   orig: 3, 3
   offset: 0, 0
   index: -1
 ion-frame
   rotate: false
-  xy: 0, 3
+  xy: 0, 0
   size: 5, 5
   orig: 5, 5
   offset: 0, 0
   index: -1
 
+
 bar-ui-fuzzy.png
-size: 8,8
+size: 16, 8
 format: RGBA8888
 filter: Linear,Linear
 repeat: none
-bar-disabled
+diagonal
   rotate: false
   xy: 0, 0
-  size: 6, 6
-  orig: 6, 6
+  size: 5, 7
+  orig: 5, 7
+  offset: 0, 0
+  index: -1
+glow
+  rotate: false
+  xy: 5, 0
+  size: 9, 9
+  orig: 9, 9
   offset: 0, 0
   index: -1

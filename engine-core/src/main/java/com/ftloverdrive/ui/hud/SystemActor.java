@@ -35,8 +35,8 @@ public class SystemActor extends ModelActor
 	public static final String ATLAS_PATH = "overdrive-assets/skins/player-hud/reactor-ui/reactor-ui.atlas";
 
 	protected final NinePatch barEmpty;
-	protected final NinePatch barDisabled;
 	protected final NinePatch barFull;
+	protected final NinePatch diagonal;
 	protected final NinePatch ionFrame;
 	protected final NinePatchDrawable barDrawable;
 
@@ -97,8 +97,8 @@ public class SystemActor extends ModelActor
 		barEmpty.setColor( colorNoPower );
 		barFull = new NinePatch( wireAtlas.findRegion( "bar-full" ), 1, 1, 1, 1 );
 		barFull.setColor( colorHasPower );
-		barDisabled = new NinePatch( wireAtlas.findRegion( "bar-disabled" ), 1, 1, 1, 1 );
-		barDisabled.setColor( colorDisabled );
+		diagonal = new NinePatch( wireAtlas.findRegion( "diagonal" ) );
+		diagonal.setColor( colorDisabled );
 		ionFrame = new NinePatch( wireAtlas.findRegion( "ion-frame" ), 2, 2, 2, 2 );
 		ionFrame.setColor( colorIon );
 
@@ -143,17 +143,24 @@ public class SystemActor extends ModelActor
 		barDrawable.setPatch( barFull );
 		for ( int i = 0; i < powerCap; ++i ) {
 			if ( i >= powerCap - powerDestroyed ) {
-				barDisabled.setColor( colorDestroyed );
-				barDrawable.setPatch( barDisabled );
+				barDrawable.setPatch( diagonal );
+				diagonal.setColor( colorDestroyed );
+				barDrawable.draw( batch, x, y, sysBarWidth, sysBarHeight );
+
+				barDrawable.setPatch( barEmpty );
+				barEmpty.setColor( colorDestroyed );
 			}
 			else if ( i >= powerCap - ( powerDisabled + powerDestroyed ) ) {
-				if ( barDrawable.getPatch() != barDisabled ) {
-					barDisabled.setColor( colorIon );
-					barDrawable.setPatch( barDisabled );
-				}
+				barDrawable.setPatch( diagonal );
+				diagonal.setColor( colorDisabled );
+				barDrawable.draw( batch, x, y, sysBarWidth, sysBarHeight );
+
+				barDrawable.setPatch( barEmpty );
+				barEmpty.setColor( colorDisabled );
 			}
 			else if ( i >= powerCurrent && barDrawable.getPatch() != barEmpty ) {
 				barDrawable.setPatch( barEmpty );
+				barEmpty.setColor( colorNoPower );
 			}
 			barDrawable.draw( batch, x, y, sysBarWidth, sysBarHeight );
 			y += sysBarHeight;
