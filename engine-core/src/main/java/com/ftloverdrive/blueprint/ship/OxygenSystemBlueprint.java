@@ -13,10 +13,11 @@ public class OxygenSystemBlueprint extends SystemBlueprint {
 		super( null );
 		properties.setString( OVDConstants.BLUEPRINT_NAME, getClass().getSimpleName() );
 
-		properties.setString( OVDConstants.ICON_NAME, "s-oxygen" );
-		properties.setBool( OVDConstants.SELF_POWERED, false );
+		properties.setString( OVDConstants.SYSTEM_ICON_NAME, "s-oxygen" );
 		properties.setInt( OVDConstants.LEVEL_MAX, 3 );
-		properties.setInt( OVDConstants.POWER_INCREMENT, 1 );
+		properties.setInt( OVDConstants.POWER_IONED, 2 );
+		properties.setInt( OVDConstants.POWER, 1 );
+		properties.setInt( OVDConstants.ION_FRACTION, 1000 );
 	}
 
 

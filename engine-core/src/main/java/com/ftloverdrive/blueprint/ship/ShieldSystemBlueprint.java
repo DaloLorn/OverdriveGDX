@@ -13,12 +13,11 @@ public class ShieldSystemBlueprint extends SystemBlueprint {
 		super( null );
 		properties.setString( OVDConstants.BLUEPRINT_NAME, getClass().getSimpleName() );
 
-		properties.setString( OVDConstants.ICON_NAME, "s-shields" );
-		properties.setBool( OVDConstants.SELF_POWERED, false );
+		properties.setString( OVDConstants.SYSTEM_ICON_NAME, "s-shields" );
 		properties.setInt( OVDConstants.LEVEL_MAX, 8 );
 		properties.setInt( OVDConstants.POWER_INCREMENT, 2 );
 		properties.setInt( OVDConstants.POWER_DISABLED, 1 );
-		properties.setInt( OVDConstants.POWER_DESTROYED, 2 );
+		properties.setInt( OVDConstants.POWER_DESTROYED, 1 );
 	}
 
 

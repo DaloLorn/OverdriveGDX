@@ -15,11 +15,13 @@ public class DefaultSystemModel implements SystemModel {
 
 	public DefaultSystemModel() {
 		super();
-		systemProperties.setInt( OVDConstants.HEALTH_MAX, 0 );
-		systemProperties.setInt( OVDConstants.HEALTH, 0 );
-		systemProperties.setInt( OVDConstants.POWER_INCREMENT, 0 );
+		systemProperties.setInt( OVDConstants.HEALTH_MAX, 100 );
+		systemProperties.setInt( OVDConstants.HEALTH, 100 );
+		systemProperties.setInt( OVDConstants.POWER_INCREMENT, 1 );
 		systemProperties.setBool( OVDConstants.SELF_POWERED, false );
-		systemProperties.setString( OVDConstants.ICON_NAME, "" );
+		systemProperties.setString( OVDConstants.SYSTEM_ICON_NAME, "" );
+		systemProperties.setInt( OVDConstants.ION_FRACTION_MAX, 1000 );
+		systemProperties.setInt( OVDConstants.ION_FRACTION, 1000 );
 		systemProperties.setInt( OVDConstants.POWER_IONED, 0 );
 		systemProperties.setInt( OVDConstants.POWER_MAX, 0 );
 		systemProperties.setInt( OVDConstants.POWER, 0 );
@@ -69,6 +71,6 @@ public class DefaultSystemModel implements SystemModel {
 
 	@Override
 	public String getIconName() {
-		return systemProperties.getString( OVDConstants.ICON_NAME );
+		return systemProperties.getString( OVDConstants.SYSTEM_ICON_NAME );
 	}
 }

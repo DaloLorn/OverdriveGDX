@@ -13,10 +13,8 @@ public class MedbaySystemBlueprint extends SystemBlueprint {
 		super( null );
 		properties.setString( OVDConstants.BLUEPRINT_NAME, getClass().getSimpleName() );
 
-		properties.setString( OVDConstants.ICON_NAME, "s-medbay" );
-		properties.setBool( OVDConstants.SELF_POWERED, false );
+		properties.setString( OVDConstants.SYSTEM_ICON_NAME, "s-medbay" );
 		properties.setInt( OVDConstants.LEVEL_MAX, 3 );
-		properties.setInt( OVDConstants.POWER_INCREMENT, 1 );
 	}
 
 
