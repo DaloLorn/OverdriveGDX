@@ -179,6 +179,8 @@ public class CrewActor extends AmbulActor
 			int shipId = gameModel.getPlayerShip( playerRefId );
 			ShipModel shipModel = context.getReferenceManager().getObject( shipId, ShipModel.class );
 
+			// TODO: This needs to be rewritten sometime in the future.
+
 			if ( shipModel.getLayout().hasCrew( modelRefId ) ) {
 				CrewModel crewModel = context.getReferenceManager().getObject( modelRefId, CrewModel.class );
 				ShipCoordinate start = Pools.get( ShipCoordinate.class ).obtain();

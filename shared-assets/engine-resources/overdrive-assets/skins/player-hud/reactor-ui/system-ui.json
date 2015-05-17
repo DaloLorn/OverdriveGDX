@@ -22,6 +22,8 @@
 
     clickable-icon-width: 26,
     clickable-icon-height: 26,
-    icon-offset-y: 3
+    icon-offset-y: 3,
+    
+    ion-lock-step-angle: 30
   }
 }

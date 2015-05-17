@@ -12,11 +12,7 @@ import com.ftloverdrive.blueprint.incident.ConsequenceResourceBlueprint;
 import com.ftloverdrive.blueprint.incident.IncidentBlueprint;
 import com.ftloverdrive.blueprint.incident.PlotBranchBlueprint;
 import com.ftloverdrive.blueprint.ship.TestShipBlueprint;
-import com.ftloverdrive.core.OVDClock;
 import com.ftloverdrive.core.OverdriveContext;
-import com.ftloverdrive.event.PropertyEvent;
-import com.ftloverdrive.event.engine.TickEvent;
-import com.ftloverdrive.event.engine.TickListener;
 import com.ftloverdrive.event.game.GamePlayerShipChangeEvent;
 import com.ftloverdrive.event.game.GamePlayerShipChangeListener;
 import com.ftloverdrive.event.handler.DoorEventHandler;
@@ -28,15 +24,12 @@ import com.ftloverdrive.event.handler.ShipEventHandler;
 import com.ftloverdrive.event.handler.SystemEventHandler;
 import com.ftloverdrive.event.handler.TickEventHandler;
 import com.ftloverdrive.event.incident.IncidentSelectionEvent;
-import com.ftloverdrive.event.ship.ShipPropertyEvent;
 import com.ftloverdrive.event.ship.ShipPropertyListener;
 import com.ftloverdrive.event.system.SystemPropertyListener;
 import com.ftloverdrive.event.system.SystemPropertySentinel;
 import com.ftloverdrive.model.DefaultPlayerModel;
-import com.ftloverdrive.model.GameModel;
 import com.ftloverdrive.model.PlayerModel;
 import com.ftloverdrive.model.incident.requirement.ShipRequirement;
-import com.ftloverdrive.model.ship.ShipModel;
 import com.ftloverdrive.ui.ShatteredImage;
 import com.ftloverdrive.ui.hud.PlayerScrapMonitor;
 import com.ftloverdrive.ui.hud.PlayerShipDoorHighlighter;
@@ -204,6 +197,7 @@ public class TestScreen extends BaseScreen {
 		eventManager.addEventListener( shipActor, GamePlayerShipChangeListener.class );
 		eventManager.addEventListener( shipActor, ShipPropertyListener.class );
 		eventManager.addEventListener( shipActor, SystemPropertyListener.class );
+		eventManager.addTickListener( 1, shipActor );
 
 		// XXX: Periodic events can be registered like this...
 		// eventManager.addTickListener( numberOfTicks, tickListener );
@@ -212,9 +206,6 @@ public class TestScreen extends BaseScreen {
 		PlayerModel playerModel = new DefaultPlayerModel();
 		context.getReferenceManager().addObject( playerModel, playerRefId );
 		context.getNetManager().setLocalPlayerRefId( playerRefId );
-
-		if ( context.getGame().isServer() )
-			serverSetup();
 
 		// Create a test ship.
 
@@ -229,63 +220,6 @@ public class TestScreen extends BaseScreen {
 		incidentWindowDemo();
 
 		resize( getScreenWidth(), getScreenHeight() );
-	}
-
-	private void serverSetup() {
-		// When there's a ship, increment its hull after every tick.
-		eventManager.addTickListener( 10, new TickListener() {
-
-			@Override
-			public void ticksAccumulated( TickEvent e ) {
-				// System.out.println( "Tick ("+ e.getTickCount() +")" );
-
-				if ( e.getTickCount() == 10 ) {
-					GameModel gameModel = context.getReferenceManager().getObject( context.getGameModelRefId(), GameModel.class );
-					int shipRefId = gameModel.getPlayerShip( context.getNetManager().getLocalPlayerRefId() );
-					if ( shipRefId != -1 ) {
-						ShipModel shipModel = context.getReferenceManager().getObject( shipRefId, ShipModel.class );
-
-						int hull = shipModel.getProperties().getInt( OVDConstants.HEALTH );
-						int hullMax = shipModel.getProperties().getInt( OVDConstants.HEALTH_MAX );
-						if ( hull < hullMax ) {
-							ShipPropertyEvent event = Pools.get( ShipPropertyEvent.class ).obtain();
-							event.init( shipRefId, PropertyEvent.INCREMENT_ACTION, OVDConstants.HEALTH, 1 );
-							context.getScreenEventManager().postDelayedEvent( event );
-						}
-					}
-				}
-
-				// Eventually a PropertyEvent would have an INC_IF_LESS_THAN flag
-				// or something. Or maybe a sentinel event listener - set to watch
-				// certain property names - vetoing attempts to increment beyond
-				// the names' associated maxes?
-			}
-		} );
-
-		eventManager.addTickListener( 1, new TickListener() {
-
-			@Override
-			public void ticksAccumulated( TickEvent e ) {
-				if ( e.getTickCount() == 1 ) {
-					GameModel gameModel = context.getReferenceManager().getObject( context.getGameModelRefId(), GameModel.class );
-					int shipRefId = gameModel.getPlayerShip( context.getNetManager().getLocalPlayerRefId() );
-					if ( shipRefId != -1 ) {
-						ShipModel shipModel = context.getReferenceManager().getObject( shipRefId, ShipModel.class );
-
-						int shield = shipModel.getProperties().getInt( OVDConstants.SHIELD );
-						int shieldMax = shipModel.getProperties().getInt( OVDConstants.SHIELD_MAX );
-						int fractionMax = shipModel.getProperties().getInt( OVDConstants.SHIELD_FRACTION_MAX );
-
-						if ( shield < shieldMax ) {
-							ShipPropertyEvent event = Pools.get( ShipPropertyEvent.class ).obtain();
-							event.init( shipRefId, PropertyEvent.INCREMENT_ACTION, OVDConstants.SHIELD_FRACTION,
-									5 * fractionMax / OVDClock.TICK_RATE );
-							context.getScreenEventManager().postDelayedEvent( event );
-						}
-					}
-				}
-			}
-		} );
 	}
 
 	private void incidentWindowDemo() {

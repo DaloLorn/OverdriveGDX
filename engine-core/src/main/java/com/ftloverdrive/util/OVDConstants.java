@@ -138,7 +138,13 @@ public class OVDConstants {
 	public static final String SELF_POWERED = "SelfPowered";
 
 	/** System property. */
-	public static final String ICON_NAME = "SystemIconName";
+	public static final String SYSTEM_ICON_NAME = "SystemIconName";
+
+	/** System property. */
+	public static final String ION_FRACTION_MAX = "IonFractionMax";
+
+	/** System property. */
+	public static final String ION_FRACTION = "IonFraction";
 
 	/** System property. */
 	public static final String LEVEL_MAX = "LevelMax";
@@ -159,6 +165,7 @@ public class OVDConstants {
 	public static final String HANGARUI_ATLAS = "img/customizeUI/.atlas.atlas";
 	public static final String EFFECTS_ATLAS = "img/effects/.atlas.atlas";
 	public static final String ICONS_ATLAS = "img/icons/.atlas.atlas";
+	public static final String ION_LOCK_ATLAS = "img/icons/locking/.atlas.atlas";
 	public static final String MISC_ATLAS = "img/misc/.atlas.atlas";
 	public static final String MOUSE_ATLAS = "img/mouse/.atlas.atlas";
 	public static final String PEOPLE_ATLAS = "img/people/.atlas.atlas";

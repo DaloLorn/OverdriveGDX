@@ -5,6 +5,7 @@ import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.NinePatch;
+import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
@@ -14,8 +15,10 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.NinePatchDrawable;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Disposable;
+import com.badlogic.gdx.utils.Pools;
 import com.badlogic.gdx.utils.Scaling;
 import com.ftloverdrive.core.OverdriveContext;
+import com.ftloverdrive.event.PropertyEvent;
 import com.ftloverdrive.event.system.SystemPropertyEvent;
 import com.ftloverdrive.event.system.SystemPropertyListener;
 import com.ftloverdrive.io.OVDSkin;
@@ -27,12 +30,14 @@ import com.ftloverdrive.util.OVDConstants;
 /**
  * Actor representing a system in the player's HUD.
  * 
+ * @author kartoFlane
  */
 public class SystemActor extends ModelActor
 		implements SystemPropertyListener, Disposable {
 
 	public static final String SKIN_PATH = "overdrive-assets/skins/player-hud/reactor-ui/system-ui.json";
 	public static final String ATLAS_PATH = "overdrive-assets/skins/player-hud/reactor-ui/reactor-ui.atlas";
+	public static final String LOCK_ATLAS_PATH = "img/icons/locking/.atlas.atlas";
 
 	protected final NinePatch barEmpty;
 	protected final NinePatch barFull;
@@ -40,12 +45,18 @@ public class SystemActor extends ModelActor
 	protected final NinePatch ionFrame;
 	protected final NinePatchDrawable barDrawable;
 
+	protected final Sprite lock;
+	protected final Sprite lockWhite;
+
 	protected final Color colorHasPower;
 	protected final Color colorNoPower;
 	protected final Color colorIon;
 	protected final Color colorDisabled;
 	protected final Color colorSelfPower;
 	protected final Color colorDestroyed;
+
+	protected final Image icon;
+	protected final IonLockActor ionLock;
 
 	protected final int sysBarWidth;
 	protected final int sysBarHeight;
@@ -59,9 +70,9 @@ public class SystemActor extends ModelActor
 	protected final int barGroupPaddingY;
 
 	private final AssetManager assetManager;
-	private final Image icon;
 
 	private float systemOffset = 0;
+	private float barsHeight = 0;
 
 	private int powerCap = 0;
 	private int powerCurrent = 0;
@@ -70,8 +81,6 @@ public class SystemActor extends ModelActor
 	private int powerDisabled = 0;
 	private int powerDestroyed = 0;
 
-	private float barsHeight = 0;
-
 
 	public SystemActor( OverdriveContext context ) {
 		super( context );
@@ -79,11 +88,13 @@ public class SystemActor extends ModelActor
 
 		assetManager.load( SKIN_PATH, OVDSkin.class );
 		assetManager.load( ATLAS_PATH, TextureAtlas.class );
+		assetManager.load( OVDConstants.ION_LOCK_ATLAS, TextureAtlas.class );
 		assetManager.load( OVDConstants.ICONS_ATLAS, TextureAtlas.class );
 		assetManager.finishLoading();
 
 		OVDSkin skin = assetManager.get( SKIN_PATH, OVDSkin.class );
 		TextureAtlas wireAtlas = assetManager.get( ATLAS_PATH, TextureAtlas.class );
+		TextureAtlas lockAtlas = assetManager.get( OVDConstants.ION_LOCK_ATLAS, TextureAtlas.class );
 
 		colorHasPower = skin.getColor( "power-available" );
 		colorNoPower = skin.getColor( "power-none" );
@@ -115,6 +126,12 @@ public class SystemActor extends ModelActor
 
 		icon = new Image();
 		addActor( icon );
+
+		lock = lockAtlas.createSprite( "s-lock" );
+		lockWhite = lockAtlas.createSprite( "s-lock-white" );
+
+		ionLock = new IonLockActor( context );
+		addActor( ionLock );
 
 		systemOffset = 0;
 		setSize( 0, 0 );
@@ -169,6 +186,13 @@ public class SystemActor extends ModelActor
 			else
 				y += barPaddingY;
 		}
+
+		if ( powerIoned > 0 ) {
+			lockWhite.setPosition( ( icon.getWidth() - lockWhite.getWidth() ) * 0.5f, y );
+			lock.setPosition( ( icon.getWidth() - lock.getWidth() ) * 0.5f, y );
+			lockWhite.draw( batch, parentAlpha );
+			lock.draw( batch, parentAlpha );
+		}
 	}
 
 	/**
@@ -177,6 +201,11 @@ public class SystemActor extends ModelActor
 	 */
 	public float getSystemOffset() {
 		return systemOffset;
+	}
+
+	public void setModelRefId( int modelRefId ) {
+		super.setModelRefId( modelRefId );
+		ionLock.setModelRefId( modelRefId );
 	}
 
 	@Override
@@ -192,7 +221,6 @@ public class SystemActor extends ModelActor
 		}
 		else {
 			SystemModel systemModel = context.getReferenceManager().getObject( modelRefId, SystemModel.class );
-			updateIcon( context, systemModel );
 
 			powerCap = systemModel.getPowerCapacity();
 			powerCurrent = systemModel.getCurrentPower();
@@ -200,6 +228,12 @@ public class SystemActor extends ModelActor
 			powerIoned = systemModel.getProperties().getInt( OVDConstants.POWER_IONED );
 			powerDisabled = systemModel.getProperties().getInt( OVDConstants.POWER_DISABLED );
 			powerDestroyed = systemModel.getProperties().getInt( OVDConstants.POWER_DESTROYED );
+
+			updateIcon( context, systemModel );
+			ionLock.setPosition( ( icon.getWidth() - ionLock.getWidth() ) * 0.5f, icon.getY() + ( icon.getWidth() - ionLock.getHeight() ) * 0.5f );
+
+			ionLock.setVisible( powerIoned > 0 );
+			//icon.setVisible( powerIoned == 0 );
 
 			barsHeight = 0;
 			for ( int i = 0; i < powerCap; ++i ) {
@@ -212,14 +246,17 @@ public class SystemActor extends ModelActor
 				}
 			}
 
-			setSize( icon.getWidth(), icon.getHeight() + barsHeight );
+			setSize( icon.getWidth(), icon.getHeight() + iconOffsetY + barsHeight + barOffsetY + ionFrameGapY );
 		}
 	}
 
 	private void updateIcon( final OverdriveContext context, final SystemModel model ) {
 		String textureName = model.getIconName();
 		if ( powerDestroyed == 0 )
-			textureName += "-green1";
+			if ( powerCurrent == 0 )
+				textureName += "-grey1";
+			else
+				textureName += "-green1";
 		else if ( powerDestroyed < powerCap )
 			textureName += "-orange1";
 		else
@@ -237,6 +274,14 @@ public class SystemActor extends ModelActor
 		icon.addListener( new ClickListener() {
 			@Override
 			public boolean touchDown( InputEvent event, float x, float y, int pointer, int button ) {
+				// TODO: For testing purposes only, remove.
+				if ( button == Buttons.MIDDLE ) {
+					SystemPropertyEvent e = Pools.get( SystemPropertyEvent.class ).obtain();
+					e.init( modelRefId, PropertyEvent.INCREMENT_ACTION, OVDConstants.POWER_IONED, 1 );
+					context.getScreenEventManager().postDelayedEvent( e );
+					return true;
+				}
+
 				if ( model.isSelfPowered() ) {
 					// TODO: sounds + info
 					return true;
@@ -270,13 +315,17 @@ public class SystemActor extends ModelActor
 	public void systemPropertyChanged( OverdriveContext context, SystemPropertyEvent e ) {
 		if ( e.getModelRefId() != modelRefId ) return;
 
+		ionLock.updateInfo( context );
 		updateInfo( context );
 	}
 
 	@Override
 	public void dispose() {
+		ionLock.dispose();
+
 		assetManager.unload( SKIN_PATH );
 		assetManager.unload( ATLAS_PATH );
+		assetManager.unload( OVDConstants.ION_LOCK_ATLAS );
 		assetManager.unload( OVDConstants.ICONS_ATLAS );
 	}
 }

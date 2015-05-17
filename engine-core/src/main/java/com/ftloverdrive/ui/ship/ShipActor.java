@@ -1,11 +1,11 @@
 package com.ftloverdrive.ui.ship;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
@@ -13,9 +13,10 @@ import com.badlogic.gdx.scenes.scene2d.utils.Align;
 import com.badlogic.gdx.scenes.scene2d.utils.SpriteDrawable;
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.IntMap;
-import com.badlogic.gdx.utils.Pools;
 import com.badlogic.gdx.utils.IntMap.Keys;
+import com.badlogic.gdx.utils.Pools;
 import com.ftloverdrive.blueprint.ship.ShieldSystemBlueprint;
+import com.ftloverdrive.core.OVDClock;
 import com.ftloverdrive.core.OverdriveContext;
 import com.ftloverdrive.event.PropertyEvent;
 import com.ftloverdrive.event.engine.TickEvent;
@@ -38,7 +39,8 @@ import com.ftloverdrive.util.OVDConstants;
 
 
 public class ShipActor extends ModelActor
-		implements Disposable, GamePlayerShipChangeListener, ShipPropertyListener, SystemPropertyListener, TickListener {
+		implements Disposable, GamePlayerShipChangeListener, ShipPropertyListener,
+		SystemPropertyListener, TickListener {
 
 	protected AssetManager assetManager;
 
@@ -67,7 +69,7 @@ public class ShipActor extends ModelActor
 	protected ImageSpec floorImgSpec = null;
 
 
-	public ShipActor( OverdriveContext context ) {
+	public ShipActor( final OverdriveContext context ) {
 		super( context );
 		assetManager = context.getAssetManager();
 
@@ -165,6 +167,7 @@ public class ShipActor extends ModelActor
 		if ( e.getModelRefId() != modelRefId ) return;
 
 		ShipModel shipModel = context.getReferenceManager().getObject( modelRefId, ShipModel.class );
+		// TODO: Shield recharging handler class
 		if ( e.getPropertyType() == PropertyEvent.INT_TYPE ) {
 			if ( OVDConstants.SHIELD.equals( e.getPropertyKey() ) || OVDConstants.SHIELD_MAX.equals( e.getPropertyKey() ) ) {
 				int shield = shipModel.getProperties().getInt( OVDConstants.SHIELD );
@@ -179,6 +182,8 @@ public class ShipActor extends ModelActor
 					event.init( modelRefId, PropertyEvent.SET_ACTION, OVDConstants.SHIELD_FRACTION, 0 );
 					context.getScreenEventManager().postDelayedEvent( event );
 				}
+
+				updateInfo( context );
 			}
 			else if ( OVDConstants.SHIELD_FRACTION.equals( e.getPropertyKey() ) ||
 					OVDConstants.SHIELD_FRACTION_MAX.equals( e.getPropertyKey() ) ) {
@@ -196,7 +201,7 @@ public class ShipActor extends ModelActor
 				}
 				else if ( fraction < 0 ) {
 					ShipPropertyEvent event = Pools.get( ShipPropertyEvent.class ).obtain();
-					event.init( modelRefId, PropertyEvent.SET_ACTION, OVDConstants.SHIELD_FRACTION, fractionMax - fraction );
+					event.init( modelRefId, PropertyEvent.SET_ACTION, OVDConstants.SHIELD_FRACTION, fractionMax + fraction );
 					context.getScreenEventManager().postDelayedEvent( event );
 
 					event = Pools.get( ShipPropertyEvent.class ).obtain();
@@ -208,30 +213,88 @@ public class ShipActor extends ModelActor
 	}
 
 	@Override
-	public void ticksAccumulated( TickEvent e ) {
-		// ShipPropertyEvent event = Pools.get( ShipPropertyEvent.class ).obtain();
-		// event.init( modelRefId, PropertyEvent.SET_ACTION, OVDConstants.SHIELD_FRACTION, Gdx.app. );
-		// context.getScreenEventManager().postDelayedEvent( event );
-	}
-
-	@Override
 	public void systemPropertyChanged( OverdriveContext context, SystemPropertyEvent e ) {
-		if ( OVDConstants.POWER.equals( e.getPropertyKey() ) ) {
-			ShipModel shipModel = context.getReferenceManager().getObject( modelRefId, ShipModel.class );
-			Keys it = shipModel.getLayout().systemRefIds();
-			boolean found = false;
-			while ( it.hasNext && !found )
-				found = it.next() == e.getModelRefId();
-			it.reset();
+		if ( modelRefId == -1 )
+			return;
 
-			if ( found ) {
-				SystemModel systemModel = context.getReferenceManager().getObject( e.getModelRefId(), SystemModel.class );
+		ShipModel shipModel = context.getReferenceManager().getObject( modelRefId, ShipModel.class );
+		Keys it = shipModel.getLayout().systemRefIds();
+		boolean found = false;
+		while ( it.hasNext && !found )
+			found = it.next() == e.getModelRefId();
+		it.reset();
+
+		if ( !found )
+			return;
+
+		int systemRefId = e.getModelRefId();
+		SystemModel systemModel = context.getReferenceManager().getObject( systemRefId, SystemModel.class );
+		// TODO: Ion lock handler class
+		if ( e.getPropertyType() == PropertyEvent.INT_TYPE ) {
+			if ( OVDConstants.POWER.equals( e.getPropertyKey() ) ) {
 				// TODO Revise this condition
 				if ( systemModel.getProperties().getString( OVDConstants.BLUEPRINT_NAME ).equals( ShieldSystemBlueprint.class.getSimpleName() ) ) {
 					int level = systemModel.getCurrentPower() / systemModel.getPowerIncrement();
 
 					ShipPropertyEvent event = Pools.get( ShipPropertyEvent.class ).obtain();
 					event.init( modelRefId, PropertyEvent.SET_ACTION, OVDConstants.SHIELD_MAX, level );
+					context.getScreenEventManager().postDelayedEvent( event );
+				}
+			}
+			else if ( OVDConstants.ION_FRACTION.equals( e.getPropertyKey() ) ||
+					OVDConstants.ION_FRACTION_MAX.equals( e.getPropertyKey() ) ) {
+				int ion = systemModel.getProperties().getInt( OVDConstants.POWER_IONED );
+				int fraction = systemModel.getProperties().getInt( OVDConstants.ION_FRACTION );
+				int fractionMax = systemModel.getProperties().getInt( OVDConstants.ION_FRACTION_MAX );
+
+				if ( fraction <= 0 ) {
+					int value = fractionMax;
+					if ( ion > 1 )
+						value += fraction;
+
+					SystemPropertyEvent event = Pools.get( SystemPropertyEvent.class ).obtain();
+					event.init( systemRefId, PropertyEvent.SET_ACTION, OVDConstants.ION_FRACTION, value );
+					context.getScreenEventManager().postDelayedEvent( event );
+
+					event = Pools.get( SystemPropertyEvent.class ).obtain();
+					event.init( systemRefId, PropertyEvent.INCREMENT_ACTION, OVDConstants.POWER_IONED, -1 );
+					context.getScreenEventManager().postDelayedEvent( event );
+				}
+			}
+		}
+	}
+
+	@Override
+	public void ticksAccumulated( TickEvent e ) {
+		if ( modelRefId == -1 )
+			return;
+
+		if ( e.getTickCount() == 1 ) {
+			ShipModel shipModel = context.getReferenceManager().getObject( modelRefId, ShipModel.class );
+
+			int shield = shipModel.getProperties().getInt( OVDConstants.SHIELD );
+			int shieldMax = shipModel.getProperties().getInt( OVDConstants.SHIELD_MAX );
+			int fractionMax = shipModel.getProperties().getInt( OVDConstants.SHIELD_FRACTION_MAX );
+
+			if ( shield < shieldMax ) {
+				ShipPropertyEvent event = Pools.get( ShipPropertyEvent.class ).obtain();
+				event.init( modelRefId, PropertyEvent.INCREMENT_ACTION, OVDConstants.SHIELD_FRACTION,
+						5 * fractionMax / OVDClock.TICK_RATE );
+				context.getScreenEventManager().postDelayedEvent( event );
+			}
+
+			Keys it = shipModel.getLayout().systemRefIds();
+			while ( it.hasNext ) {
+				int systemRefId = it.next();
+				SystemModel systemModel = context.getReferenceManager().getObject( systemRefId, SystemModel.class );
+
+				int ion = systemModel.getProperties().getInt( OVDConstants.POWER_IONED );
+				int ionFractionMax = systemModel.getProperties().getInt( OVDConstants.ION_FRACTION_MAX );
+
+				if ( ion > 0 ) {
+					SystemPropertyEvent event = Pools.get( SystemPropertyEvent.class ).obtain();
+					event.init( systemRefId, PropertyEvent.INCREMENT_ACTION, OVDConstants.ION_FRACTION,
+							-2 * ionFractionMax / OVDClock.TICK_RATE );
 					context.getScreenEventManager().postDelayedEvent( event );
 				}
 			}
@@ -297,6 +360,10 @@ public class ShipActor extends ModelActor
 
 			shipFudgeGroup.setPosition( shipModel.getShipOffsetX(), -shipModel.getShipOffsetY() );
 			shipHullGroup.setPosition( shipModel.getHullOffsetX(), -shipModel.getHullOffsetY() );
+
+			int shields = shipModel.getProperties().getInt( OVDConstants.SHIELD );
+			shieldImage.setColor( 1, 1, 1, 0.4f + shields * 0.17f );
+			shieldImage.setVisible( shields > 0 );
 
 			ImageSpec currentBaseImgSpec = shipModel.getBaseImageSpec();
 			if ( !isEqual( baseImgSpec, currentBaseImgSpec ) ) {
@@ -419,6 +486,11 @@ public class ShipActor extends ModelActor
 				doorGroup.addTile( context, shipModel.getLayout().getDoorCoords( doorRefId ), doorRefId );
 			}
 
+			// TODO: Create customized group class that handles listeners
+			for ( Actor a : tpadGroup.getChildren() ) {
+				TeleportPadActor tpadActor = (TeleportPadActor)a;
+				context.getScreenEventManager().removeEventListener( tpadActor, LocalActorClickedListener.class );
+			}
 			tpadGroup.clear();
 			tpadGroup.setSize( shipModel.getHullWidth(), shipModel.getHullHeight() );
 			for ( IntMap.Keys it = shipModel.getLayout().tpadRefIds(); it.hasNext; ) {
@@ -435,10 +507,18 @@ public class ShipActor extends ModelActor
 				context.getScreenEventManager().addEventListener( tpadActor, LocalActorClickedListener.class );
 			}
 
+			// TODO: Create customized group class that handles listeners
+			// TODO: Don't keep CrewActors as children of the ship, have them be separate entities in the screen space?
+			for ( Actor a : crewGroup.getChildren() ) {
+				CrewActor crewActor = (CrewActor)a;
+				context.getScreenEventManager().removeEventListener( crewActor, LocalActorClickedListener.class );
+				context.getScreenEventManager().removeEventListener( crewActor, OrderListener.class );
+			}
 			crewGroup.clear();
 			crewGroup.setSize( shipModel.getHullWidth(), shipModel.getHullHeight() );
 			for ( IntMap.Keys it = shipModel.getLayout().crewRefIds(); it.hasNext; ) {
 				int crewRefId = it.next();
+				// TODO: Crew coords need to be updated when moving!
 				ShipCoordinate coord = shipModel.getLayout().getCrewCoords( crewRefId );
 
 				CrewActor crewActor = new CrewActor( context );

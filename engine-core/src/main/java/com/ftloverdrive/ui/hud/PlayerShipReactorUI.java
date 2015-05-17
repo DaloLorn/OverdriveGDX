@@ -280,28 +280,29 @@ public class PlayerShipReactorUI extends Group
 		if ( shipModelRefId == -1 )
 			return;
 
+		ShipModel shipModel = context.getReferenceManager().getObject( shipModelRefId, ShipModel.class );
+		Keys it = shipModel.getLayout().systemRefIds();
+		boolean found = false;
+		while ( it.hasNext && !found )
+			found = it.next() == e.getModelRefId();
+		it.reset();
+
+		if ( !found )
+			return;
+
 		if ( OVDConstants.POWER.equals( e.getPropertyKey() ) ) {
-			ShipModel shipModel = context.getReferenceManager().getObject( shipModelRefId, ShipModel.class );
-			Keys it = shipModel.getLayout().systemRefIds();
-			boolean found = false;
-			while ( it.hasNext && !found )
-				found = it.next() == e.getModelRefId();
-			it.reset();
+			SystemModel systemModel = context.getReferenceManager().getObject( e.getModelRefId(), SystemModel.class );
+			int difference = systemModel.getCurrentPower() - e.getIntValue();
+			if ( barCount + difference >= 0 ) {
+				ShipPropertyEvent event = Pools.get( ShipPropertyEvent.class ).obtain();
+				event.init( shipModelRefId, PropertyEvent.INCREMENT_ACTION, OVDConstants.POWER, difference );
+				context.getScreenEventManager().postDelayedEvent( event );
 
-			if ( found ) {
-				SystemModel systemModel = context.getReferenceManager().getObject( e.getModelRefId(), SystemModel.class );
-				int difference = systemModel.getCurrentPower() - e.getIntValue();
-				if ( barCount + difference >= 0 ) {
-					ShipPropertyEvent event = Pools.get( ShipPropertyEvent.class ).obtain();
-					event.init( shipModelRefId, PropertyEvent.INCREMENT_ACTION, OVDConstants.POWER, difference );
-					context.getScreenEventManager().postDelayedEvent( event );
-
-					// TODO: Sound events
-				}
-				else {
-					// TODO: Not enough power sound + info
-					e.cancel();
-				}
+				// TODO: Sound events
+			}
+			else {
+				// TODO: Not enough power sound + info
+				e.cancel();
 			}
 		}
 	}
@@ -312,8 +313,9 @@ public class PlayerShipReactorUI extends Group
 			return;
 
 		for ( Actor a : getChildren() ) {
-			if ( a instanceof SystemActor )
-				( (SystemActor)a ).updateInfo( context );
+			if ( a instanceof SystemPropertyListener ) {
+				( (SystemPropertyListener)a ).systemPropertyChanged( context, e );
+			}
 		}
 	}
 
