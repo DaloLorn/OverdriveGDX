@@ -233,7 +233,7 @@ public class SystemActor extends ModelActor
 			ionLock.setPosition( ( icon.getWidth() - ionLock.getWidth() ) * 0.5f, icon.getY() + ( icon.getWidth() - ionLock.getHeight() ) * 0.5f );
 
 			ionLock.setVisible( powerIoned > 0 );
-			//icon.setVisible( powerIoned == 0 );
+			// icon.setVisible( powerIoned == 0 ); // TODO: Commented out so that the actor remains clickable for testing purposes. Uncomment
 
 			barsHeight = 0;
 			for ( int i = 0; i < powerCap; ++i ) {
@@ -275,11 +275,19 @@ public class SystemActor extends ModelActor
 			@Override
 			public boolean touchDown( InputEvent event, float x, float y, int pointer, int button ) {
 				// TODO: For testing purposes only, remove.
-				if ( button == Buttons.MIDDLE ) {
-					SystemPropertyEvent e = Pools.get( SystemPropertyEvent.class ).obtain();
-					e.init( modelRefId, PropertyEvent.INCREMENT_ACTION, OVDConstants.POWER_IONED, 1 );
-					context.getScreenEventManager().postDelayedEvent( e );
-					return true;
+				{
+					if ( button == Buttons.FORWARD ) {
+						SystemPropertyEvent e = Pools.get( SystemPropertyEvent.class ).obtain();
+						e.init( modelRefId, PropertyEvent.INCREMENT_ACTION, OVDConstants.POWER_IONED, 1 );
+						context.getScreenEventManager().postDelayedEvent( e );
+						return true;
+					}
+					else if ( button == Buttons.BACK ) {
+						SystemPropertyEvent e = Pools.get( SystemPropertyEvent.class ).obtain();
+						e.init( modelRefId, PropertyEvent.INCREMENT_ACTION, OVDConstants.POWER_IONED, -1 );
+						context.getScreenEventManager().postDelayedEvent( e );
+						return true;
+					}
 				}
 
 				if ( model.isSelfPowered() ) {

@@ -248,16 +248,22 @@ public class ShipActor extends ModelActor
 				int fractionMax = systemModel.getProperties().getInt( OVDConstants.ION_FRACTION_MAX );
 
 				if ( fraction <= 0 ) {
-					int value = fractionMax;
-					if ( ion > 1 )
-						value += fraction;
-
 					SystemPropertyEvent event = Pools.get( SystemPropertyEvent.class ).obtain();
-					event.init( systemRefId, PropertyEvent.SET_ACTION, OVDConstants.ION_FRACTION, value );
+					event.init( systemRefId, PropertyEvent.SET_ACTION, OVDConstants.ION_FRACTION, fractionMax + fraction );
 					context.getScreenEventManager().postDelayedEvent( event );
 
 					event = Pools.get( SystemPropertyEvent.class ).obtain();
 					event.init( systemRefId, PropertyEvent.INCREMENT_ACTION, OVDConstants.POWER_IONED, -1 );
+					context.getScreenEventManager().postDelayedEvent( event );
+				}
+			}
+			else if ( OVDConstants.POWER_IONED.equals( e.getPropertyKey() ) ) {
+				int ion = systemModel.getProperties().getInt( OVDConstants.POWER_IONED );
+				int fractionMax = systemModel.getProperties().getInt( OVDConstants.ION_FRACTION_MAX );
+
+				if ( ion == 0 ) {
+					SystemPropertyEvent event = Pools.get( SystemPropertyEvent.class ).obtain();
+					event.init( systemRefId, PropertyEvent.SET_ACTION, OVDConstants.ION_FRACTION, fractionMax );
 					context.getScreenEventManager().postDelayedEvent( event );
 				}
 			}
