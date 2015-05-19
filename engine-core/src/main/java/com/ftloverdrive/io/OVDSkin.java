@@ -7,6 +7,7 @@ import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.assets.loaders.FileHandleResolver;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.NinePatch;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
@@ -133,6 +134,22 @@ public class OVDSkin extends Skin {
 			}
 		} );
 
+		json.setSerializer( NinePatch.class, new ReadOnlySerializer<NinePatch>() {
+
+			public NinePatch read( Json json, JsonValue jsonData, Class type ) {
+				String specName = json.readValue( "texture", String.class, jsonData );
+				ImageSpec spec = skin.get( specName, ImageSpec.class );
+				TextureAtlas atlas = manager.get( spec.atlasPath, TextureAtlas.class );
+				TextureRegion region = atlas.findRegion( spec.regionName );
+
+				return new NinePatch( region,
+						json.readValue( "left", int.class, jsonData ),
+						json.readValue( "right", int.class, jsonData ),
+						json.readValue( "top", int.class, jsonData ),
+						json.readValue( "bot", int.class, jsonData ) );
+			}
+		} );
+
 		json.setSerializer( FileHandle.class, new ReadOnlySerializer<FileHandle>() {
 
 			public FileHandle read( Json json, JsonValue jsonData, Class type ) {
@@ -155,6 +172,27 @@ public class OVDSkin extends Skin {
 					skin.add( key, shader, DistanceFieldShader.class );
 				}
 				return shader;
+			}
+		} );
+
+		json.setSerializer( TextureRegion.class, new ReadOnlySerializer<TextureRegion>() {
+
+			public TextureRegion read( Json json, JsonValue jsonData, Class type ) {
+				String specName = json.readValue( "texture", String.class, jsonData );
+				ImageSpec spec = skin.get( specName, ImageSpec.class );
+				TextureAtlas atlas = manager.get( spec.atlasPath, TextureAtlas.class );
+
+				String key = jsonData.name;
+				TextureRegion result = null;
+				if ( skin.has( key, TextureRegion.class ) ) {
+					result = skin.getRegion( key );
+				}
+				else {
+					result = atlas.findRegion( spec.regionName );
+					skin.add( key, result, TextureRegion.class );
+				}
+
+				return result;
 			}
 		} );
 
