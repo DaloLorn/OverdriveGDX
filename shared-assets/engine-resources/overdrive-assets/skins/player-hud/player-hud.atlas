@@ -1,0 +1,13 @@
+
+player-hud.png
+size: 4,4
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+tooltip-bg
+  rotate: false
+  xy: 0, 0
+  size: 3, 3
+  orig: 3, 3
+  offset: 0, 0
+  index: -1

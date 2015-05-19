@@ -1,0 +1,45 @@
+{
+  com.badlogic.gdx.graphics.g2d.BitmapFont: {
+    plot-font: { file: "fonts/JustinFont12.ttf?size=12" }
+  },
+
+  com.badlogic.gdx.graphics.Color: {
+    white: { a: 1, r: 1, g: 1, b: 1 }
+  },
+
+  com.ftloverdrive.ui.DistanceFieldShader: {
+    shader: { smoothing: 0.6f }
+  },
+
+  com.ftloverdrive.io.ImageSpec: {
+    tooltip-tex: { atlasPath: "overdrive-assets/skins/player-hud/player-hud.atlas", regionName: "tooltip-bg" }
+  },
+  
+  com.badlogic.gdx.graphics.g2d.NinePatch: {
+    tooltip-patch: { texture: tooltip-tex, left: 1, right: 1, top: 1, bot: 1 }
+  },
+  
+  com.badlogic.gdx.scenes.scene2d.utils.NinePatchDrawable: {
+    tooltip-drawable: { patch: tooltip-patch }
+  },
+  
+  // Fields the game is hardcoded to look for.
+  // Values can be changed freely, but entry names must remain the same.
+  
+  com.ftloverdrive.ui.ShaderLabel$ShaderLabelStyle: {
+    style: { font: plot-font, fontColor: white, shader: shader, background: tooltip-patch }
+  },
+
+  java.lang.Integer: {
+    offset-x: 15,
+    offset-y: 10,
+    gap-x: 5,
+    gap-y: 5,
+    max-width: 300
+  },
+  
+  java.lang.Float: {
+    show-delay: 0.5,
+    hide-delay: 0
+  }
+}

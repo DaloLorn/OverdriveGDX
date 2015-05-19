@@ -2,6 +2,7 @@ package com.ftloverdrive.ui;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
@@ -46,12 +47,17 @@ public class ShaderLabel extends Label {
 	public static class ShaderLabelStyle extends LabelStyle {
 
 		public DistanceFieldShader shader;
-		
+
+
 		public ShaderLabelStyle() {
 		}
-		
-		public ShaderLabelStyle(ShaderLabelStyle style) {
-			super(style);
+
+		public ShaderLabelStyle( BitmapFont font ) {
+			super( font, null );
+		}
+
+		public ShaderLabelStyle( ShaderLabelStyle style ) {
+			super( style );
 			shader = style.shader;
 		}
 	}
