@@ -45,7 +45,7 @@ public class IncidentDialog extends Window implements Disposable, EventListener 
 
 	private static final WindowStyle defaultWindowStyle = new WindowStyle( new BitmapFont(), new Color(), null );
 	/** Only 10 number keys on the keyboard, so we can only support 10 hotkeyed plot branches */
-	private static final int maxHHotkeyChoiceCount = 10;
+	private static final int maxHotkeyChoiceCount = 10;
 
 	public static final String SKIN_PATH = "overdrive-assets/skins/incident-dialog/window.json";
 	public static final String ACTOR_NAME = "IncidentDialog";
@@ -84,7 +84,7 @@ public class IncidentDialog extends Window implements Disposable, EventListener 
 	private int choiceCount = 0; // Total choice count (includes grayed-out, but not invisible ones)
 	private int availableChoiceCount = 0; // Available (non-grayed out and visible) choice count
 	// TODO: Should use refIds instead?
-	private PlotBranch[] hotkeyChoices = new PlotBranch[maxHHotkeyChoiceCount];
+	private PlotBranch[] hotkeyChoices = new PlotBranch[maxHotkeyChoiceCount];
 	private DeferredIncidentModel curIncModel = null;
 
 	private boolean captureInput = false;
@@ -241,7 +241,7 @@ public class IncidentDialog extends Window implements Disposable, EventListener 
 			stlDefault = stlDisabled;
 
 		// Keep track of branches
-		if ( choiceCount < maxHHotkeyChoiceCount )
+		if ( choiceCount < maxHotkeyChoiceCount )
 			hotkeyChoices[choiceCount] = branch;
 		choiceCount++;
 
@@ -402,8 +402,8 @@ public class IncidentDialog extends Window implements Disposable, EventListener 
 	 * A "soft dispose", resets the dialog so that it can be reused by another incident.
 	 */
 	private void reset0() {
-		if ( choiceCount > maxHHotkeyChoiceCount )
-			choiceCount = maxHHotkeyChoiceCount;
+		if ( choiceCount > maxHotkeyChoiceCount )
+			choiceCount = maxHotkeyChoiceCount;
 		while ( choiceCount > 0 ) {
 			--choiceCount;
 			hotkeyChoices[choiceCount] = null;
@@ -484,7 +484,7 @@ public class IncidentDialog extends Window implements Disposable, EventListener 
 			if ( choiceNumber >= Keys.NUM_0 && choiceNumber <= Keys.NUM_9 ) {
 				choiceNumber -= Keys.NUM_0;
 				if ( choiceNumber == 0 )
-					choiceNumber = maxHHotkeyChoiceCount;
+					choiceNumber = maxHotkeyChoiceCount;
 				if ( choiceNumber <= choiceCount )
 					choiceSelected( context, hotkeyChoices[choiceNumber - 1], getX(), getTop() );
 				return true;
