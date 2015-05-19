@@ -16,6 +16,10 @@ import com.ftloverdrive.event.OVDEventManager;
  * 
  *  	ScriptResource script = context.getAssetManager().get( "path/to/somescript.java", ScriptResource.class );
  *  	OVDScript proxy = context.getScreenScriptManager().getInterface( script, OVDScript.class );
+ *  
+ *  
+ *  TODO: REVISE THIS
+ *  
  */
 public interface OVDScript {
 

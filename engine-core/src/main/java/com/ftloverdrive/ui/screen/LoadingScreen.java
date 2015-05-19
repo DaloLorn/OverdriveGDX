@@ -33,6 +33,7 @@ import com.ftloverdrive.blueprint.PropertyOVDBlueprint;
 import com.ftloverdrive.core.OverdriveContext;
 import com.ftloverdrive.event.OVDEventManager;
 import com.ftloverdrive.model.ModelScript;
+import com.ftloverdrive.model.OVDModel;
 import com.ftloverdrive.script.OVDScriptManager;
 import com.ftloverdrive.script.ScriptResource;
 import com.ftloverdrive.util.OVDConstants;
@@ -286,17 +287,34 @@ public class LoadingScreen implements Disposable, OVDScreen {
 
 		for ( ScriptResource script : scripts ) {
 			try {
-				BlueprintScript inter = context.getScreenScriptManager().getInterface( script, BlueprintScript.class );
-				PropertyOVDBlueprint blueprint = inter.create();
-				context.getBlueprintManager().storeBlueprint( blueprint.getString( OVDConstants.BLUEPRINT_NAME ), blueprint );
+				BlueprintScript inter = null;
+				try {
+					inter = context.getScreenScriptManager().getInterfaceAsserted( script, BlueprintScript.class );
+				}
+				catch ( Exception e ) {
+					// If an exception is thrown here, it just means that the script was not a BlueprintScript
+				}
+				if ( inter != null ) {
+					PropertyOVDBlueprint blueprint = inter.create();
+					context.getBlueprintManager().storeBlueprint( blueprint.getString( OVDConstants.BLUEPRINT_NAME ), blueprint );
+				}
 			}
 			catch ( Exception e ) {
 				e.printStackTrace();
 			}
 
 			try {
-				ModelScript inter = context.getScreenScriptManager().getInterface( script, ModelScript.class );
-				context.getBlueprintManager().associateModel( inter.getAssociatedBlueprint(), inter.getObjectClass() );
+				ModelScript inter = null;
+				try {
+					inter = context.getScreenScriptManager().getInterfaceAsserted( script, ModelScript.class );
+				}
+				catch ( Exception e ) {
+					// If an exception is thrown here, it just means that the script was not a ModelScript
+				}
+				if ( inter != null ) {
+					Class<? extends OVDModel> modelClass = inter.getObjectClass();
+					context.getBlueprintManager().associateModel( inter.getAssociatedBlueprint(), modelClass );
+				}
 			}
 			catch ( Exception e ) {
 				e.printStackTrace();
