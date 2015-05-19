@@ -3,14 +3,18 @@ package com.ftloverdrive.ui.hud;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.Button.ButtonStyle;
+import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.NinePatchDrawable;
 import com.ftloverdrive.core.OverdriveContext;
 import com.ftloverdrive.io.ButtonSpec;
 import com.ftloverdrive.io.OVDSkin;
 import com.ftloverdrive.model.system.SystemModel;
+import com.ftloverdrive.script.ButtonScript;
+import com.ftloverdrive.script.ScriptResource;
 import com.ftloverdrive.ui.ClippableButton;
 import com.ftloverdrive.ui.ModelActor;
 
@@ -64,7 +68,7 @@ public class SystemButtonsActor extends ModelActor {
 	}
 
 	@Override
-	protected void updateInfo( OverdriveContext context ) {
+	protected void updateInfo( final OverdriveContext context ) {
 		if ( modelRefId == -1 ) {
 			buttonBaseWidth = 0;
 			buttonBaseHeight = 0;
@@ -95,6 +99,7 @@ public class SystemButtonsActor extends ModelActor {
 				ButtonSpec spec = specs[i];
 
 				assetManager.load( spec.getSkinPath(), OVDSkin.class );
+				assetManager.load( spec.getScriptPath(), ScriptResource.class );
 				assetManager.finishLoading();
 				OVDSkin skin = assetManager.get( spec.getSkinPath(), OVDSkin.class );
 
@@ -104,9 +109,20 @@ public class SystemButtonsActor extends ModelActor {
 				final int h = skin.getInt( "clickable-height" );
 				ButtonStyle style = skin.get( "style", ButtonStyle.class );
 
-				ClippableButton btn = new ClippableButton( style );
+				final ClippableButton btn = new ClippableButton( style );
 				btn.setClickArea( ox, oy, w, h );
 				btn.setPosition( x - ox, y - oy );
+
+				ScriptResource script = assetManager.get( spec.getScriptPath(), ScriptResource.class );
+				final ButtonScript btnScript = context.getScreenScriptManager().getInterface( script, ButtonScript.class );
+				btnScript.onUpdate( context, btn, modelRefId );
+				btn.addListener( new ClickListener() {
+					@Override
+					public void clicked( InputEvent event, float x, float y ) {
+						btnScript.onClick( context, btn );
+					}
+				} );
+
 				addActor( btn );
 
 				maxW = Math.max( maxW, w );

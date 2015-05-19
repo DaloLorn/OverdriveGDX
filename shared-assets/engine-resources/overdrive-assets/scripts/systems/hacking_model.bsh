@@ -15,7 +15,7 @@ class HackingSystemModel extends DefaultSystemModel
     // TODO: Number/kind of buttons depends on what system is hacked?
     buttons[0] = new ButtonSpec();
     buttons[0].setSkinPath( "overdrive-assets/skins/player-hud/systems/hacking-1.json" );
-    buttons[0].setScriptPath( null ); // TODO
+    buttons[0].setScriptPath( "overdrive-assets/scripts/systems/buttons/hacking-1.bsh" );
   }
 
   public String getIconName() {

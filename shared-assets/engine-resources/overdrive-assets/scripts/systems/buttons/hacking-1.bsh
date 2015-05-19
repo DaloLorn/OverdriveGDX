@@ -1,0 +1,21 @@
+import com.ftloverdrive.core.OverdriveContext;
+import com.ftloverdrive.model.system.SystemModel;
+import com.ftloverdrive.util.OVDConstants;
+import com.badlogic.gdx.scenes.scene2d.ui.Button;
+
+/** modelRefId - ref id of the model this button is tied to. */
+void onUpdate( OverdriveContext context, Button button, int modelRefId ) {
+  SystemModel model = context.getReferenceManager().getObject( modelRefId, SystemModel.class );
+
+  int power = model.getCurrentPower();
+  int ion = model.getProperties().getInt( OVDConstants.POWER_IONED );
+
+  button.setDisabled( power == 0 || ion > 0 );
+}
+
+void onClick( OverdriveContext context, Button button ) {
+  if ( button.isDisabled() )
+    return;
+
+  System.out.println("Hacking button script test");
+}
