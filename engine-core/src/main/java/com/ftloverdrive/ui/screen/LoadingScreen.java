@@ -5,6 +5,9 @@
 
 package com.ftloverdrive.ui.screen;
 
+import java.io.File;
+import java.io.FilenameFilter;
+
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.files.FileHandle;
@@ -25,9 +28,13 @@ import com.badlogic.gdx.utils.Logger;
 import com.badlogic.gdx.utils.Pools;
 import com.badlogic.gdx.utils.Scaling;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
+import com.ftloverdrive.blueprint.BlueprintScript;
+import com.ftloverdrive.blueprint.PropertyOVDBlueprint;
 import com.ftloverdrive.core.OverdriveContext;
 import com.ftloverdrive.event.OVDEventManager;
+import com.ftloverdrive.model.ModelScript;
 import com.ftloverdrive.script.OVDScriptManager;
+import com.ftloverdrive.script.ScriptResource;
 import com.ftloverdrive.util.OVDConstants;
 
 
@@ -135,7 +142,6 @@ public class LoadingScreen implements Disposable, OVDScreen {
 
 		// XXX: Re-enable once scripts are actually needed for something
 		// Preload scripts.
-		/*
 		FileHandle scriptsFolder = context.getFileHandleResolver().resolve( "overdrive-assets/scripts" );
 		FilenameFilter scriptFilter = new FilenameFilter() {
 
@@ -151,7 +157,6 @@ public class LoadingScreen implements Disposable, OVDScreen {
 				context.getAssetManager().load( scriptFile.path(), ScriptResource.class );
 			}
 		}
-		*/
 	}
 
 	/**
@@ -245,6 +250,7 @@ public class LoadingScreen implements Disposable, OVDScreen {
 		// Incrementally load assets until completely done.
 		if ( context.getAssetManager().update() ) {
 			// if ( Gdx.input.isTouched() )
+			registerBlueprints( context );
 			context.getScreenManager().continueToNextScreen();
 		}
 
@@ -265,7 +271,6 @@ public class LoadingScreen implements Disposable, OVDScreen {
 		renderedPreviousFrame = true;
 	}
 
-
 	@Override
 	public void pause() {
 		renderedPreviousFrame = false;
@@ -275,6 +280,29 @@ public class LoadingScreen implements Disposable, OVDScreen {
 	public void resume() {
 	}
 
+	private void registerBlueprints( OverdriveContext context ) {
+		Array<ScriptResource> scripts = new Array<ScriptResource>();
+		context.getAssetManager().getAll( ScriptResource.class, scripts );
+
+		for ( ScriptResource script : scripts ) {
+			try {
+				BlueprintScript inter = context.getScreenScriptManager().getInterface( script, BlueprintScript.class );
+				PropertyOVDBlueprint blueprint = inter.create();
+				context.getBlueprintManager().storeBlueprint( blueprint.getString( OVDConstants.BLUEPRINT_NAME ), blueprint );
+			}
+			catch ( Exception e ) {
+				e.printStackTrace();
+			}
+
+			try {
+				ModelScript inter = context.getScreenScriptManager().getInterface( script, ModelScript.class );
+				context.getBlueprintManager().associateModel( inter.getAssociatedBlueprint(), inter.getObjectClass() );
+			}
+			catch ( Exception e ) {
+				e.printStackTrace();
+			}
+		}
+	}
 
 	@Override
 	public void dispose() {
@@ -282,7 +310,6 @@ public class LoadingScreen implements Disposable, OVDScreen {
 		loadingAssetManager.dispose();
 		Pools.get( OverdriveContext.class ).free( context );
 	}
-
 
 	@Override
 	public OVDStageManager getStageManager() {

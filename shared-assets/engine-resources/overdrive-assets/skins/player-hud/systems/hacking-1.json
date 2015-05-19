@@ -1,0 +1,28 @@
+{
+  com.ftloverdrive.io.ImageSpec: {
+    up-tex:   { atlasPath: "img/systemUI/.atlas.atlas", regionName: "button-hack-drone-on" },
+    over-tex: { atlasPath: "img/systemUI/.atlas.atlas", regionName: "button-hack-drone-select2" },
+    off-tex: { atlasPath: "img/systemUI/.atlas.atlas", regionName: "button-hack-drone-off" }
+  },
+
+  com.badlogic.gdx.graphics.g2d.TextureRegion: {
+    up-region: { texture: up-tex },
+    over-region: { texture: over-tex },
+    down-region: over-region,
+    off-region: { texture: off-tex }
+  },
+
+  // Fields the game is hardcoded to look for.
+  // Values can be changed freely, but entry names must remain the same.
+
+  com.badlogic.gdx.scenes.scene2d.ui.Button$ButtonStyle: {
+    style: { up: up-region, down: down-region, over: over-region, disabled: off-region }
+  },
+  
+  java.lang.Integer: {
+    clickable-offset-x: 10,
+    clickable-offset-y: 51,
+    clickable-width: 20,
+    clickable-height: 20
+  }
+}

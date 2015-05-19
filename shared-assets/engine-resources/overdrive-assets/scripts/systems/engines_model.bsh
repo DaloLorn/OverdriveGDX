@@ -1,0 +1,51 @@
+
+import com.ftloverdrive.util.OVDConstants;
+import com.ftloverdrive.io.ButtonSpec;
+import com.ftloverdrive.model.ModelScript;
+import com.ftloverdrive.model.system.DefaultSystemModel;
+
+class EnginesSystemModel extends DefaultSystemModel
+    implements ModelScript {
+
+  public EnginesSystemModel() {
+    super();
+  }
+
+  public String getIconName() {
+    return "s-engines";
+  }
+
+  public boolean isSelfPowered() {
+    return false;
+  }
+
+  public String getTooltipSystemDescription() {
+    return "Engines: Charges the FTL drive and powers evasion. Manning increases dodge chance.";
+  }
+
+  public String getTooltipPowerDescription() {
+    int power = getProperties().getInt( OVDConstants.POWER );
+    if ( power == 0 ) {
+      return "OFF: NO DODGE!";
+    }
+    else {
+      return String.format( "Level %s: Dodge %s / FTL %sx", power, power * 5, 0.75 + 0.25 * power );
+    }
+  }
+
+  public String getTooltipManningDescription() {
+    return "Evasion +5";
+  }
+
+  public ButtonSpec[] getButtons() {
+    return null;
+  }
+}
+
+String getAssociatedBlueprint() {
+  return "EnginesSystemBlueprint";
+}
+
+Class getObjectClass() {
+  return EnginesSystemModel.class;
+}

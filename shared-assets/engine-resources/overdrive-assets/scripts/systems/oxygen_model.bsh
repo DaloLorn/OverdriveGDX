@@ -1,0 +1,51 @@
+
+import com.ftloverdrive.util.OVDConstants;
+import com.ftloverdrive.io.ButtonSpec;
+import com.ftloverdrive.model.ModelScript;
+import com.ftloverdrive.model.system.DefaultSystemModel;
+
+class OxygenSystemModel extends DefaultSystemModel
+    implements ModelScript {
+
+  public OxygenSystemModel() {
+    super();
+  }
+
+  public String getIconName() {
+    return "s-oxygen";
+  }
+
+  public boolean isSelfPowered() {
+    return false;
+  }
+
+  public String getTooltipSystemDescription() {
+    return "Oxygen: Replenishes the ship's oxygen supply.";
+  }
+
+  public String getTooltipPowerDescription() {
+    int power = getProperties().getInt( OVDConstants.POWER );
+    if ( power == 0 ) {
+      return "OFF: OXYGEN DRAINING!";
+    }
+    else {
+      return String.format( "Level %s: O2 Refill Boost %sx", power, 0.5 + power * 0.5 );
+    }
+  }
+
+  public String getTooltipManningDescription() {
+    return null; // Cannot be manned
+  }
+
+  public ButtonSpec[] getButtons() {
+    return null;
+  }
+}
+
+String getAssociatedBlueprint() {
+  return "OxygenSystemBlueprint";
+}
+
+Class getObjectClass() {
+  return OxygenSystemModel.class;
+}

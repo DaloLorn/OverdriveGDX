@@ -39,7 +39,6 @@ import com.ftloverdrive.model.ship.ShipCoordinate;
 import com.ftloverdrive.model.ship.ShipModel;
 import com.ftloverdrive.model.ship.TeleportPadModel;
 import com.ftloverdrive.model.ship.TestShipModel;
-import com.ftloverdrive.model.system.DefaultSystemModel;
 import com.ftloverdrive.model.system.SystemModel;
 
 
@@ -245,9 +244,8 @@ public class ShipEventHandler implements OVDEventHandler {
 
 			int systemRefId = event.getSystemRefId();
 			SystemModel sysModel = context.getBlueprintManager().createModel( event.getSystemBlueprintId() );
-			if ( sysModel == null ) {
-				sysModel = new DefaultSystemModel();
-			}
+			if ( sysModel == null )
+				throw new RuntimeException( "System blueprint doesn't have an associated model: " + event.getSystemBlueprintId() );
 			sysModel.getProperties().setAll( event.getProperties() );
 
 			context.getReferenceManager().addObject( sysModel, systemRefId );

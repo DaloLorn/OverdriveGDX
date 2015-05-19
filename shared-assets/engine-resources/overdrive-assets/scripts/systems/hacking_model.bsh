@@ -1,0 +1,58 @@
+
+import com.ftloverdrive.util.OVDConstants;
+import com.ftloverdrive.io.ButtonSpec;
+import com.ftloverdrive.model.ModelScript;
+import com.ftloverdrive.model.system.DefaultSystemModel;
+
+class HackingSystemModel extends DefaultSystemModel
+    implements ModelScript {
+
+  private ButtonSpec[] buttons = new ButtonSpec[1];
+
+  public HackingSystemModel() {
+    super();
+
+    // TODO: Number/kind of buttons depends on what system is hacked?
+    buttons[0] = new ButtonSpec();
+    buttons[0].setSkinPath( "overdrive-assets/skins/player-hud/systems/hacking-1.json" );
+    buttons[0].setScriptPath( null ); // TODO
+  }
+
+  public String getIconName() {
+    return "s-hacking";
+  }
+
+  public boolean isSelfPowered() {
+    return false;
+  }
+
+  public String getTooltipSystemDescription() {
+    return "Hacking: Lockdown a system room while periodically disrupting the system and stunning crew.";
+  }
+
+  public String getTooltipPowerDescription() {
+    int power = getProperties().getInt( OVDConstants.POWER );
+    if ( power == 0 ) {
+      return "OFF";
+    }
+    else {
+      return String.format( "Level %s: %s second disruption", power, 2 + power * 3 );
+    }
+  }
+
+  public String getTooltipManningDescription() {
+    return null; // Not mannable.
+  }
+
+  public ButtonSpec[] getButtons() {
+    return buttons;
+  }
+}
+
+String getAssociatedBlueprint() {
+  return "HackingSystemBlueprint";
+}
+
+Class getObjectClass() {
+  return HackingSystemModel.class;
+}

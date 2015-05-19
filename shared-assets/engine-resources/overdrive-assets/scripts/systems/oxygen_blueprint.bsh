@@ -1,0 +1,19 @@
+import com.ftloverdrive.blueprint.BlueprintScript;
+import com.ftloverdrive.blueprint.PropertyOVDBlueprint;
+import com.ftloverdrive.blueprint.ship.SystemBlueprint;
+import com.ftloverdrive.util.OVDConstants;
+
+class OxygenSystemBlueprint extends SystemBlueprint
+    implements BlueprintScript {
+  
+  public OxygenSystemBlueprint() {
+    super( null );
+    
+    getProperties().setString( OVDConstants.BLUEPRINT_NAME, "OxygenSystemBlueprint" );
+    getProperties().setInt( OVDConstants.LEVEL_MAX, 3 );
+  }
+}
+
+PropertyOVDBlueprint create() {
+  return new OxygenSystemBlueprint();
+}

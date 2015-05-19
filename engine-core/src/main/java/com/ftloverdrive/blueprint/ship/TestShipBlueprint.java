@@ -2,6 +2,7 @@ package com.ftloverdrive.blueprint.ship;
 
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Pools;
+import com.ftloverdrive.blueprint.OVDBlueprint;
 import com.ftloverdrive.core.OverdriveContext;
 import com.ftloverdrive.event.PropertyEvent;
 import com.ftloverdrive.event.ship.ShipCreationEvent;
@@ -126,48 +127,59 @@ public class TestShipBlueprint extends ShipBlueprint {
 		// Systems
 
 		// TODO: Add system blueprints instead?
-		ShieldSystemBlueprint shieldSys = new ShieldSystemBlueprint();
-		int sysRefId = shieldSys.construct( context );
+		OVDBlueprint blue = context.getBlueprintManager().getBlueprint( "ShieldSystemBlueprint" );
+		int sysRefId = blue.construct( context );
 
 		SystemPropertyEvent sysPropE = Pools.get( SystemPropertyEvent.class ).obtain();
-		sysPropE.init( sysRefId, PropertyEvent.SET_ACTION, OVDConstants.LEVEL, 8 ); // TODO: Normally would be loaded from blueprint
+		sysPropE.init( sysRefId, PropertyEvent.SET_ACTION, OVDConstants.LEVEL, 8 ); // TODO: Normally would be loaded from ship's blueprint
 		context.getScreenEventManager().postDelayedEvent( sysPropE );
 
 		ShipSystemAddEvent sysAddE = Pools.get( ShipSystemAddEvent.class ).obtain();
 		sysAddE.init( shipRefId, roomRefIds[5], sysRefId );
 		context.getScreenEventManager().postDelayedEvent( sysAddE );
 
-		EngineSystemBlueprint engineSys = new EngineSystemBlueprint();
-		sysRefId = engineSys.construct( context );
+		blue = context.getBlueprintManager().getBlueprint( "EnginesSystemBlueprint" );
+		sysRefId = blue.construct( context );
 
 		sysPropE = Pools.get( SystemPropertyEvent.class ).obtain();
-		sysPropE.init( sysRefId, PropertyEvent.SET_ACTION, OVDConstants.LEVEL, 8 ); // TODO: Normally would be loaded from blueprint
+		sysPropE.init( sysRefId, PropertyEvent.SET_ACTION, OVDConstants.LEVEL, 8 ); // TODO: Normally would be loaded from ship's blueprint
 		context.getScreenEventManager().postDelayedEvent( sysPropE );
 
 		sysAddE = Pools.get( ShipSystemAddEvent.class ).obtain();
 		sysAddE.init( shipRefId, roomRefIds[14], sysRefId );
 		context.getScreenEventManager().postDelayedEvent( sysAddE );
 
-		MedbaySystemBlueprint medbaySys = new MedbaySystemBlueprint();
-		sysRefId = medbaySys.construct( context );
+		blue = context.getBlueprintManager().getBlueprint( "MedbaySystemBlueprint" );
+		sysRefId = blue.construct( context );
 
 		sysPropE = Pools.get( SystemPropertyEvent.class ).obtain();
-		sysPropE.init( sysRefId, PropertyEvent.SET_ACTION, OVDConstants.LEVEL, 3 ); // TODO: Normally would be loaded from blueprint
+		sysPropE.init( sysRefId, PropertyEvent.SET_ACTION, OVDConstants.LEVEL, 3 ); // TODO: Normally would be loaded from ship's blueprint
 		context.getScreenEventManager().postDelayedEvent( sysPropE );
 
 		sysAddE = Pools.get( ShipSystemAddEvent.class ).obtain();
 		sysAddE.init( shipRefId, roomRefIds[4], sysRefId );
 		context.getScreenEventManager().postDelayedEvent( sysAddE );
 
-		OxygenSystemBlueprint oxySys = new OxygenSystemBlueprint();
-		sysRefId = oxySys.construct( context );
+		blue = context.getBlueprintManager().getBlueprint( "OxygenSystemBlueprint" );
+		sysRefId = blue.construct( context );
 
 		sysPropE = Pools.get( SystemPropertyEvent.class ).obtain();
-		sysPropE.init( sysRefId, PropertyEvent.SET_ACTION, OVDConstants.LEVEL, 3 ); // TODO: Normally would be loaded from blueprint
+		sysPropE.init( sysRefId, PropertyEvent.SET_ACTION, OVDConstants.LEVEL, 3 ); // TODO: Normally would be loaded from ship's blueprint
 		context.getScreenEventManager().postDelayedEvent( sysPropE );
 
 		sysAddE = Pools.get( ShipSystemAddEvent.class ).obtain();
 		sysAddE.init( shipRefId, roomRefIds[13], sysRefId );
+		context.getScreenEventManager().postDelayedEvent( sysAddE );
+
+		blue = context.getBlueprintManager().getBlueprint( "HackingSystemBlueprint" );
+		sysRefId = blue.construct( context );
+
+		sysPropE = Pools.get( SystemPropertyEvent.class ).obtain();
+		sysPropE.init( sysRefId, PropertyEvent.SET_ACTION, OVDConstants.LEVEL, 3 ); // TODO: Normally would be loaded from ship's blueprint
+		context.getScreenEventManager().postDelayedEvent( sysPropE );
+
+		sysAddE = Pools.get( ShipSystemAddEvent.class ).obtain();
+		sysAddE.init( shipRefId, roomRefIds[11], sysRefId );
 		context.getScreenEventManager().postDelayedEvent( sysAddE );
 
 		// =====

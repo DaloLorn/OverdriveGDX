@@ -1,0 +1,55 @@
+
+import com.ftloverdrive.util.OVDConstants;
+import com.ftloverdrive.io.ButtonSpec;
+import com.ftloverdrive.model.ModelScript;
+import com.ftloverdrive.model.system.DefaultSystemModel;
+
+class ShieldSystemModel extends DefaultSystemModel
+    implements ModelScript {
+
+  public ShieldSystemModel() {
+    super();
+  }
+
+  public String getIconName() {
+    return "s-shields";
+  }
+
+  public boolean isSelfPowered() {
+    return false;
+  }
+
+  public int getPowerIncrement() {
+    return 2;
+  }
+
+  public String getTooltipSystemDescription() {
+    return "Shields: Sustains projectile-blocking shields. Manning increases shield recharge speed.";
+  }
+
+  public String getTooltipPowerDescription() {
+    int power = getProperties().getInt( OVDConstants.POWER );
+    if ( power == 0 ) {
+      return "OFF: SHIELDS DOWN!";
+    }
+    else {
+      return String.format( "Level %s: %s Shield Barriers", power, power / 2 );
+    }
+  }
+
+  public String getTooltipManningDescription() {
+    return "15% faster recharge";
+  }
+
+  public ButtonSpec[] getButtons() {
+    return null;
+  }
+}
+
+String getAssociatedBlueprint() {
+  return "ShieldSystemBlueprint";
+}
+
+Class getObjectClass() {
+  return ShieldSystemModel.class;
+}

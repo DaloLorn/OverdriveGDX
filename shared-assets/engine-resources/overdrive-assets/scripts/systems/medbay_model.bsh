@@ -1,0 +1,51 @@
+
+import com.ftloverdrive.util.OVDConstants;
+import com.ftloverdrive.io.ButtonSpec;
+import com.ftloverdrive.model.ModelScript;
+import com.ftloverdrive.model.system.DefaultSystemModel;
+
+class MedbaySystemModel extends DefaultSystemModel
+    implements ModelScript {
+
+  public MedbaySystemModel() {
+    super();
+  }
+
+  public String getIconName() {
+    return "s-medbay";
+  }
+
+  public boolean isSelfPowered() {
+    return false;
+  }
+
+  public String getTooltipSystemDescription() {
+    return "Medbay: Heals crewmembers inside the Medbay.";
+  }
+
+  public String getTooltipPowerDescription() {
+    int power = getProperties().getInt( OVDConstants.POWER );
+    if ( power == 0 ) {
+      return "OFF: Cannot heal crew";
+    }
+    else {
+      return String.format( "Level %s: Healing Boost %s", power, 0.5 + power * 0.5 );
+    }
+  }
+
+  public String getTooltipManningDescription() {
+    return null; // Cannot be manned
+  }
+
+  public ButtonSpec[] getButtons() {
+    return null;
+  }
+}
+
+String getAssociatedBlueprint() {
+  return "MedbaySystemBlueprint";
+}
+
+Class getObjectClass() {
+  return MedbaySystemModel.class;
+}

@@ -135,10 +135,7 @@ public class OVDConstants {
 	public static final String POWER_DESTROYED = "PowerDestroyed";
 
 	/** System property. */
-	public static final String SELF_POWERED = "SelfPowered";
-
-	/** System property. */
-	public static final String SYSTEM_ICON_NAME = "SystemIconName";
+	public static final String MANNED = "Manned";
 
 	/** System property. */
 	public static final String ION_FRACTION_MAX = "IonFractionMax";

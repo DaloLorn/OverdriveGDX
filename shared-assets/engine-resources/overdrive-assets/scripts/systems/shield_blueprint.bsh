@@ -1,0 +1,19 @@
+import com.ftloverdrive.blueprint.BlueprintScript;
+import com.ftloverdrive.blueprint.PropertyOVDBlueprint;
+import com.ftloverdrive.blueprint.ship.SystemBlueprint;
+import com.ftloverdrive.util.OVDConstants;
+
+class ShieldSystemBlueprint extends SystemBlueprint
+    implements BlueprintScript {
+  
+  public ShieldSystemBlueprint() {
+    super( null );
+
+    getProperties().setString( OVDConstants.BLUEPRINT_NAME, "ShieldSystemBlueprint" );
+    getProperties().setInt( OVDConstants.LEVEL_MAX, 8 );
+  }
+}
+
+PropertyOVDBlueprint create() {
+  return new ShieldSystemBlueprint();
+}
