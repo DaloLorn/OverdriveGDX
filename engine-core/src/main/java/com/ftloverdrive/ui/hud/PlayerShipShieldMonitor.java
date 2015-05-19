@@ -22,7 +22,8 @@ public class PlayerShipShieldMonitor extends Actor implements Disposable, GamePl
 
 	public static final String SKIN_PATH = "overdrive-assets/skins/player-hud/shield-hud.json";
 
-	protected final Sprite bgSprite;
+	protected final Sprite bgSpriteOn;
+	protected final Sprite bgSpriteOff;
 	protected final Sprite shieldEmptySprite;
 	protected final Sprite shieldFullSprite;
 	protected final Sprite shieldRechargeBgSprite;
@@ -55,7 +56,8 @@ public class PlayerShipShieldMonitor extends Actor implements Disposable, GamePl
 
 		OVDSkin skin = assetManager.get( SKIN_PATH, OVDSkin.class );
 
-		bgSprite = skin.getSprite( "shield-bg-on" );
+		bgSpriteOn = skin.getSprite( "shield-bg-on" );
+		bgSpriteOff = skin.getSprite( "shield-bg-off" );
 		shieldEmptySprite = skin.getSprite( "shield-empty" );
 		shieldFullSprite = skin.getSprite( "shield-full" );
 		shieldRechargeBgSprite = skin.getSprite( "shield-recharge-bg" );
@@ -69,38 +71,46 @@ public class PlayerShipShieldMonitor extends Actor implements Disposable, GamePl
 		shieldRechargeBgAlignX = skin.getInt( "shield-recharge-bg-align-x" );
 		shieldRechargeBgAlignY = skin.getInt( "shield-recharge-bg-align-y" );
 
-		setWidth( bgSprite.getWidth() );
-		setHeight( bgSprite.getHeight() );
+		setWidth( bgSpriteOn.getWidth() );
+		setHeight( bgSpriteOn.getHeight() );
 	}
 
 	@Override
 	public void draw( Batch batch, float parentAlpha ) {
 		super.draw( batch, parentAlpha );
 
-		bgSprite.setPosition( getX(), getY() );
-		bgSprite.draw( batch, parentAlpha );
+		if ( shieldMax == 0 ) {
+			bgSpriteOff.setPosition( getX(), getY() );
+			bgSpriteOff.draw( batch, parentAlpha );
+		}
+		else {
+			bgSpriteOn.setPosition( getX(), getY() );
+			bgSpriteOn.draw( batch, parentAlpha );
+
+			// Interpolate the percentage to make it more smooth.
+			recharge = Interpolation.linear.apply( recharge, rechargePrev, 0.25f );
+			shieldRechargeBarSprite.setSize( recharge * ( shieldRechargeBgSprite.getWidth() - 6 ), 6 );
+			shieldRechargeBarSprite.setPosition( getX() + shieldRechargeBgAlignX + 3, getY() + shieldRechargeBgAlignY + 3 );
+			shieldRechargeBarSprite.draw( batch, parentAlpha );
+
+			for ( int shieldIndex = 0; shieldIndex < shieldMax; ++shieldIndex ) {
+				if ( shieldIndex < shield ) {
+					shieldFullSprite.setPosition( getX() + offsetX + shieldIndex * spacingX,
+							getY() + offsetY );
+					shieldFullSprite.draw( batch, parentAlpha );
+				}
+				else {
+					shieldEmptySprite.setPosition( getX() + offsetX + shieldIndex * spacingX,
+							getY() + offsetY );
+					shieldEmptySprite.draw( batch, parentAlpha );
+				}
+			}
+		}
 
 		shieldRechargeBgSprite.setPosition( getX() + shieldRechargeBgAlignX, getY() + shieldRechargeBgAlignY );
 		shieldRechargeBgSprite.draw( batch, parentAlpha );
 
-		// Interpolate the percentage to make it more smooth.
-		recharge = Interpolation.linear.apply( recharge, rechargePrev, 0.25f );
-		shieldRechargeBarSprite.setSize( recharge * ( shieldRechargeBgSprite.getWidth() - 6 ), 6 );
-		shieldRechargeBarSprite.setPosition( getX() + shieldRechargeBgAlignX + 3, getY() + shieldRechargeBgAlignY + 3 );
-		shieldRechargeBarSprite.draw( batch, parentAlpha );
-
-		for ( int shieldIndex = 0; shieldIndex < shieldMax; ++shieldIndex ) {
-			if ( shieldIndex < shield ) {
-				shieldFullSprite.setPosition( getX() + offsetX + shieldIndex * spacingX,
-						getY() + offsetY );
-				shieldFullSprite.draw( batch, parentAlpha );
-			}
-			else {
-				shieldEmptySprite.setPosition( getX() + offsetX + shieldIndex * spacingX,
-						getY() + offsetY );
-				shieldEmptySprite.draw( batch, parentAlpha );
-			}
-		}
+		// TODO: Zoltan supershield
 	}
 
 	public void setShipModel( OverdriveContext context, int shipModelRefId ) {
