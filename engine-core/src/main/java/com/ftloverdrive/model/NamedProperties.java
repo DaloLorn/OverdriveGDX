@@ -38,21 +38,25 @@ public class NamedProperties {
 	}
 
 	public void setAll( NamedProperties other ) {
-		if ( namedIntMap != null && other.namedIntMap != null )
+		if ( other.namedIntMap != null ) {
 			for ( Map.Entry<String, MutableInt> entry : other.namedIntMap.entrySet() )
-				namedIntMap.put( entry.getKey(), entry.getValue() );
+				setInt( entry.getKey(), entry.getValue().get() );
+		}
 
-		if ( namedFloatMap != null && other.namedFloatMap != null )
+		if ( other.namedFloatMap != null ) {
 			for ( Map.Entry<String, MutableFloat> entry : other.namedFloatMap.entrySet() )
-				namedFloatMap.put( entry.getKey(), entry.getValue() );
+				setFloat( entry.getKey(), entry.getValue().get() );
+		}
 
-		if ( namedBoolMap != null && other.namedBoolMap != null )
+		if ( other.namedBoolMap != null ) {
 			for ( Map.Entry<String, MutableBool> entry : other.namedBoolMap.entrySet() )
-				namedBoolMap.put( entry.getKey(), entry.getValue() );
+				setBool( entry.getKey(), entry.getValue().get() );
+		}
 
-		if ( namedStringMap != null && other.namedStringMap != null )
+		if ( other.namedStringMap != null ) {
 			for ( Map.Entry<String, MutableString> entry : other.namedStringMap.entrySet() )
-				namedStringMap.put( entry.getKey(), entry.getValue() );
+				setString( entry.getKey(), entry.getValue().get() );
+		}
 	}
 
 	/**
