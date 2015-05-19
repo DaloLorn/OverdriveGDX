@@ -1,6 +1,18 @@
 {
+  com.ftloverdrive.io.ImageSpec: {
+    btn-base-tex: { atlasPath: "img/systemUI/.atlas.atlas", regionName: "button-teleport-base" }
+  },
+
+  com.badlogic.gdx.graphics.g2d.NinePatch: {
+    btn-base-patch: { texture: btn-base-tex, left: 14, right: 14, top: 17, bot: 33 }
+  },
+
   // Fields the game is hardcoded to look for.
   // Values can be changed freely, but entry names must remain the same.
+
+  com.badlogic.gdx.scenes.scene2d.utils.NinePatchDrawable: {
+    button-base: { patch: btn-base-patch }
+  },
 
   com.badlogic.gdx.graphics.Color: {
     power-available: { a: 1, r: 0.4, g: 1, b: 0.4 },
@@ -23,7 +35,24 @@
     clickable-icon-width: 26,
     clickable-icon-height: 26,
     icon-offset-y: 3,
-    
+
+    // Moves the entire button actor by this offset
+    button-base-offset-x: -9,
+    button-base-offset-y: 3,
+    // Specifies the location relative to the button base's bottom left corner
+    // at which buttons should be placed
+    button-base-start-x: 8,
+    button-base-start-y: 24,
+    // Similar as above, but for top left corner-relative
+    button-base-end-x: 8,
+    button-base-end-y: 8,
+    // Spacing between button and the start/end point
+    button-base-gap-x: 2,
+    button-base-gap-y: 2,
+    // Spacing between buttons
+    button-base-spacing-y: 2,
+
+    // 360 / (number of flakes in )
     ion-lock-step-angle: 30
   }
 }
