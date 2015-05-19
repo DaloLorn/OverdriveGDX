@@ -3,6 +3,7 @@ package com.ftloverdrive.ui.ship;
 import java.util.Stack;
 
 import com.badlogic.gdx.Input.Buttons;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.Animation.PlayMode;
 import com.badlogic.gdx.graphics.g2d.Batch;
@@ -53,6 +54,7 @@ public class CrewActor extends AmbulActor
 	@Override
 	public void draw( Batch batch, float parentAlpha ) {
 		if ( modelRefId != -1 ) {
+			batch.setColor( Color.WHITE );
 			batch.draw( currentAnim.getKeyFrame( elapsed ), getX(), getY(), 0, 0,
 					getWidth(), getHeight(), 1, 1, getRotation() );
 		}

@@ -15,7 +15,6 @@ import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.IntMap;
 import com.badlogic.gdx.utils.IntMap.Keys;
 import com.badlogic.gdx.utils.Pools;
-import com.ftloverdrive.blueprint.ship.ShieldSystemBlueprint;
 import com.ftloverdrive.core.OVDClock;
 import com.ftloverdrive.core.OverdriveContext;
 import com.ftloverdrive.event.PropertyEvent;
@@ -133,15 +132,15 @@ public class ShipActor extends ModelActor
 		doorGroup.setTouchable( Touchable.childrenOnly );
 		shipFloorplanGroup.addActor( doorGroup );
 
+		systemIcons = new ShipSystemIconsActor( context );
+		systemIcons.setTouchable( Touchable.disabled );
+		shipFloorplanGroup.addActor( systemIcons );
+
 		// TODO: Where to draw crew layer?
 		// Needs to be drawn above door layer for sure
 		crewGroup = new Group();
 		crewGroup.setTouchable( Touchable.childrenOnly );
 		shipFloorplanGroup.addActor( crewGroup );
-
-		systemIcons = new ShipSystemIconsActor( context );
-		systemIcons.setTouchable( Touchable.disabled );
-		shipFloorplanGroup.addActor( systemIcons );
 	}
 
 
@@ -233,7 +232,8 @@ public class ShipActor extends ModelActor
 		if ( e.getPropertyType() == PropertyEvent.INT_TYPE ) {
 			if ( OVDConstants.POWER.equals( e.getPropertyKey() ) ) {
 				// TODO Revise this condition
-				if ( systemModel.getProperties().getString( OVDConstants.BLUEPRINT_NAME ).equals( ShieldSystemBlueprint.class.getSimpleName() ) ) {
+				// TODO: Move to the ShieldSystemModel script somehow??
+				if ( systemModel.getProperties().getString( OVDConstants.BLUEPRINT_NAME ).equals( "ShieldSystemBlueprint" ) ) {
 					int level = systemModel.getCurrentPower() / systemModel.getPowerIncrement();
 
 					ShipPropertyEvent event = Pools.get( ShipPropertyEvent.class ).obtain();
@@ -513,6 +513,19 @@ public class ShipActor extends ModelActor
 				context.getScreenEventManager().addEventListener( tpadActor, LocalActorClickedListener.class );
 			}
 
+			systemIcons.clear();
+			systemIcons.setSize( shipModel.getHullWidth(), shipModel.getHullHeight() );
+			systemIcons.setTileSize( 35 );
+			for ( IntMap.Keys it = shipModel.getLayout().systemRefIds(); it.hasNext; ) {
+				int systemRefId = it.next();
+				SystemModel systemModel = context.getReferenceManager().getObject( systemRefId, SystemModel.class );
+				String iconName = systemModel.getIconName();
+				if ( iconName == null ) continue;
+
+				Vector2 iconOffset = shipModel.getLayout().getRoomSystemIcon( systemRefId );
+				systemIcons.addSystemIcon( iconOffset.x, iconOffset.y, iconName );
+			}
+
 			// TODO: Create customized group class that handles listeners
 			// TODO: Don't keep CrewActors as children of the ship, have them be separate entities in the screen space?
 			for ( Actor a : crewGroup.getChildren() ) {
@@ -535,19 +548,6 @@ public class ShipActor extends ModelActor
 
 				context.getScreenEventManager().addEventListener( crewActor, LocalActorClickedListener.class );
 				context.getScreenEventManager().addEventListener( crewActor, OrderListener.class );
-			}
-
-			systemIcons.clear();
-			systemIcons.setSize( shipModel.getHullWidth(), shipModel.getHullHeight() );
-			systemIcons.setTileSize( 35 );
-			for ( IntMap.Keys it = shipModel.getLayout().systemRefIds(); it.hasNext; ) {
-				int systemRefId = it.next();
-				SystemModel systemModel = context.getReferenceManager().getObject( systemRefId, SystemModel.class );
-				String iconName = systemModel.getIconName();
-				if ( iconName == null ) continue;
-
-				Vector2 iconOffset = shipModel.getLayout().getRoomSystemIcon( systemRefId );
-				systemIcons.addSystemIcon( iconOffset.x, iconOffset.y, iconName );
 			}
 		}
 	}

@@ -14,4 +14,8 @@ public class MutableString {
 	public String get() {
 		return s;
 	}
+	
+	public String toString() {
+		return s;
+	}
 }

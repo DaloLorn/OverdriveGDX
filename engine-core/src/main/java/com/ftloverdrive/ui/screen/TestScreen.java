@@ -120,6 +120,7 @@ public class TestScreen extends BaseScreen {
 		bg.setSize( bgImage.getCompleteWidth(), bgImage.getCompleteHeight() );
 		bg.addActor( bgImage );
 
+		// TODO: Encapsulate HUD actors in a PlayerHUD class.
 		playerShipHullMonitor = new PlayerShipHullMonitor( context );
 		playerShipHullMonitor.setPosition( 0, hudStage.getHeight() - playerShipHullMonitor.getHeight() );
 		hudStage.addActor( playerShipHullMonitor );
@@ -135,7 +136,7 @@ public class TestScreen extends BaseScreen {
 		hudStage.addActor( playerScrapMonitor );
 
 		playerShipReactor = new PlayerShipReactorUI( context );
-		playerShipReactor.setPosition( 40, 5 );
+		playerShipReactor.setPosition( 45, 5 );
 		hudStage.addActor( playerShipReactor );
 
 		doorHighlighter = new PlayerShipDoorHighlighter( context );
@@ -287,7 +288,7 @@ public class TestScreen extends BaseScreen {
 		playerScrapMonitor.setPosition( playerShipHullMonitor.getWidth(),
 				hudStage.getHeight() - playerScrapMonitor.getHeight() );
 		playerShipShieldMonitor.setPosition( 0,
-				hudStage.getHeight() - playerShipHullMonitor.getHeight() - playerShipShieldMonitor.getHeight() );
+				hudStage.getHeight() - playerShipHullMonitor.getHeight() - playerShipShieldMonitor.getHeight() + 22 );
 		// Main
 		shipActor.setPosition( 350, mainStage.getHeight() - shipActor.getHeight() - 170 );
 

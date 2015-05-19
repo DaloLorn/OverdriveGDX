@@ -1,13 +1,13 @@
 package com.ftloverdrive.ui.ship;
 
 import com.badlogic.gdx.assets.AssetManager;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.utils.Disposable;
 import com.ftloverdrive.core.OverdriveContext;
-import com.ftloverdrive.model.ship.ShipCoordinate;
 import com.ftloverdrive.util.OVDConstants;
 
 
@@ -63,6 +63,7 @@ public class ShipSystemIconsActor extends Group
 		x -= xCoord;
 		y -= yCoord;
 		iconImage.setPosition( calcTileX( xCoord ) + x * tileSize + 2, calcTileY( yCoord ) + y * tileSize + 1 );
+		iconImage.setColor( Color.GRAY );
 		addActor( iconImage );
 	}
 

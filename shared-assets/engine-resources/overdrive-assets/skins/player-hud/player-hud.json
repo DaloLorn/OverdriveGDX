@@ -1,0 +1,11 @@
+{
+  // Fields the game is hardcoded to look for.
+  // Values can be changed freely, but entry names must remain the same.
+
+  java.lang.Integer: {
+    shield-monitor-offset-x: 0,
+    shield-monitor-offset-y: -22,
+    scrap-monitor-offset-x: -5,
+    scrap-monitor-offset-y: 0
+  }
+}
