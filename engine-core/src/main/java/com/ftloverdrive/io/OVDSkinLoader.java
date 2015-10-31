@@ -35,7 +35,6 @@ public class OVDSkinLoader extends AsynchronousAssetLoader<OVDSkin, OVDSkinLoade
 
 	@Override
 	public Array<AssetDescriptor> getDependencies( String fileName, FileHandle file, OVDSkinParameter parameter ) {
-		System.out.println("Getting dependencies for: " + fileName);
 		Array<AssetDescriptor> deps = new Array();
 		if ( parameter == null ) {
 			FileHandle atlasFile = new FileHandle( file.pathWithoutExtension() + ".atlas" );
@@ -82,7 +81,6 @@ public class OVDSkinLoader extends AsynchronousAssetLoader<OVDSkin, OVDSkinLoade
 
 	@Override
 	public OVDSkin loadSync( AssetManager manager, String fileName, FileHandle file, OVDSkinParameter parameter ) {
-		System.out.println("Loading: " + fileName);
 		String textureAtlasPath;
 		ObjectMap<String, Object> resources;
 		if ( parameter == null ) {
