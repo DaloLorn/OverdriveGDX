@@ -13,6 +13,7 @@
 		<android.version>4.1.1.4</android.version>
 		<android.maven.version>3.6.0</android.maven.version>
 		<beanshell2.version>2.1.6</beanshell2.version>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
 
 	<repositories>
