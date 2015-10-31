@@ -3,7 +3,7 @@
 
 package com.ftloverdrive.packer;
 
-import java.awt.Component;
+import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 import javax.swing.JFileChooser;
@@ -114,5 +114,24 @@ public class FTLUtilities {
 		}
 
 		return null;
+	}
+
+	public static File promptForOutputDir(Component parentComponent) {
+		File result = null;
+
+		File appDir = new File( "." );
+
+		JFileChooser packChooser = new JFileChooser();
+		packChooser.setDialogTitle( "Choose a dir to contain resources folder" );
+		packChooser.setCurrentDirectory(appDir);
+		packChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+		packChooser.setMultiSelectionEnabled(false);
+
+        if ( packChooser.showSaveDialog( null ) != JFileChooser.APPROVE_OPTION )
+            System.exit( 0 );
+
+		result = packChooser.getSelectedFile();
+
+		return result;
 	}
 }

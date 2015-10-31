@@ -1,6 +1,9 @@
 target/
 build.bat
 
+.idea/
+
+*.iml
 *.class
 *.tmp
 *.bak
