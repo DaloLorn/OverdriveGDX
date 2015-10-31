@@ -1,5 +1,6 @@
 package com.ftloverdrive.io;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetDescriptor;
 import com.badlogic.gdx.assets.AssetLoaderParameters;
 import com.badlogic.gdx.assets.AssetManager;
@@ -34,6 +35,7 @@ public class OVDSkinLoader extends AsynchronousAssetLoader<OVDSkin, OVDSkinLoade
 
 	@Override
 	public Array<AssetDescriptor> getDependencies( String fileName, FileHandle file, OVDSkinParameter parameter ) {
+		System.out.println("Getting dependencies for: " + fileName);
 		Array<AssetDescriptor> deps = new Array();
 		if ( parameter == null ) {
 			FileHandle atlasFile = new FileHandle( file.pathWithoutExtension() + ".atlas" );
@@ -51,7 +53,20 @@ public class OVDSkinLoader extends AsynchronousAssetLoader<OVDSkin, OVDSkinLoade
 		JsonValue jv = map.get( ImageSpec.class.getCanonicalName() );
 		if ( jv != null ) {
 			for ( JsonValue spec : jv ) {
-				FileHandle atlasFile = new FileHandle( spec.getString( "atlasPath" ) );
+				String path = spec.getString( "atlasPath" );
+				FileHandle atlasFile = new FileHandle( path );
+
+				// if the file doesn't exist, check the internal storage
+				if(!atlasFile.exists()){
+					atlasFile = Gdx.files.internal(path);
+				}
+
+				// if the file cannot be found, exit the application
+				// TODO: proper handling of missing files
+				if(!atlasFile.exists()){
+					Gdx.app.exit();
+				}
+
 				AssetDescriptor descr = new AssetDescriptor( atlasFile, TextureAtlas.class );
 				if ( !deps.contains( descr, false ) )
 					deps.add( descr );
@@ -67,6 +82,7 @@ public class OVDSkinLoader extends AsynchronousAssetLoader<OVDSkin, OVDSkinLoade
 
 	@Override
 	public OVDSkin loadSync( AssetManager manager, String fileName, FileHandle file, OVDSkinParameter parameter ) {
+		System.out.println("Loading: " + fileName);
 		String textureAtlasPath;
 		ObjectMap<String, Object> resources;
 		if ( parameter == null ) {
