@@ -1,6 +1,5 @@
 package com.ftloverdrive.io;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetDescriptor;
 import com.badlogic.gdx.assets.AssetLoaderParameters;
 import com.badlogic.gdx.assets.AssetManager;
@@ -52,20 +51,7 @@ public class OVDSkinLoader extends AsynchronousAssetLoader<OVDSkin, OVDSkinLoade
 		JsonValue jv = map.get( ImageSpec.class.getCanonicalName() );
 		if ( jv != null ) {
 			for ( JsonValue spec : jv ) {
-				String path = spec.getString( "atlasPath" );
-				FileHandle atlasFile = new FileHandle( path );
-
-				// if the file doesn't exist, check the internal storage
-				if(!atlasFile.exists()){
-					atlasFile = Gdx.files.internal(path);
-				}
-
-				// if the file cannot be found, exit the application
-				// TODO: proper handling of missing files
-				if(!atlasFile.exists()){
-					Gdx.app.exit();
-				}
-
+				FileHandle atlasFile = new FileHandle( spec.getString( "atlasPath" ) );
 				AssetDescriptor descr = new AssetDescriptor( atlasFile, TextureAtlas.class );
 				if ( !deps.contains( descr, false ) )
 					deps.add( descr );
