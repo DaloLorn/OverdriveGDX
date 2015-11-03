@@ -2,16 +2,23 @@ import com.ftloverdrive.blueprint.BlueprintScript;
 import com.ftloverdrive.blueprint.PropertyOVDBlueprint;
 import com.ftloverdrive.blueprint.ship.SystemBlueprint;
 import com.ftloverdrive.util.OVDConstants;
+import com.ftloverdrive.core.OverdriveContext;
 
 class MedbaySystemBlueprint extends SystemBlueprint
     implements BlueprintScript {
   
-  public MedbaySystemBlueprint() {
-    super( null );
+	public MedbaySystemBlueprint() {
+		super( null );
 
-    getProperties().setString( OVDConstants.BLUEPRINT_NAME, "MedbaySystemBlueprint" );
-    getProperties().setInt( OVDConstants.LEVEL_MAX, 3 );
-  }
+		getProperties().setString( OVDConstants.BLUEPRINT_NAME, "MedbaySystemBlueprint" );
+		getProperties().setInt( OVDConstants.LEVEL_MAX, 3 );
+		getProperties().setInt( OVDConstants.LEVEL, 2 );
+	}
+  
+  	public int construct( OverdriveContext context ) {
+		int systemRefId = super.construct(context);
+		return systemRefId;
+	}
 }
 
 PropertyOVDBlueprint create() {

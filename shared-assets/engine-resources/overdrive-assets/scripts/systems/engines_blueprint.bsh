@@ -2,16 +2,23 @@ import com.ftloverdrive.blueprint.BlueprintScript;
 import com.ftloverdrive.blueprint.PropertyOVDBlueprint;
 import com.ftloverdrive.blueprint.ship.SystemBlueprint;
 import com.ftloverdrive.util.OVDConstants;
+import com.ftloverdrive.core.OverdriveContext;
 
 class EnginesSystemBlueprint extends SystemBlueprint
     implements BlueprintScript {
   
-  public EnginesSystemBlueprint() {
-    super( null );
+	public EnginesSystemBlueprint() {
+		super( null );
 
-    getProperties().setString( OVDConstants.BLUEPRINT_NAME, "EnginesSystemBlueprint" );
-    getProperties().setInt( OVDConstants.LEVEL_MAX, 8 );
-  }
+		getProperties().setString( OVDConstants.BLUEPRINT_NAME, "EnginesSystemBlueprint" );
+		getProperties().setInt( OVDConstants.LEVEL_MAX, 8 );
+		getProperties().setInt( OVDConstants.LEVEL, 3 );
+	}
+  
+  	public int construct( OverdriveContext context ) {
+		int systemRefId = super.construct(context);
+		return systemRefId;
+	}
 }
 
 PropertyOVDBlueprint create() {

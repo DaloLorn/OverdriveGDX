@@ -140,9 +140,7 @@ public class TestScreen extends BaseScreen {
 
 		incidentWindowDemo();
 
-
 		resize( getScreenWidth(), getScreenHeight() );
-		//*/
 	}
 
 	private void initLayers() {
