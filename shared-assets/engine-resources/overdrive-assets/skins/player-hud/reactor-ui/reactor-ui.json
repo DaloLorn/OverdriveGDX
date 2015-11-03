@@ -33,7 +33,7 @@
 
     power-text-offset-x: -30,
     power-text-offset-y: 5,
-    reactor-tile-align-y: 11,
+    reactor-tile-align-y: 9,
     reactor-tile-overlap-offset-y: -3,
     bar-spacing-v: reactor-tile-align-y,
     bar-offset-x: -6,
