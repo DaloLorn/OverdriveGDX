@@ -2,7 +2,6 @@ package com.ftloverdrive.ui.hud;
 
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.ftloverdrive.core.OverdriveContext;
-import com.ftloverdrive.event.OVDEventListener;
 import com.ftloverdrive.event.OVDEventManager;
 import com.ftloverdrive.event.game.GamePlayerShipChangeListener;
 import com.ftloverdrive.event.ship.ShipPropertyListener;
@@ -107,7 +106,6 @@ public class PlayerHUD extends Group {
         playerShipHullMonitor.dispose();
         playerScrapMonitor.dispose();
         playerShipShieldMonitor.dispose();
-        playerScrapMonitor.dispose();
         playerShipReactor.dispose();
     }
 }

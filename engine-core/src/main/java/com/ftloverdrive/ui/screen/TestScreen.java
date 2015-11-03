@@ -26,7 +26,6 @@ import com.ftloverdrive.event.handler.TickEventHandler;
 import com.ftloverdrive.event.incident.IncidentSelectionEvent;
 import com.ftloverdrive.event.ship.ShipPropertyListener;
 import com.ftloverdrive.event.system.SystemPropertyListener;
-import com.ftloverdrive.event.system.SystemPropertySentinel;
 import com.ftloverdrive.model.DefaultPlayerModel;
 import com.ftloverdrive.model.PlayerModel;
 import com.ftloverdrive.model.incident.requirement.ShipRequirement;
@@ -39,12 +38,6 @@ import com.ftloverdrive.util.OVDConstants;
 public class TestScreen extends BaseScreen {
 
 	private TextureAtlas bgAtlas;
-
-	/*private PlayerShipHullMonitor playerShipHullMonitor;
-	private PlayerShipShieldMonitor playerShipShieldMonitor;
-	private PlayerScrapMonitor playerScrapMonitor;
-	private PlayerShipReactorUI playerShipReactor;
-	private PlayerShipDoorHighlighter doorHighlighter;*/
 
     private PlayerHUD playerHUD;
 	private ShipActor shipActor;
