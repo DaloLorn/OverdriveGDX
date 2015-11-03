@@ -31,11 +31,7 @@ import com.ftloverdrive.model.DefaultPlayerModel;
 import com.ftloverdrive.model.PlayerModel;
 import com.ftloverdrive.model.incident.requirement.ShipRequirement;
 import com.ftloverdrive.ui.ShatteredImage;
-import com.ftloverdrive.ui.hud.PlayerScrapMonitor;
-import com.ftloverdrive.ui.hud.PlayerShipDoorHighlighter;
-import com.ftloverdrive.ui.hud.PlayerShipHullMonitor;
-import com.ftloverdrive.ui.hud.PlayerShipReactorUI;
-import com.ftloverdrive.ui.hud.PlayerShipShieldMonitor;
+import com.ftloverdrive.ui.hud.*;
 import com.ftloverdrive.ui.ship.ShipActor;
 import com.ftloverdrive.util.OVDConstants;
 
@@ -44,17 +40,119 @@ public class TestScreen extends BaseScreen {
 
 	private TextureAtlas bgAtlas;
 
-	private PlayerShipHullMonitor playerShipHullMonitor;
+	/*private PlayerShipHullMonitor playerShipHullMonitor;
 	private PlayerShipShieldMonitor playerShipShieldMonitor;
 	private PlayerScrapMonitor playerScrapMonitor;
 	private PlayerShipReactorUI playerShipReactor;
-	private PlayerShipDoorHighlighter doorHighlighter;
+	private PlayerShipDoorHighlighter doorHighlighter;*/
+
+    private PlayerHUD playerHUD;
 	private ShipActor shipActor;
 
 
 	public TestScreen( OverdriveContext srcContext ) {
 		super( srcContext );
 
+		//init layer drawing order
+		initLayers();
+
+		context.getAssetManager().load( OVDConstants.BKG_ATLAS, TextureAtlas.class );
+		context.getAssetManager().load( OVDConstants.ROOT_ATLAS, TextureAtlas.class );
+		context.getAssetManager().load( OVDConstants.MISC_ATLAS, TextureAtlas.class );
+		context.getAssetManager().load( OVDConstants.STATUSUI_ATLAS, TextureAtlas.class );
+		context.getAssetManager().load( OVDConstants.EFFECTS_ATLAS, TextureAtlas.class );
+		context.getAssetManager().load( OVDConstants.PEOPLE_ATLAS, TextureAtlas.class );
+		context.getAssetManager().load( OVDConstants.PLOT_FONT, BitmapFont.class );
+
+		context.getAssetManager().finishLoading();
+
+		bgAtlas = context.getAssetManager().get( OVDConstants.BKG_ATLAS, TextureAtlas.class );
+		ShatteredImage bgImage = new ShatteredImage( bgAtlas.findRegions( "bg-blueStarcluster" ), 5 );
+		bgImage.setFillParent( true );
+		Group bg = mainStage.getRoot().findActor( "Background" );
+		bg.setSize( bgImage.getCompleteWidth(), bgImage.getCompleteHeight() );
+		bg.addActor( bgImage );
+
+        // playerHUD contains encapsulated elements of hud
+        playerHUD = new PlayerHUD(context);
+        hudStage.addActor(playerHUD);
+
+		mainStage.addListener( playerHUD.getDoorHighlighter() );
+
+		shipActor = new ShipActor( context );
+		// Ship's offset from the window's top left corner in FTL: X + 350, Y + 170
+		// At this point, shipActor's height is 0...
+		// shipActor.setPosition( 350, mainStage.getHeight() - shipActor.getHeight() - 170 );
+		mainStage.addActor( shipActor );
+		mainStage.addListener( shipActor );
+
+		// Wire up the event manager...
+		TickEventHandler tickHandler = new TickEventHandler();
+		for ( Class c : tickHandler.getEventClasses() )
+			eventManager.setEventHandler( c, tickHandler );
+
+		EngineEventHandler engineHandler = new EngineEventHandler();
+		for ( Class c : engineHandler.getEventClasses() )
+			eventManager.setEventHandler( c, engineHandler );
+
+		LocalEventHandler localHandler = new LocalEventHandler();
+		for ( Class c : localHandler.getEventClasses() )
+			eventManager.setEventHandler( c, localHandler );
+
+		GameEventHandler gameHandler = new GameEventHandler();
+		for ( Class c : gameHandler.getEventClasses() )
+			eventManager.setEventHandler( c, gameHandler );
+
+		ShipEventHandler shipHandler = new ShipEventHandler();
+		for ( Class c : shipHandler.getEventClasses() )
+			eventManager.setEventHandler( c, shipHandler );
+
+		DoorEventHandler doorHandler = new DoorEventHandler();
+		for ( Class c : doorHandler.getEventClasses() )
+			eventManager.setEventHandler( c, doorHandler );
+
+		SystemEventHandler systemHandler = new SystemEventHandler();
+		for ( Class c : systemHandler.getEventClasses() )
+			eventManager.setEventHandler( c, systemHandler );
+
+		IncidentEventHandler incHandler = new IncidentEventHandler();
+		for ( Class c : incHandler.getEventClasses() )
+			eventManager.setEventHandler( c, incHandler );
+
+        // register event listeners to current screen
+        playerHUD.registerEventListeners(eventManager);
+
+		eventManager.addEventListener( shipActor, GamePlayerShipChangeListener.class );
+		eventManager.addEventListener( shipActor, ShipPropertyListener.class );
+		eventManager.addEventListener( shipActor, SystemPropertyListener.class );
+		eventManager.addTickListener( 1, shipActor );
+
+		// XXX: Periodic events can be registered like this...
+		// eventManager.addTickListener( numberOfTicks, tickListener );
+
+		int playerRefId = context.getNetManager().requestNewRefId();
+		PlayerModel playerModel = new DefaultPlayerModel();
+		context.getReferenceManager().addObject( playerModel, playerRefId );
+		context.getNetManager().setLocalPlayerRefId( playerRefId );
+
+		// Create a test ship.
+
+		int shipRefId = new TestShipBlueprint( null ).construct( context );
+
+		int gameRefId = context.getGameModelRefId();
+		// Set it as the player's ship.
+		GamePlayerShipChangeEvent shipChangeEvent = Pools.get( GamePlayerShipChangeEvent.class ).obtain();
+		shipChangeEvent.init( gameRefId, playerRefId, shipRefId );
+		eventManager.postDelayedEvent( shipChangeEvent );
+
+		incidentWindowDemo();
+
+
+		resize( getScreenWidth(), getScreenHeight() );
+		//*/
+	}
+
+	private void initLayers() {
 		// These layers are mainly notes. Many will probably be moved inside actors.
 		Array<String> mainLayerNames = new Array<String>();
 		mainLayerNames.add( "Background" );
@@ -102,125 +200,6 @@ public class TestScreen extends BaseScreen {
 		// Group stageRoot = stage.getRoot();
 		// Group lowerLayer = (Group)stageRoot.findActor( layerName );
 		// stageRoot.addActorAfter( lowerLayer, newGroup );
-
-		context.getAssetManager().load( OVDConstants.BKG_ATLAS, TextureAtlas.class );
-		context.getAssetManager().load( OVDConstants.ROOT_ATLAS, TextureAtlas.class );
-		context.getAssetManager().load( OVDConstants.MISC_ATLAS, TextureAtlas.class );
-		context.getAssetManager().load( OVDConstants.STATUSUI_ATLAS, TextureAtlas.class );
-		context.getAssetManager().load( OVDConstants.EFFECTS_ATLAS, TextureAtlas.class );
-		context.getAssetManager().load( OVDConstants.PEOPLE_ATLAS, TextureAtlas.class );
-		context.getAssetManager().load( OVDConstants.PLOT_FONT, BitmapFont.class );
-
-		context.getAssetManager().finishLoading();
-
-		bgAtlas = context.getAssetManager().get( OVDConstants.BKG_ATLAS, TextureAtlas.class );
-		ShatteredImage bgImage = new ShatteredImage( bgAtlas.findRegions( "bg-blueStarcluster" ), 5 );
-		bgImage.setFillParent( true );
-		Group bg = mainStage.getRoot().findActor( "Background" );
-		bg.setSize( bgImage.getCompleteWidth(), bgImage.getCompleteHeight() );
-		bg.addActor( bgImage );
-
-		// TODO: Encapsulate HUD actors in a PlayerHUD class.
-		playerShipHullMonitor = new PlayerShipHullMonitor( context );
-		playerShipHullMonitor.setPosition( 0, hudStage.getHeight() - playerShipHullMonitor.getHeight() );
-		hudStage.addActor( playerShipHullMonitor );
-
-		playerShipShieldMonitor = new PlayerShipShieldMonitor( context );
-		playerShipShieldMonitor.setPosition( 0,
-				hudStage.getHeight() - playerShipHullMonitor.getHeight() - playerShipShieldMonitor.getHeight() );
-		hudStage.addActor( playerShipShieldMonitor );
-
-		playerScrapMonitor = new PlayerScrapMonitor( context );
-		playerScrapMonitor.setPosition( playerShipHullMonitor.getWidth(),
-				hudStage.getHeight() - playerScrapMonitor.getHeight() );
-		hudStage.addActor( playerScrapMonitor );
-
-		playerShipReactor = new PlayerShipReactorUI( context );
-		playerShipReactor.setPosition( 45, 5 );
-		hudStage.addActor( playerShipReactor );
-
-		doorHighlighter = new PlayerShipDoorHighlighter( context );
-		doorHighlighter.setVisible( false );
-		hudStage.addActor( doorHighlighter );
-		mainStage.addListener( doorHighlighter );
-
-		shipActor = new ShipActor( context );
-		// Ship's offset from the window's top left corner in FTL: X + 350, Y + 170
-		// At this point, shipActor's height is 0...
-		// shipActor.setPosition( 350, mainStage.getHeight() - shipActor.getHeight() - 170 );
-		mainStage.addActor( shipActor );
-		mainStage.addListener( shipActor );
-
-		// Wire up the event manager...
-		TickEventHandler tickHandler = new TickEventHandler();
-		for ( Class c : tickHandler.getEventClasses() )
-			eventManager.setEventHandler( c, tickHandler );
-
-		EngineEventHandler engineHandler = new EngineEventHandler();
-		for ( Class c : engineHandler.getEventClasses() )
-			eventManager.setEventHandler( c, engineHandler );
-
-		LocalEventHandler localHandler = new LocalEventHandler();
-		for ( Class c : localHandler.getEventClasses() )
-			eventManager.setEventHandler( c, localHandler );
-
-		GameEventHandler gameHandler = new GameEventHandler();
-		for ( Class c : gameHandler.getEventClasses() )
-			eventManager.setEventHandler( c, gameHandler );
-
-		ShipEventHandler shipHandler = new ShipEventHandler();
-		for ( Class c : shipHandler.getEventClasses() )
-			eventManager.setEventHandler( c, shipHandler );
-
-		DoorEventHandler doorHandler = new DoorEventHandler();
-		for ( Class c : doorHandler.getEventClasses() )
-			eventManager.setEventHandler( c, doorHandler );
-
-		SystemEventHandler systemHandler = new SystemEventHandler();
-		for ( Class c : systemHandler.getEventClasses() )
-			eventManager.setEventHandler( c, systemHandler );
-
-		IncidentEventHandler incHandler = new IncidentEventHandler();
-		for ( Class c : incHandler.getEventClasses() )
-			eventManager.setEventHandler( c, incHandler );
-
-		eventManager.addEventListener( playerShipHullMonitor, GamePlayerShipChangeListener.class );
-		eventManager.addEventListener( playerShipHullMonitor, ShipPropertyListener.class );
-		eventManager.addEventListener( playerShipShieldMonitor, GamePlayerShipChangeListener.class );
-		eventManager.addEventListener( playerShipShieldMonitor, ShipPropertyListener.class );
-		eventManager.addEventListener( playerScrapMonitor, GamePlayerShipChangeListener.class );
-		eventManager.addEventListener( playerScrapMonitor, ShipPropertyListener.class );
-		eventManager.addEventListener( playerShipReactor, GamePlayerShipChangeListener.class );
-		eventManager.addEventListener( playerShipReactor, ShipPropertyListener.class );
-		eventManager.addEventListener( playerShipReactor, SystemPropertyListener.class );
-		eventManager.addEventListener( playerShipReactor, SystemPropertySentinel.class );
-
-		eventManager.addEventListener( shipActor, GamePlayerShipChangeListener.class );
-		eventManager.addEventListener( shipActor, ShipPropertyListener.class );
-		eventManager.addEventListener( shipActor, SystemPropertyListener.class );
-		eventManager.addTickListener( 1, shipActor );
-
-		// XXX: Periodic events can be registered like this...
-		// eventManager.addTickListener( numberOfTicks, tickListener );
-
-		int playerRefId = context.getNetManager().requestNewRefId();
-		PlayerModel playerModel = new DefaultPlayerModel();
-		context.getReferenceManager().addObject( playerModel, playerRefId );
-		context.getNetManager().setLocalPlayerRefId( playerRefId );
-
-		// Create a test ship.
-
-		int shipRefId = new TestShipBlueprint( null ).construct( context );
-
-		int gameRefId = context.getGameModelRefId();
-		// Set it as the player's ship.
-		GamePlayerShipChangeEvent shipChangeEvent = Pools.get( GamePlayerShipChangeEvent.class ).obtain();
-		shipChangeEvent.init( gameRefId, playerRefId, shipRefId );
-		eventManager.postDelayedEvent( shipChangeEvent );
-
-		incidentWindowDemo();
-
-		resize( getScreenWidth(), getScreenHeight() );
 	}
 
 	private void incidentWindowDemo() {
@@ -283,12 +262,9 @@ public class TestScreen extends BaseScreen {
 
 		// TODO: Re-layout Stages.
 
-		// HUD
-		playerShipHullMonitor.setPosition( 0, hudStage.getHeight() - playerShipHullMonitor.getHeight() );
-		playerScrapMonitor.setPosition( playerShipHullMonitor.getWidth(),
-				hudStage.getHeight() - playerScrapMonitor.getHeight() );
-		playerShipShieldMonitor.setPosition( 0,
-				hudStage.getHeight() - playerShipHullMonitor.getHeight() - playerShipShieldMonitor.getHeight() + 22 );
+        // HUD elements container
+        playerHUD.resize(width, height);
+
 		// Main
 		shipActor.setPosition( 350, mainStage.getHeight() - shipActor.getHeight() - 170 );
 
@@ -319,8 +295,7 @@ public class TestScreen extends BaseScreen {
 	@Override
 	public void dispose() {
 		hudStage.dispose();
-		playerShipHullMonitor.dispose();
-		playerScrapMonitor.dispose();
+        playerHUD.dispose();
 		shipActor.dispose();
 		context.getAssetManager().unload( OVDConstants.BKG_ATLAS );
 		context.getAssetManager().unload( OVDConstants.ROOT_ATLAS );
