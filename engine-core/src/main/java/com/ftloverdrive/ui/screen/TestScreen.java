@@ -7,6 +7,7 @@ import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Pools;
 import com.badlogic.gdx.utils.Scaling;
+import com.ftloverdrive.blueprint.OVDBlueprint;
 import com.ftloverdrive.blueprint.incident.ConsequenceDamageBlueprint;
 import com.ftloverdrive.blueprint.incident.ConsequenceResourceBlueprint;
 import com.ftloverdrive.blueprint.incident.IncidentBlueprint;
@@ -130,7 +131,9 @@ public class TestScreen extends BaseScreen {
 
 		// Create a test ship.
 
-		int shipRefId = new TestShipBlueprint( null ).construct( context );
+		OVDBlueprint blue = context.getBlueprintManager().getBlueprint("KestrelAShipBlueprint");
+		int shipRefId = blue.construct(context);
+		//int shipRefId = new TestShipBlueprint( null ).construct( context );
 
 		int gameRefId = context.getGameModelRefId();
 		// Set it as the player's ship.

@@ -1,0 +1,54 @@
+import com.ftloverdrive.blueprint.BlueprintScript;
+import com.ftloverdrive.blueprint.PropertyOVDBlueprint;
+import com.ftloverdrive.util.OVDConstants;
+import com.ftloverdrive.core.OverdriveContext;
+import com.ftloverdrive.blueprint.ship.ShipBlueprint;
+import com.ftloverdrive.io.ImageSpec;
+
+class KestrelAShipBlueprint extends ShipBlueprint
+	implements BlueprintScript{
+	
+	public KestrelAShipBlueprint( ){
+		super(null);
+		
+		getProperties().setString( OVDConstants.BLUEPRINT_NAME, "KestrelAShipBlueprint" );
+		
+		
+	}
+	
+	public int construct(OverdriveContext context){
+		int shipRefId = super.construct(context);
+		createRooms(context, shipRefId);
+		return shipRefId;
+	}
+	
+	private void createRooms(OverdriveContext context, int shipRefId){
+		//rooms with system
+		createRoom(shipRefId, 8, 4, 2, 2, new ImageSpec( OVDConstants.SHIP_INTERIOR_ATLAS, "room-shields"), "ShieldSystemBlueprint");
+		createRoom(shipRefId, 1, 3, 2, 2, new ImageSpec( OVDConstants.SHIP_INTERIOR_ATLAS, "room-engines"), "EnginesSystemBlueprint");
+		createRoom(shipRefId, 1, 2, 2, 1, new ImageSpec( OVDConstants.SHIP_INTERIOR_ATLAS, "room-oxygen"), "OxygenSystemBlueprint");
+		createRoom(shipRefId, 4, 3, 2, 2, new ImageSpec( OVDConstants.SHIP_INTERIOR_ATLAS, "room-weapons"));
+		createRoom(shipRefId, 8, 2, 2, 2, new ImageSpec( OVDConstants.SHIP_INTERIOR_ATLAS, "room-medbay" ), "MedbaySystemBlueprint");
+		createRoom(shipRefId, 3, 2, 2, 1, new ImageSpec( OVDConstants.SHIP_INTERIOR_ATLAS, "room-hacking-4" ), "HackingSystemBlueprint");	
+		
+		//subsystem rooms
+		createRoom(shipRefId, 14, 3, 1, 2, new ImageSpec( OVDConstants.SHIP_INTERIOR_ATLAS, "room-pilot" ));
+		createRoom(shipRefId, 10, 3, 2, 1, new ImageSpec( OVDConstants.SHIP_INTERIOR_ATLAS, "room-doors" ));
+		createRoom(shipRefId, 10, 4, 2, 1, new ImageSpec( OVDConstants.SHIP_INTERIOR_ATLAS, "room-sensors" ));
+
+		//systemless rooms
+		createRoom(shipRefId, 12, 3, 2, 2);
+		createRoom(shipRefId, 6, 1, 2, 1);
+		createRoom(shipRefId, 6, 2, 2, 2);
+        createRoom(shipRefId, 6, 4, 2, 2);
+        createRoom(shipRefId, 6, 6, 2, 1);              
+        createRoom(shipRefId, 3, 5, 2, 1);
+        createRoom(shipRefId, 1, 5, 2, 1);
+        createRoom(shipRefId, 0, 3, 1, 2);
+	}
+	
+}
+
+PropertyOVDBlueprint create() {
+	return new KestrelAShipBlueprint();
+}

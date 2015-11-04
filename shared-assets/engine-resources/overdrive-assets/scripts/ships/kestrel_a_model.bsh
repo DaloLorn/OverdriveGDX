@@ -1,0 +1,40 @@
+import com.ftloverdrive.io.ImageSpec;
+import com.ftloverdrive.util.OVDConstants;
+import com.ftloverdrive.model.ship.DefaultShipModel;
+import com.ftloverdrive.model.ModelScript;
+import com.ftloverdrive.blueprint.BlueprintScript;
+
+class KestrelAShipModel extends DefaultShipModel
+    implements ModelScript {
+	
+	public KestrelAShipModel(){
+		super();
+		
+		this.setShipOffset( 0, 70 );
+		this.setHullOffset( -59, -103 );
+		this.setHullSize( 652, 418 );
+		this.setFloorOffset( 45, 93 );
+		this.setCloakOffset( 19, 19 );
+		this.setShieldEllipse( -30, 0, 350, 220 );
+		
+		this.setShieldImageSpec( new ImageSpec( OVDConstants.SHIP_ATLAS, "kestral-shields1" ) );
+		this.setBaseImageSpec( new ImageSpec( OVDConstants.SHIP_ATLAS, "kestral-base" ) );
+		this.setCloakImageSpec( new ImageSpec( OVDConstants.SHIP_ATLAS, "kestral-cloak" ) );
+		this.setFloorImageSpec( new ImageSpec( OVDConstants.SHIP_ATLAS, "kestral-floor" ) );
+		
+		this.getProperties().setInt( OVDConstants.HEALTH_MAX, 30 );
+        this.getProperties().setInt( OVDConstants.HEALTH, 30 );
+        this.getProperties().setInt( OVDConstants.POWER_DISABLED, 0 );
+        this.getProperties().setInt( OVDConstants.POWER_MAX, 25 );
+        this.getProperties().setInt( OVDConstants.POWER, 8 );
+	}
+	
+}
+
+String getAssociatedBlueprint() {
+  return "KestrelAShipBlueprint";
+}
+
+Class getObjectClass() {
+  return KestrelAShipModel.class;
+}
