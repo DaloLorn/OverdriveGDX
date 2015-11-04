@@ -18,11 +18,13 @@ class KestrelAShipBlueprint extends ShipBlueprint
 	
 	public int construct(OverdriveContext context){
 		int shipRefId = super.construct(context);
-		createRooms(context, shipRefId);
+		createRooms(shipRefId);
+		createDoors(shipRefId);
+		createCrew(shipRefId);
 		return shipRefId;
 	}
 	
-	private void createRooms(OverdriveContext context, int shipRefId){
+	private void createRooms(int shipRefId){
 		//rooms with system
 		createRoom(shipRefId, 8, 4, 2, 2, new ImageSpec( OVDConstants.SHIP_INTERIOR_ATLAS, "room-shields"), "ShieldSystemBlueprint");
 		createRoom(shipRefId, 1, 3, 2, 2, new ImageSpec( OVDConstants.SHIP_INTERIOR_ATLAS, "room-engines"), "EnginesSystemBlueprint");
@@ -40,13 +42,51 @@ class KestrelAShipBlueprint extends ShipBlueprint
 		createRoom(shipRefId, 12, 3, 2, 2);
 		createRoom(shipRefId, 6, 1, 2, 1);
 		createRoom(shipRefId, 6, 2, 2, 2);
-        createRoom(shipRefId, 6, 4, 2, 2);
-        createRoom(shipRefId, 6, 6, 2, 1);              
-        createRoom(shipRefId, 3, 5, 2, 1);
-        createRoom(shipRefId, 1, 5, 2, 1);
-        createRoom(shipRefId, 0, 3, 1, 2);
+		createRoom(shipRefId, 6, 4, 2, 2);
+		createRoom(shipRefId, 6, 6, 2, 1);              
+		createRoom(shipRefId, 3, 5, 2, 1);
+		createRoom(shipRefId, 1, 5, 2, 1);
+		createRoom(shipRefId, 0, 3, 1, 2);
 	}
 	
+	private void createDoors(int shipRefId){
+		
+		//vertical doors
+		createDoor(shipRefId, 14, 4, true);
+		createDoor(shipRefId, 12, 4, true);
+		createDoor(shipRefId, 12, 3, true);
+		createDoor(shipRefId, 10, 3, true);
+        createDoor(shipRefId, 8, 2, true);
+        createDoor(shipRefId, 8, 5, true);
+	    createDoor(shipRefId, 10, 4, true);
+		createDoor(shipRefId, 6, 3, true);
+        createDoor(shipRefId, 6, 4, true);
+		createDoor(shipRefId, 3, 2, true);
+		createDoor(shipRefId, 3, 5, true);
+        createDoor(shipRefId, 1, 4, true);
+        createDoor(shipRefId, 1, 3, true);
+		createDoor(shipRefId, 0, 3, true);
+        createDoor(shipRefId, 0, 4, true);
+		
+		//horizontal doors
+        createDoor(shipRefId, 8, 4, false);
+        createDoor(shipRefId, 7, 6, false);
+        createDoor(shipRefId, 7, 2, false);
+        createDoor(shipRefId, 4, 5, false);
+        createDoor(shipRefId, 4, 3, false);
+        createDoor(shipRefId, 2, 3, false);
+        createDoor(shipRefId, 2, 5, false);
+        createDoor(shipRefId, 6, 7, false);
+        createDoor(shipRefId, 7, 7, false);
+        createDoor(shipRefId, 6, 1, false);
+        createDoor(shipRefId, 7, 1, false);
+	}
+	
+	private void createCrew(int shipRefId){
+		createCrewMember(shipRefId, 14, 3);
+		createCrewMember(shipRefId, 5, 3);
+		createCrewMember(shipRefId, 1, 4);
+	}
 }
 
 PropertyOVDBlueprint create() {

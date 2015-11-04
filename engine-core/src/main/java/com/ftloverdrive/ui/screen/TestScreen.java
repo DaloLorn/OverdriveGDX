@@ -12,7 +12,6 @@ import com.ftloverdrive.blueprint.incident.ConsequenceDamageBlueprint;
 import com.ftloverdrive.blueprint.incident.ConsequenceResourceBlueprint;
 import com.ftloverdrive.blueprint.incident.IncidentBlueprint;
 import com.ftloverdrive.blueprint.incident.PlotBranchBlueprint;
-import com.ftloverdrive.blueprint.ship.TestShipBlueprint;
 import com.ftloverdrive.core.OverdriveContext;
 import com.ftloverdrive.event.game.GamePlayerShipChangeEvent;
 import com.ftloverdrive.event.game.GamePlayerShipChangeListener;
@@ -29,7 +28,6 @@ import com.ftloverdrive.event.ship.ShipPropertyListener;
 import com.ftloverdrive.event.system.SystemPropertyListener;
 import com.ftloverdrive.model.DefaultPlayerModel;
 import com.ftloverdrive.model.PlayerModel;
-import com.ftloverdrive.model.incident.requirement.ShipRequirement;
 import com.ftloverdrive.ui.ShatteredImage;
 import com.ftloverdrive.ui.hud.*;
 import com.ftloverdrive.ui.ship.ShipActor;
@@ -209,7 +207,8 @@ public class TestScreen extends BaseScreen {
 				"Go to event 2. Also a branch with a very long selection text that hopefully will wrap correctly." );
 		incBlueprint.addPlotBranch( branchBlueprint );
 		branchBlueprint = new PlotBranchBlueprint( "TEST_INCIDENT_3", "(Test Ship) Need moar scrap!" );
-		branchBlueprint.addRequirement( new ShipRequirement( TestShipBlueprint.class.getSimpleName() ) );
+		// TODO: fix the ship requirement
+		//branchBlueprint.addRequirement( new ShipRequirement( ShipBlueprint.class.getSimpleName() ) );
 		incBlueprint.addPlotBranch( branchBlueprint );
 		incBlueprint.addPlotBranch( new PlotBranchBlueprint() );
 

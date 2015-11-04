@@ -30,7 +30,7 @@ public abstract class ShipBlueprint extends PropertyOVDBlueprint {
 	}
 
 	/**
-	 * Creates ShipCreationsEvent and sends it the event manager.
+	 * Creates ShipCreationsEvent and sends it to the event manager.
 	 * @return
 	 * 		returns ship reference id
      */
@@ -49,9 +49,9 @@ public abstract class ShipBlueprint extends PropertyOVDBlueprint {
 	 * @param shipRefId
 	 * 			Id reference of ship to create room on.
 	 * @param x
-	 * 			X position of rooms first tile
+	 * 			X position of room's first tile
 	 * @param y
-	 * 			Y position of rooms first tile
+	 * 			Y position of room's first tile
 	 * @param w
 	 * 			width of room in tiles
 	 * @param h
@@ -68,9 +68,9 @@ public abstract class ShipBlueprint extends PropertyOVDBlueprint {
 	 * @param shipRefId
 	 * 			Id reference of ship to create room on.
 	 * @param x
-	 * 			X position of rooms first tile
+	 * 			X position of room's first tile
 	 * @param y
-	 * 			Y position of rooms first tile
+	 * 			Y position of room's first tile
 	 * @param w
 	 * 			width of room in tiles
 	 * @param h
@@ -90,9 +90,9 @@ public abstract class ShipBlueprint extends PropertyOVDBlueprint {
 	 * @param shipRefId
 	 * 			Id reference of ship to create room on.
 	 * @param x
-	 * 			X position of rooms first tile
+	 * 			X position of room's first tile
 	 * @param y
-	 * 			Y position of rooms first tile
+	 * 			Y position of room's first tile
 	 * @param w
 	 * 			width of room in tiles
 	 * @param h
@@ -135,6 +135,84 @@ public abstract class ShipBlueprint extends PropertyOVDBlueprint {
 			blue.addSystemToRoom(shipRefId, roomRefId);
 		}
 
-		return 0;
+		return roomRefId;
+	}
+
+	/**
+	 * Create room from layout
+	 * @param shipRefId
+	 * 			Id reference of ship to create room on.
+	 * @param x
+	 * 			X position of room's first tile
+	 * @param y
+	 * 			Y position of room's first tile
+	 * @param roomLayout
+	 * 			pattern of room
+	 * 			Example:
+	 * 		 	 	roomLayout = "" + "d=w" + "\n" + "  c";
+     * @return
+     */
+	public int createRoomFromLayout(int shipRefId, int x, int y, String roomLayout){
+		int roomRefId = context.getNetManager().requestNewRefId();
+		/*String roomLayout = "" + "d=w" + "\n" + "  c";
+				*/
+		ShipCoordinate[] roomCoords = ShipLayout.createRoomCoords( x, y, roomLayout );
+
+		ShipRoomCreationEvent roomCreateEvent = Pools.get( ShipRoomCreationEvent.class ).obtain();
+		roomCreateEvent.init( roomRefId );
+		context.getScreenEventManager().postDelayedEvent( roomCreateEvent );
+
+		ShipLayoutRoomAddEvent roomAddEvent = Pools.get( ShipLayoutRoomAddEvent.class ).obtain();
+		roomAddEvent.init( shipRefId, roomRefId, roomCoords );
+		context.getScreenEventManager().postDelayedEvent( roomAddEvent );
+
+		ShipLayoutSystemIconAddEvent iconAddEvent = Pools.get( ShipLayoutSystemIconAddEvent.class ).obtain();
+		// TODO: fix icon offset
+		iconAddEvent.init( shipRefId, roomRefId, x, y );
+		context.getScreenEventManager().postDelayedEvent( iconAddEvent );
+		return roomRefId;
+	}
+
+	public int createDoor(int shipRefId, int x, int y, boolean vertical){
+		ShipCoordinate doorCoords = null;
+
+		int doorRefId = context.getNetManager().requestNewRefId();
+
+		if(vertical == true){
+			doorCoords = ShipCoordinate.doorVertical(x, y)[0];
+		}
+		else{
+			doorCoords = ShipCoordinate.doorHorizontal(x, y)[0];
+		}
+
+		ShipDoorCreationEvent doorCreateEvent = Pools.get( ShipDoorCreationEvent.class ).obtain();
+		doorCreateEvent.init( doorRefId );
+		context.getScreenEventManager().postDelayedEvent( doorCreateEvent );
+
+		ShipLayoutDoorAddEvent doorAddEvent = Pools.get( ShipLayoutDoorAddEvent.class ).obtain();
+		doorAddEvent.init( shipRefId, doorRefId, doorCoords );
+		context.getScreenEventManager().postDelayedEvent( doorAddEvent );
+
+		return doorRefId;
+	}
+
+	// TODO: create crew member from blueprint
+	public int createCrewMember(int shipRefId, int x, int y){
+		int crewRefId = context.getNetManager().requestNewRefId();
+		ShipCrewCreationEvent crewCreateEvent = Pools.get( ShipCrewCreationEvent.class ).obtain();
+		crewCreateEvent.init( crewRefId );
+		context.getScreenEventManager().postDelayedEvent( crewCreateEvent );
+
+		ShipCrewAddEvent crewAddEvent = Pools.get( ShipCrewAddEvent.class ).obtain();
+		crewAddEvent.init( shipRefId, crewRefId );
+		context.getScreenEventManager().postDelayedEvent( crewAddEvent );
+
+		ShipLayoutCrewPlacementEvent crewPlaceEvent = Pools.get( ShipLayoutCrewPlacementEvent.class ).obtain();
+		ShipCoordinate coord = Pools.get( ShipCoordinate.class ).obtain();
+		coord.init( x, y, ShipCoordinate.TYPE_SQUARE );
+		crewPlaceEvent.init( shipRefId, crewRefId, coord );
+		context.getScreenEventManager().postDelayedEvent( crewPlaceEvent );
+
+		return crewRefId;
 	}
 }
